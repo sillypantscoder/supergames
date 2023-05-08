@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<style>
+#hint {
+	margin: 1em;
+	border: 1px solid black;
+	padding: 1em;
+	background: #99ffed;
+}
+#hint a {
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 1em;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab selected">Profile: {{NAME}}</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+		</div>
+		<div class="rm" id="stuff"></div>
+		<h1>Profile: <b>{{NAME}}</b></h1>
+		<h2 class="rm">Info</h2>
+		<div class="rm physics">This is profile number <span id="profilen"></span>.</div>
+		<div class="rm physics">Joined on <span id="joindate"></span></div>
+		<h2 id="header">Stats</h2>
+		<table class="rm">
+			<tbody>
+				<tr>
+					<th>Leaderboard</th>
+					<th>Points</th>
+					<th>Badges</th>
+					<th>Leaderboard ranking</th>
+				</tr>
+			</tbody>
+		</table>
+		<div class="rm physics" id="hint">
+			<h2>Hey!</h2>
+			<p>It looks like you haven't done anything yet. To get badges, you need to submit your scores from various games. Use the link below to submit scores!</p>
+			<p style="padding: 1em;"><a href="https://docs.google.com/forms/d/e/1FAIpQLSc58l5O1rnrituu9xOfaD-vZZjgaLCCF73MaljxQGQM-7jy9w/viewform?usp=sf_link">Submit your scores!</a></p>
+			<p>Once your submission is accepted, this message will go away. You can find that button on the home page (second-to-right button).</p>
+		</div>
+		<script src="/data.js"></script>
+		<script>
+(() => {
+	if ([/*"Epicrafter", */"General Hunter"].includes("{{NAME}}") || location.search == "?bored") {
+		var x = new XMLHttpRequest()
+		x.open("GET", "/bored.txt")
+		x.addEventListener("loadend", (e) => {
+			document.querySelector("#stuff").innerText = e.target.responseText
+		})
+		x.send()
+	}
+})();
+getData().then((info) => {
+	var this_user_obj = info.getUserObject("{{NAME}}")
+	var userlist = info.getUserList()
+	if (! userlist.includes("{{NAME}}")) {
+		// Invalid profile...
+		document.querySelectorAll(".rm").forEach((e) => e.remove())
+		document.querySelector("#header").innerText = "The profile does not exist. Use one of the tabs at the top to get back to a real page."
+		return;
+	}
+	document.querySelector("#profilen").innerText = ((userlist.length - 1) - userlist.indexOf("{{NAME}}")) + 1
+	var join_date = new Date(this_user_obj.date + "T08:00")
+	document.querySelector("#joindate").innerText = `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][join_date.getDay()]}, ${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][join_date.getMonth()]} ${join_date.getDate()}, ${join_date.getFullYear()}`
+	// Get data
+	var eventlist = info.getEventList("{{NAME}}")
+	for (var eventno = 0; eventno < eventlist.length; eventno++) {
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].appendChild(document.createElement("a"))
+				e.children[0].children[0].href = "/leaderboard/" + eventlist[eventno]
+				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[0].children[0].innerText = eventlist[eventno]
+		e.appendChild(document.createElement("td"))
+			e.children[1].setAttribute("style", "text-align: right;")
+			e.children[1].innerText = addCommas(info.getScore("{{NAME}}", eventlist[eventno]))
+		e.appendChild(document.createElement("td"))
+			var badgeno = info.getBadgeCount("{{NAME}}", eventlist[eventno])
+			for (var i = 0; i < badgeno; i++) {
+				e.children[2].innerHTML += `<a href="/badges/${eventlist[eventno]}/${i}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
+			}
+		e.appendChild(document.createElement("td"))
+			var i = info.getLeaderboardRanks(eventlist[eventno]).indexOf("{{NAME}}")
+			var s = "<span class='outline'"
+			if (i < 3) s += " style='"
+			else s += " style='font-size: 0.8em; opacity: 0.7; "
+			s += `color: ${getColor(i)};`
+			s += "'>"
+			e.children[3].innerHTML = `${s}${i + 1}${getSuffix(i + 1)} place</span>`
+		document.querySelector("table tbody").appendChild(e)
+	}
+	// badge leaderboard
+	var badgeranks = info.getBadgeTypeCounts()
+	for (var i = 0; i < badgeranks.length; i++) {
+		if (badgeranks[i][0] == "{{NAME}}") {
+			var e = document.createElement("tr")
+			e.appendChild(document.createElement("td"))
+				e.children[0].setAttribute("colspan", "3")
+				e.children[0].innerText = "Badge Leaderboard"
+			e.appendChild(document.createElement("td"))
+				e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(i)};">${i + 1}${getSuffix(i + 1)} place</b>`
+			document.querySelector("table tbody").appendChild(e)
+		}
+	}
+	// Hint
+	if (document.querySelector("table tbody").children.length <= 2) {
+	} else {
+		document.querySelector("#hint").remove()
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

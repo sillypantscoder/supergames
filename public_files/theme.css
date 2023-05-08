@@ -1,0 +1,59 @@
+body {
+	background: #3bb0b7;
+	background: linear-gradient(180deg, #44e494 0%, #3bb0b7 100%) no-repeat, linear-gradient(0deg, #3bb0b7 0%, #3bb0b7 100%) repeat;
+}
+.tabs img {
+	max-height: 3em;
+	margin-left: 1em;
+}
+.tabs {
+	/* background: #44e494; */
+	padding-top: 1em;
+	display: flex;
+	flex-direction: row;
+	border-bottom: 2px solid #666;
+}
+.tab {
+	position: relative;
+	bottom: -2px;
+}
+.tab {
+	background: #03fccf;
+	display: inline-block;
+	border: 2px solid #666;
+	padding: 1em;
+	margin-left: 1em;
+	color: black;
+	text-decoration: none;
+}
+.tab.selected, .tab:hover {
+	background: #99ffed;
+}
+.tab.selected {
+	border-bottom: 2px solid #99ffed;
+}
+
+
+
+@font-face {
+	font-family: 'Jellee';
+	src: url('/Jellee-Roman.otf') format('opentype');
+}
+h1, h2, .outline {
+	color: white;
+	text-shadow:
+		-1px -1px 0 #000,
+		-1px 0px 0 #000,
+		-1px 1px 0 #000,
+		0px -1px 0 #000,
+		0px 1px 0 #000,
+		1px -1px 0 #000,
+		1px 0px 0 #000,
+		1px 1px 0 #000;
+	font-family: 'Jellee';
+	font-weight: 400;
+}
+h2 {
+	font-size: 1em;
+	color: #66b3e3;
+}

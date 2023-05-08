@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab selected">Leaderboard for {{NAME}}</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+		</div>
+		<h1>Leaderboard for <b>{{NAME}}</b></h1>
+		<table>
+			<tr>
+				<th>Name</th>
+				<th>Score</th>
+				<th>Badges</th>
+			</tr>
+		</table>
+		<h2>Badges for {{NAME}}</h2>
+		<div id="badges"></div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	var ranks = info.getLeaderboardRanks("{{NAME}}")
+	var i = 0;
+	for (; i < ranks.length; i++) {
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].appendChild(document.createElement("a"))
+				e.children[0].children[0].href = "/profile/" + ranks[i]
+				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[0].children[0].innerText = ranks[i]
+		e.appendChild(document.createElement("td"))
+			e.children[1].classList.add("outline")
+			e.children[1].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
+			e.children[1].innerText = addCommas(info.getScore(ranks[i], "{{NAME}}"))
+		e.appendChild(document.createElement("td"))
+			// Badges
+			var badgeno = info.getBadgeCount(ranks[i], "{{NAME}}")
+			for (var x = 0; x < badgeno; x++) {
+				e.children[2].innerHTML += `<a href="/badges/{{NAME}}/${x}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
+			}
+		document.querySelector("table tbody").appendChild(e)
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+;(() => {
+	var e = document.querySelector("#badges") // NVAPREMU
+	e.innerHTML += `<a href="/badges/{{NAME}}/0"><div class="badge badge-bronze">N</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/1"><div class="badge badge-bronze">V</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/2"><div class="badge badge-bronze">A</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/3"><div class="badge badge-silver">P</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/4"><div class="badge badge-silver">R</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/5"><div class="badge badge-gold">E</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/6"><div class="badge badge-gold">M</div></a>`
+	e.innerHTML += `<a href="/badges/{{NAME}}/7"><div class="badge badge-platinum">U</div></a>`
+})();
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

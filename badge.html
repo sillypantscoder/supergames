@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<style>
+h2 {
+	color: white;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab selected">{{SRANK}} {{SNAME}}</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+		</div>
+		<h1><b>{{SRANK}} {{SNAME}}</b> badge</h1>
+		<div id="badge_desc" class="physics"></div>
+		<div>
+			<h2>Owners of this badge:</h2>
+			<ul id="owners"></ul>
+		</div>
+		<div>
+			<h2>Leaderboard</h2>
+			<a href="/leaderboard/{{NAME}}" style="color: rgb(0, 0, 200);" class="physics">Show leaderboard for {{SNAME}}</a>
+		</div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	var badge_value = info.badge_values["{{NAME}}"][{{RANK}}]
+	var badge_desc = info.badge_values["{{NAME}}"][8]
+	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", addCommas(badge_value))}`
+	// owners
+	var owners = info.getBadgeOwners("{{NAME}}", {{RANK}})
+	for (var i = 0; i < owners.length; i++) {
+		var e = document.createElement("li")
+		e.appendChild(document.createElement("a"))
+			e.children[0].href = "/profile/" + owners[i]
+			e.children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+			e.children[0].appendChild(document.createElement("b"))
+				e.children[0].children[0].innerText = owners[i]
+		e.appendChild(document.createElement("span"))
+			e.children[1].innerText = ` with ${addCommas(info.getScore(owners[i], "{{NAME}}"))} points`
+		document.querySelector("#owners").appendChild(e)
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

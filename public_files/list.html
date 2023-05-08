@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<style>
+#buttons a {
+	display: inline-block;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+	border: 1px solid #666;
+	margin: 1em;
+	padding: 1em;
+	border-radius: 1em;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab selected">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+		</div>
+		<h1>Leaderboard List</h1>
+		<div id="buttons">Loading leaderboard list...</div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	document.querySelector("#buttons").innerText = ""
+	var keys = Object.keys(info.badge_values)
+	for (var i = 0; i < keys.length; i++) {
+		var e = document.createElement("a")
+		e.innerText = keys[i]
+		e.href = "/leaderboard/" + keys[i]
+		document.querySelector("#buttons").appendChild(e)
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

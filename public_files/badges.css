@@ -1,0 +1,23 @@
+.badge {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	border-radius: 50%;
+	color: white;
+	font-family: sans-serif;
+	text-align: center;
+	line-height: 1em;
+	margin-right: 0.1em;
+}
+.badge-bronze {
+	background: #823c19;
+}
+.badge-silver {
+	background: #948f8d;
+}
+.badge-gold {
+	background: #827b19;
+}
+.badge-platinum {
+	background: #00c8c8;
+}

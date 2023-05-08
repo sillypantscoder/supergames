@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<style>
+.badge {
+	margin-left: 0.8em;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab selected">Badge Leaderboard</a>
+		</div>
+		<h1>Badge Leaderboard</h1>
+		<!--<div>
+			<ol id="badges"></ol>
+		</div>
+		<h3>Testing...</h3>-->
+		<div>
+			<table id="badges2">
+				<tbody></tbody>
+			</table>
+		</div>
+		<h2>Totals</h2>
+		<div id="stats"></div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	var list_data = info.getBadgeTypeCounts()
+	for (var i = 0; i < list_data.length; i++) {
+		var username = list_data[i][0]
+		var counts = list_data[i][1]
+		// Create the element
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].setAttribute("style", "text-align: right;")
+			e.children[0].appendChild(document.createElement("a"))
+				e.children[0].children[0].href = "/profile/" + username
+				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[0].children[0].innerText = username
+		e.appendChild(document.createElement("td"))
+			e.children[1].innerHTML = "<div class='badge badge-bronze'></div>" + counts[0]
+		e.appendChild(document.createElement("td"))
+			e.children[2].innerHTML = "<div class='badge badge-silver'></div>" + counts[1]
+		e.appendChild(document.createElement("td"))
+			e.children[3].innerHTML = "<div class='badge badge-gold'></div>" + counts[2]
+		e.appendChild(document.createElement("td"))
+			e.children[4].innerHTML = "<div class='badge badge-platinum'></div>" + counts[3]
+		document.querySelector("#badges2 tbody").appendChild(e)
+	}
+	// Statistics
+	var total_badges = info.getTotalBadgeCounts()
+	var total_users = info.getUserList().length
+	document.querySelector("#stats").innerHTML =
+		`<div class="physics">Total awarded badges of each type:</div>` +
+		`<span class="physics"><div class='badge badge-bronze'></div>${total_badges[0]}</span> <span class="physics"><div class='badge badge-silver'></div>${total_badges[1]}</span> <span class="physics"><div class='badge badge-gold'></div>${total_badges[2]}</span> <span class="physics"><div class='badge badge-platinum'></div>${total_badges[3]}</span><br>` +
+		`<div class="physics">Total number of awarded badges: <b>${total_badges[0] + total_badges[1] + total_badges[2] + total_badges[3]}</b></div>` +
+		`<div class="physics">Total number of users: <b>${total_users}</b></div>` +
+		`<div class="physics">Average number of badges per user: <b>${Math.round(((total_badges[0] + total_badges[1] + total_badges[2] + total_badges[3]) / total_users) * 10) / 10}</b></div>` +
+		`<div class="physics">Average number of badges of each type per user:</div>` +
+		`<span class="physics"><div class='badge badge-bronze'></div>${Math.round((total_badges[0] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-silver'></div>${Math.round((total_badges[1] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-gold'></div>${Math.round((total_badges[2] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-platinum'></div>${Math.round((total_badges[3] / total_users) * 100) / 100}</span>`
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

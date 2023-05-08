@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<style>
+p {
+	margin: 1em;
+	padding-left: 1em;
+	border-left: 10px solid black;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+			<a class="tab selected">Updates</a>
+		</div>
+		<h1>List of updates</h1>
+		<h2 class="physics">April 12, 2023 - Version 2.0 - <b>Code Redo</b></h2>
+		<p class="physics">I completely redid the code for getting statistics from the files. Now you'll see all sorts of statistics popping up in all kinds of places!</p>
+		<script>window.addEventListener("error", (e) => alert(`${e.message} :${e.lineno}`))</script>
+		<script>
+Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
+Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
+
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<style>
+.badge {
+	margin-left: 0.8em;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab selected">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+		</div>
+		<h1>Badges</h1>
+		<table>
+			<tr>
+				<th>Badge Name</th>
+				<th>Novice</th>
+				<th>Vassal</th>
+				<th>Apprentice</th>
+				<th>Prospect</th>
+				<th>Artisan</th>
+				<th>Expert</th>
+				<th>Master</th>
+				<th>Ultimate Master</th>
+			</tr>
+		</table>
+		<h2>Badge value info</h2>
+		<div>
+			<div class="physics" style="color: #823c19;">Bronze badges are meant to be possible for anyone to earn who gives a little bit of effort. Have a try.</div>
+			<div class="physics" style="color: #948f8d;">Silver badges take a little bit more effort and time. You're going to need to spend some time here.</div>
+			<div class="physics" style="color: #827b19;">Gold badges are awarded to the very best of players. The masters.</div>
+			<div class="physics" style="color: #00ffff;">There is nothing so rare, so pure as one of these platinum badges. Only a selected few ever reach this level of greatness!!!</div>
+		</div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	var data = info.badge_values
+	var names = Object.keys(data)
+	for (var i = 0; i < names.length; i++) {
+		var e = document.createElement("tr")
+		var n = document.createElement("td")
+		n.innerText = names[i]
+		e.appendChild(n)
+		for (var x = 0; x < data[names[i]].length - 1; x++) {
+			var n = document.createElement("td")
+			n.innerText = data[names[i]][x]
+			n.innerText = addCommas(n.innerText)
+			var bl = document.createElement("a")
+			bl.href = "/badges/" + names[i] + "/" + x
+			n.appendChild(bl)
+			var b = document.createElement("div")
+			b.classList.add("badge")
+			b.classList.add("badge-" + ["bronze", "bronze", "bronze", "silver", "silver", "gold", "gold", "platinum"][x])
+			b.innerText = "NVAPREMU"[x]
+			bl.appendChild(b)
+			e.appendChild(n)
+		}
+		document.querySelector("table tbody").appendChild(e)
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

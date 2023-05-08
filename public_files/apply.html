@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<style>
+body {
+	min-height: 50vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+img {
+	max-width: 25vw;
+	margin: 2em;
+	margin-top: 4em;
+}
+h1, h2 {
+	margin: 2em;
+}
+h1 {
+	margin-bottom: 0.5em;
+	letter-spacing: 0.1em;
+}
+h2 {
+	margin-top: 0.5em;
+	font-size: 1em;
+}
+		</style>
+		<style>
+button {
+	background: #44e494;
+	color: white;
+	width: 80vw;
+	padding: 1.5em;
+	background: linear-gradient(90deg, transparent 0%, #44e494 50%, transparent 100%);
+	border: none;
+	margin: 2em 0;
+}
+		</style>
+	</head>
+	<body>
+		<img src="/logo.png">
+		<h1>SUPERGAMES</h1>
+		<h2>Apply now!</h2>
+		<div><b class="outline">Username: </b><input type="text" id="username"></div>
+		<div><b class="outline">Email address: </b><input type="email" id="email"></div>
+		<div><button class="outline" onclick="submit()">SUBMIT</button></div>
+		<script src="/background.js"></script>
+		<script>
+if (location.search.startsWith("?u=")) {
+	document.querySelector("h2").innerText = "Thank you for your application!"
+	document.querySelectorAll("body > div").forEach((e) => e.remove())
+	var e = document.createElement("div")
+	e.innerHTML = "Thanks for signing up, <b id='name'></b>! Your application will be reviewed and submitted shortly. <a style='color: rgb(0, 0, 200);'>Here's your profile page</a>, but you will have to wait until it is created!"
+	e.querySelector("#name").innerText = location.search.substring(3)
+	e.querySelector("a").setAttribute("href", "/profile/" + location.search.substring(3))
+	document.body.appendChild(e)
+	var e = document.createElement("a")
+	e.innerHTML = "Back home"
+	e.setAttribute("style", "margin: 1em; padding: 1em; border: 1px solid black; border-radius: 1em; color: black; text-decoration: none; background: #03fccf;")
+	e.setAttribute("href", "/")
+	document.body.appendChild(e)
+}
+function submit() {
+	var username = document.querySelector("#username").value
+	var email = document.querySelector("#email").value
+	if (username.length < 3) {
+		alert("Username must be at least 3 characters long")
+	} else if (username.length >= 15) {
+		alert("Username must be at most 15 characters long")
+	} else if (email != "" && email.match(/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/ig) == null) {
+		// Require RFC 2822 compliant email address
+		alert("Please enter a well-formed email address")
+	} else {
+		var x = new XMLHttpRequest()
+		x.open("POST", "/add_application")
+		x.addEventListener("loadend", (e) => {
+			location.replace("/apply.html?u=" + username)
+		})
+		x.send(username + "\n" + email)
+	}
+}
+		</script>
+	</body>
+</html>
