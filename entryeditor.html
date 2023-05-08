@@ -7,6 +7,10 @@
 		<div>Event: <select id="eventname"></select></div>
 		<div>Username: <select id="username"></select></div>
 		<div>Score: <input type="number" min="0" step="1" id="score"></div>
+		<div>Mode: <select id="mode">
+			<option value="add">Add</option>
+			<option value="replace">Replace</option>
+		</select></div>
 		<div><button onclick="go()">Submit</button></div>
 		<script>window.addEventListener("error", (e) => alert(`${e.message}`))</script>
 		<script>
@@ -39,7 +43,7 @@ x.send()
 function go() {
 	var x = new XMLHttpRequest()
 	x.open("POST", "/addentry")
-	x.send(`${eventname.value}\n${username.value}\n${score.value}`)
+	x.send(`${eventname.value}\n${username.value}\n${score.value}\n${mode.value}`)
 }
 		</script>
 	</body>

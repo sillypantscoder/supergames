@@ -132,13 +132,14 @@ def post(path, body):
 		eventname = bodydata[0]
 		username = bodydata[1]
 		score = bodydata[2]
+		mode = bodydata[3]
 		if eventname in data:
 			for d in data[eventname]:
 				if d[0] == username:
 					# Update existing entry
-					print(f"Updated entry for event: {eventname} user: {username} old score: {d[1]} new score: {score}")
-					d[1] += float(score)
-					#d[1] = max(d[1], float(score))
+					print(f"Updated entry for event: {eventname} user: {username} old score: {d[1]} new score: {score} mode: {mode}")
+					if mode == "add": d[1] += float(score)
+					else: d[1] = max(d[1], float(score))
 					finished = True
 			if not finished:
 				# Create new entry
