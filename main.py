@@ -139,7 +139,7 @@ def post(path, body):
 					# Update existing entry
 					print(f"Updated entry for event: {eventname} user: {username} old score: {d[1]} new score: {score} mode: {mode}")
 					if mode == "add": d[1] += float(score)
-					else: d[1] = max(d[1], float(score))
+					else: d[1] = float(score)
 					d[2] = datetime.datetime.now().isoformat()
 					finished = True
 			if not finished:
