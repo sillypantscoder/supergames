@@ -44,16 +44,16 @@
 		<script src="/data.js"></script>
 		<script>
 getData().then((info) => {
-	var data = info.badge_values
-	var names = Object.keys(data)
+	var names = Object.keys(info.data)
 	for (var i = 0; i < names.length; i++) {
 		var e = document.createElement("tr")
 		var n = document.createElement("td")
 		n.innerText = names[i]
 		e.appendChild(n)
-		for (var x = 0; x < data[names[i]].length - 1; x++) {
+		var badge_set = info.data[names[i]].badges
+		for (var x = 0; x < badge_set.length; x++) {
 			var n = document.createElement("td")
-			n.innerText = data[names[i]][x]
+			n.innerText = badge_set[x]
 			n.innerText = addCommas(n.innerText)
 			var bl = document.createElement("a")
 			bl.href = "/badges/" + names[i] + "/" + x

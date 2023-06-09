@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html>
-	<head></head>
+	<head>
+		<style>
+#result {
+	font-family: monospace;
+	white-space: pre;
+	tab-size: 4;
+}
+		</style>
+	</head>
 	<body>
 		<div><a href="/list.html" style="color: rgb(0, 0, 200);">Main Website</a></div>
 		<h1>Entry Editor</h1>
 		<div>Event: <select id="eventname"></select></div>
 		<div>Username: <select id="username"></select></div>
+		<div><button onclick="document.querySelector('#score').value = getScore()">Get score (based on event name and username)</button></div>
 		<div>Score: <input type="number" min="0" step="1" id="score"></div>
 		<div>Mode: <select id="mode">
 			<option value="add">Add</option>
@@ -13,6 +22,7 @@
 			<option value="max">Max</option>
 		</select></div>
 		<div><button onclick="go()">Submit</button></div>
+		<div id="result"></div>
 		<script>window.addEventListener("error", (e) => alert(`${e.message}`))</script>
 		<script>
 var x = new XMLHttpRequest()
@@ -28,10 +38,12 @@ x.addEventListener("loadend", (e) => {
 	}
 })
 x.send()
+var data = {}
 var x = new XMLHttpRequest()
 x.open("GET", "data.json")
 x.addEventListener("loadend", (e) => {
 	var obj_event_list = Object.keys(JSON.parse(e.target.responseText))
+	data = JSON.parse(e.target.responseText)
 	obj_event_list.reverse()
 	for (var i = obj_event_list.length - 1; i >= 0; i--) {
 		var e = document.createElement("option")
@@ -44,7 +56,20 @@ x.send()
 function go() {
 	var x = new XMLHttpRequest()
 	x.open("POST", "/addentry")
+	x.addEventListener("loadend", (e) => {
+		document.body.querySelector("#result").innerText = e.target.responseText
+	})
 	x.send(`${eventname.value}\n${username.value}\n${score.value}\n${mode.value}`)
+}
+function getScore() {
+	var user = username.value
+	var event = eventname.value
+	// copied from data.js
+	var event_info = data[event].entries
+	for (var i = 0; i < event_info.length; i++) {
+		var entry_info = event_info[i]
+		if (entry_info[0] == user) return entry_info[1]
+	}
 }
 		</script>
 	</body>

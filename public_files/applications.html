@@ -18,7 +18,7 @@
 	x.open("GET", "/applications.txt")
 	x.addEventListener("loadend", (e) => {
 		var t = e.target.responseText
-		var h = t.replaceAll(/(Username: ([A-Za-z0-9 \._]+)\nEmail address: ([A-Za-z0-9@\.]+)\n)(?!\[(Rejected|Accepted)\])/ig, "$1<button onclick=\"createprofile('$2', '$3')\">Accept</button><button onclick=\"rejectprofile('$2', '$3')\">Reject</button>\n")
+		var h = t.replaceAll(/(Username: ([A-Za-z0-9 \._]+)\nEmail address: ([A-Za-z0-9@\.]+)?\n)(?!\[(Rejected|Accepted)\])/ig, "$1<button onclick=\"createprofile('$2', '$3')\">Accept</button><button onclick=\"rejectprofile('$2', '$3')\">Reject</button>\n")
 		h = h.replaceAll(/^\n*$/ig, "There are no applications at the moment.")
 		if (h == t) h += "\nThere are no valid applications at the moment."
 		document.querySelector("#output").innerHTML = h
@@ -28,11 +28,13 @@ x.send()
 function createprofile(username, email) {
 	var x = new XMLHttpRequest()
 	x.open("POST", "/createuser")
+	x.addEventListener("loadend", () => location.reload())
 	x.send(`${username}\n${email}`)
 }
 function rejectprofile(username, email) {
 	var x = new XMLHttpRequest()
 	x.open("POST", "/rejectprofile")
+	x.addEventListener("loadend", () => location.reload())
 	x.send(`${username}\n${email}`)
 }
 		</script>

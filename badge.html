@@ -34,8 +34,8 @@ h2 {
 		<script src="/data.js"></script>
 		<script>
 getData().then((info) => {
-	var badge_value = info.badge_values["{{NAME}}"][{{RANK}}]
-	var badge_desc = info.badge_values["{{NAME}}"][8]
+	var badge_value = info.data["{{NAME}}"].badges[{{RANK}}]
+	var badge_desc = info.data["{{NAME}}"].desc
 	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", addCommas(badge_value))}`
 	// owners
 	var owners = info.getBadgeOwners("{{NAME}}", {{RANK}})

@@ -1,9 +1,19 @@
 {
-	"Example": [
-		[
+	"Example": {
+		"badges": [1,
+			10,
+			100,
+			1000,
+			10000,
+			100000,
+			1000000,
+			10000000
+		],
+		"desc": "Get %s points in something or rather",
+		"entries": [
 			"test user",
 			49,
 			"2023-05-22T13:59:12.794Z"
 		]
-	]
+	}
 }

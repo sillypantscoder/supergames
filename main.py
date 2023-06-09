@@ -3,6 +3,7 @@ import os
 import time
 import json
 import datetime
+import traceback
 
 vandalize = False
 
@@ -126,34 +127,43 @@ def get(path):
 
 def post(path, body):
 	if path == "/addentry":
-		data = json.loads(read_file("public_files/data.json"))
-		finished = False
-		bodydata = body.decode("UTF-8").split("\n")
-		eventname = bodydata[0]
-		username = bodydata[1]
-		score = bodydata[2]
-		mode = bodydata[3]
-		if eventname in data:
-			for d in data[eventname]:
-				if d[0] == username:
-					# Update existing entry
-					print(f"Updated entry for event: {eventname} user: {username} old score: {d[1]} new score: {score} mode: {mode}")
-					if mode == "add": d[1] += float(score)
-					elif mode == "replace": d[1] = float(score)
-					else: d[1] = max(d[1], float(score))
-					d[2] = datetime.datetime.now().isoformat()
-					finished = True
-			if not finished:
-				# Create new entry
-				print(f"Creating entry for event: {eventname} user: {username} new score: {score}")
-				data[eventname].append([username, float(score)])
-		else:
-			print(f"ERROR: Unknown event: {eventname} (user = {username}; score = {score})")
-		write_file("public_files/data.json", json.dumps(data, indent='\t'))
+		update = "There was an error and no entries were updated."
+		try:
+			data = json.loads(read_file("public_files/data.json"))
+			finished = False
+			bodydata = body.decode("UTF-8").split("\n")
+			eventname = bodydata[0]
+			username = bodydata[1]
+			score = bodydata[2]
+			mode = bodydata[3]
+			if eventname in data:
+				for d in data[eventname]["entries"]:
+					if d[0] == username:
+						# Update existing entry
+						update = f"Updated entry\n\tevent: {eventname}\n\tuser: {username}\n\told score: {d[1]}\n\tnew score: {score}\n\tmode: {mode}"
+						if mode == "add": d[1] += float(score)
+						elif mode == "replace": d[1] = float(score)
+						else: d[1] = max(d[1], float(score))
+						d[2] = datetime.datetime.now().isoformat()
+						update += f"\n\tregistered score: {d[1]}"
+						finished = True
+				if not finished:
+					# Create new entry
+					update = f"Created entry\n\tevent: {eventname}\n\tuser: {username}\n\tnew score: {score}"
+					data[eventname]["entries"].append([username, float(score), datetime.datetime.now().isoformat()])
+			else:
+				update += f"\n\nERROR: Unknown event: {eventname}\nRequest data:\n\tuser: {username}\n\tscore: {score}\n\tmode: {mode}"
+			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+		except Exception as e:
+			update += "\nError was:\n\n"
+			update += ''.join(traceback.format_exception(type(e), e, e.__traceback__))
+		print(update)
 		return {
-			"status": 301,
-			"headers": {},
-			"content": f""
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/plain"
+			},
+			"content": update
 		}
 	elif path == "/add_application":
 		bodydata = body.decode("UTF-8").split("\n")

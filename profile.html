@@ -48,11 +48,11 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="rm physics" id="hint">
+		<div class="rm physics" id="hint" style="display: none;">
 			<h2>Hey!</h2>
 			<p>It looks like you haven't done anything yet. To get badges, you need to submit your scores from various games. Use the link below to submit scores!</p>
 			<p style="padding: 1em;"><a href="https://docs.google.com/forms/d/e/1FAIpQLSc58l5O1rnrituu9xOfaD-vZZjgaLCCF73MaljxQGQM-7jy9w/viewform?usp=sf_link">Submit your scores!</a></p>
-			<p>Once your submission is accepted, this message will go away. You can find that button on the home page (second-to-right button).</p>
+			<p>Once your submission is accepted, this message will go away. You can find this button on the home page (second-to-right button).</p>
 		</div>
 		<script src="/data.js"></script>
 		<script>
@@ -120,8 +120,7 @@ getData().then((info) => {
 	}
 	// Hint
 	if (document.querySelector("table tbody").children.length <= 2) {
-	} else {
-		document.querySelector("#hint").remove()
+		document.querySelector("#hint").removeAttribute("style")
 	}
 })
 if (top != window) document.querySelector("#sites-tab").remove()

@@ -25,12 +25,10 @@ function getData() {
 	return new Promise((resolve) => {
 		var info = {
 			users: null,
-			badge_values: null,
 			data: null
 		}
 		function finish() {
 			if (info.users == null) return
-			if (info.badge_values == null) return
 			if (info.data == null) return
 			generateObject(info)
 		}
@@ -42,19 +40,12 @@ function getData() {
 		})
 		x1.send()
 		var x2 = new XMLHttpRequest()
-		x2.open("GET", "/badge_values.json")
+		x2.open("GET", "/data.json")
 		x2.addEventListener("loadend", (e) => {
-			info.badge_values = JSON.parse(e.target.responseText)
-			finish()
-		})
-		x2.send()
-		var x3 = new XMLHttpRequest()
-		x3.open("GET", "/data.json")
-		x3.addEventListener("loadend", (e) => {
 			info.data = JSON.parse(e.target.responseText)
 			finish()
 		})
-		x3.send()
+		x2.send()
 		// generator
 		function generateObject(info) {
 			function getUserList() {
@@ -64,7 +55,7 @@ function getData() {
 				}
 				return userlist
 			}
-			function getBadgeTypeCounts(user) {
+			function getBadgeTypeCounts() {
 				var userlist = getUserList()
 				var names = {}
 				for (var i = 0; i < userlist.length; i++) {
@@ -73,8 +64,8 @@ function getData() {
 				// 1. Loop over the different events
 				var eventnames = Object.keys(info.data)
 				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event = info.data[eventnames[eventno]]
-					var e_values = info.badge_values[eventnames[eventno]]
+					var event = 	info.data[eventnames[eventno]].entries
+					var e_values = 	info.data[eventnames[eventno]].badges
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
@@ -115,8 +106,8 @@ function getData() {
 				// 1. Loop over the different events
 				var eventnames = Object.keys(info.data)
 				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event = info.data[eventnames[eventno]]
-					var e_values = info.badge_values[eventnames[eventno]]
+					var event = 	info.data[eventnames[eventno]].entries
+					var e_values = 	info.data[eventnames[eventno]].badges
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
@@ -133,19 +124,19 @@ function getData() {
 				return badges
 			}
 			function getScore(user, event) {
-				var event_info = info.data[event]
+				var event_info = info.data[event].entries
 				for (var i = 0; i < event_info.length; i++) {
 					var entry_info = event_info[i]
 					if (entry_info[0] == user) return entry_info[1]
 				}
 			}
 			function getBadgeCount(user, event) {
-				var event_info = info.data[event]
+				var event_info = info.data[event].entries
 				for (var i = 0; i < event_info.length; i++) {
 					var entry_info = event_info[i]
 					if (entry_info[0] == user) {
 						// Get badges
-						var e_values = info.badge_values[event]
+						var e_values = info.data[event].badges
 						var n_badges = 0
 						if (entry_info[1] >= e_values[0]) n_badges += 1
 						if (entry_info[1] >= e_values[1]) n_badges += 1
@@ -161,11 +152,11 @@ function getData() {
 			}
 			function getBadgeOwners(event, level) {
 				var users = []
-				var event_info = info.data[event]
+				var event_info = info.data[event].entries
 				for (var i = 0; i < event_info.length; i++) {
 					var entry_info = event_info[i]
 					// Get badges
-					var e_values = info.badge_values[event]
+					var e_values = info.data[event].badges
 					var n_badges = 0
 					if (entry_info[1] >= e_values[level]) users.push(entry_info[0])
 				}
@@ -178,7 +169,7 @@ function getData() {
 				var events = []
 				var eventnames = Object.keys(info.data)
 				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event_info = info.data[eventnames[eventno]]
+					var event_info = info.data[eventnames[eventno]].entries
 					for (var i = 0; i < event_info.length; i++) {
 						var entry_info = event_info[i]
 						if (entry_info[0] == user) events.push(eventnames[eventno])
@@ -188,7 +179,7 @@ function getData() {
 			}
 			function getLeaderboardRanks(event) {
 				var users = {}
-				var event_info = info.data[event]
+				var event_info = info.data[event].entries
 				for (var i = 0; i < event_info.length; i++) {
 					var entry_info = event_info[i]
 					// Get score
@@ -236,7 +227,7 @@ function getData() {
 				getEventList,
 				getLeaderboardRanks,
 				getUserObject,
-				badge_values: info.badge_values
+				data: info.data
 			})
 		}
 	})
