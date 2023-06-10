@@ -66,8 +66,8 @@ function submit() {
 	var email = document.querySelector("#email").value
 	if (username.length < 3) {
 		alert("Username must be at least 3 characters long")
-	} else if (username.length >= 15) {
-		alert("Username must be at most 15 characters long")
+	} else if (username.length >= 30) {
+		alert("Username must be at most 30 characters long")
 	} else if (email != "" && email.match(/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/ig) == null) {
 		// Require RFC 2822 compliant email address
 		alert("Please enter a well-formed email address")

@@ -227,7 +227,8 @@ function getData() {
 				getEventList,
 				getLeaderboardRanks,
 				getUserObject,
-				data: info.data
+				data: info.data,
+				users: info.users
 			})
 		}
 	})

@@ -37,7 +37,7 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			e.children[0].classList.add("outline")
 			e.children[0].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
-			e.children[0].innerText = i + 1
+			e.children[0].innerText = String(i + 1) + getSuffix(i + 1)
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
 				e.children[1].children[0].href = "/profile/" + ranks[i]
