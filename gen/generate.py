@@ -1,27 +1,27 @@
 import json
 
 f = open("badges.csv", "r")
-d = [x.split(",") for x in f.read().split("\n")]
-f.close()
-
-obj = {}
-for line in d[1:]:
-	obj[line[0]] = [int(x) for x in line[1:-2]]
-	obj[line[0]].append(line[-2])
-
-f = open("../public_files/badge_values.json", "w")
-f.write(json.dumps(obj, indent='\t'))
+d = [x.split(",") for x in f.read().split("\n")[1:]]
 f.close()
 
 f = open("../public_files/data.json", "r")
-d = json.loads(f.read())
+data = json.loads(f.read())
 f.close()
 
-event_names = [*obj.keys()]
-for n in event_names:
-	if n not in d.keys():
-		d[n] = []
+newData = {}
+for line in d[1:]:
+	newData[line[0]] = {
+		"badges": [int(x) for x in line[1:-2]],
+		"desc": line[-2],
+		"entries": []
+	}
+
+for name in data:
+	if name not in newData.keys():
+		newData[name] = data[name]
+	else:
+		newData[name]["entries"] = data[name]["entries"]
 
 f = open("../public_files/data.json", "w")
-f.write(json.dumps(d, indent='\t'))
+f.write(json.dumps(newData, indent='\t'))
 f.close()

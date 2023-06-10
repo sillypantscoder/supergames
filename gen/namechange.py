@@ -21,9 +21,10 @@ d = json.loads(f.read())
 f.close()
 
 for eventname in d.keys():
-	for itemno in range(len(d[eventname])):
-		if d[eventname][itemno][0] == oldname:
-			d[eventname][itemno][0] = newname
+	entries = d[eventname]["entries"]
+	for itemno in range(len(entries)):
+		if entries[itemno][0] == oldname:
+			entries[itemno][0] = newname
 			print("Changed entry for event: " + eventname + " item: " + str(itemno))
 
 f = open("../public_files/data.json", "w")
