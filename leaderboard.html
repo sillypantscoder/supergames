@@ -22,7 +22,7 @@
 				<th>Rank</th>
 				<th>Name</th>
 				<th>Score</th>
-				<th>Badges</th>
+				<th id="badge_head">Badges</th>
 			</tr>
 		</table>
 		<h2>Badges for {{NAME}}</h2>
@@ -31,6 +31,10 @@
 		<script>
 getData().then((info) => {
 	var ranks = info.getLeaderboardRanks("{{NAME}}")
+	var is_specialty = info.data["{{NAME}}"].badges.length == 0
+	if (is_specialty) {
+		document.querySelector("#badge_head").remove()
+	}
 	var i = 0;
 	for (; i < ranks.length; i++) {
 		var e = document.createElement("tr")
@@ -47,27 +51,31 @@ getData().then((info) => {
 			e.children[2].classList.add("outline")
 			e.children[2].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
 			e.children[2].innerText = addCommas(info.getScore(ranks[i], "{{NAME}}"))
-		e.appendChild(document.createElement("td"))
+		if (!is_specialty) {
+			e.appendChild(document.createElement("td"))
 			// Badges
 			var badgeno = info.getBadgeCount(ranks[i], "{{NAME}}")
 			for (var x = 0; x < badgeno; x++) {
 				e.children[3].innerHTML += `<a href="/badges/{{NAME}}/${x}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
 			}
+		}
 		document.querySelector("table tbody").appendChild(e)
+	}
+	if (!is_specialty) {
+		var e = document.querySelector("#badges") // NVAPREMU
+		e.innerHTML += `<a href="/badges/{{NAME}}/0"><div class="badge badge-bronze">N</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/1"><div class="badge badge-bronze">V</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/2"><div class="badge badge-bronze">A</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/3"><div class="badge badge-silver">P</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/4"><div class="badge badge-silver">R</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/5"><div class="badge badge-gold">E</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/6"><div class="badge badge-gold">M</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/7"><div class="badge badge-platinum">U</div></a>`
+	} else {
+		document.querySelectorAll("#badges, :has( + #badges)").forEach((e) => e.remove())
 	}
 })
 if (top != window) document.querySelector("#sites-tab").remove()
-;(() => {
-	var e = document.querySelector("#badges") // NVAPREMU
-	e.innerHTML += `<a href="/badges/{{NAME}}/0"><div class="badge badge-bronze">N</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/1"><div class="badge badge-bronze">V</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/2"><div class="badge badge-bronze">A</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/3"><div class="badge badge-silver">P</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/4"><div class="badge badge-silver">R</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/5"><div class="badge badge-gold">E</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/6"><div class="badge badge-gold">M</div></a>`
-	e.innerHTML += `<a href="/badges/{{NAME}}/7"><div class="badge badge-platinum">U</div></a>`
-})();
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

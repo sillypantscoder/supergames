@@ -66,6 +66,7 @@ function getData() {
 				for (var eventno = 0; eventno < eventnames.length; eventno++) {
 					var event = 	info.data[eventnames[eventno]].entries
 					var e_values = 	info.data[eventnames[eventno]].badges
+					if (e_values.length == 0) continue; // Specialty leaderboard
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
@@ -108,6 +109,7 @@ function getData() {
 				for (var eventno = 0; eventno < eventnames.length; eventno++) {
 					var event = 	info.data[eventnames[eventno]].entries
 					var e_values = 	info.data[eventnames[eventno]].badges
+					if (e_values.length == 0) continue; // Specialty leaderboard
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
@@ -137,6 +139,7 @@ function getData() {
 					if (entry_info[0] == user) {
 						// Get badges
 						var e_values = info.data[event].badges
+						if (e_values.length == 0) return 0; // Specialty leaderboard
 						var n_badges = 0
 						if (entry_info[1] >= e_values[0]) n_badges += 1
 						if (entry_info[1] >= e_values[1]) n_badges += 1

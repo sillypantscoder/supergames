@@ -46,15 +46,15 @@
 getData().then((info) => {
 	var names = Object.keys(info.data)
 	for (var i = 0; i < names.length; i++) {
+		var badge_set = info.data[names[i]].badges
+		if (badge_set.length == 0) continue;
 		var e = document.createElement("tr")
 		var n = document.createElement("td")
-		n.innerText = names[i]
+		n.innerHTML = `<a href="/leaderboard/${names[i]}" style="color: rgb(0, 0, 200);">${names[i]}</a>`
 		e.appendChild(n)
-		var badge_set = info.data[names[i]].badges
 		for (var x = 0; x < badge_set.length; x++) {
 			var n = document.createElement("td")
-			n.innerText = badge_set[x]
-			n.innerText = addCommas(n.innerText)
+			n.innerText = addCommas(badge_set[x])
 			var bl = document.createElement("a")
 			bl.href = "/badges/" + names[i] + "/" + x
 			n.appendChild(bl)
@@ -63,6 +63,14 @@ getData().then((info) => {
 			b.classList.add("badge-" + ["bronze", "bronze", "bronze", "silver", "silver", "gold", "gold", "platinum"][x])
 			b.innerText = "NVAPREMU"[x]
 			bl.appendChild(b)
+			e.appendChild(n)
+		}
+		if (badge_set.length == 0) {
+			// Specialty leaderboard!
+			var n = document.createElement("td")
+			n.setAttribute("colspan", "8")
+			n.setAttribute("style", "opacity: 0.5; font-style: italic; text-align: center;")
+			n.innerText = `This is a specialty leaderboard; there are no badges`
 			e.appendChild(n)
 		}
 		document.querySelector("table tbody").appendChild(e)
