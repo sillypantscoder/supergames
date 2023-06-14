@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+	</head>
+	<body>
+		<div class="tabs">
+			<a href="/"><img src="/logo.png"></a>
+			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
+			<a class="tab" href="/list.html">Leaderboard List</a>
+			<a class="tab" href="/badges.html">Badges</a>
+			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
+			<a class="tab selected">ATH Leaderboard</a>
+		</div>
+		<h1>ATH Leaderboard</h1>
+		<div>
+			<table id="athl">
+				<tbody>
+					<tr>
+						<th>Name</th>
+						<th class="outline" style="color: #FF0;">1sts</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<script src="/data.js"></script>
+		<script>
+getData().then((info) => {
+	var users = info.getUserList()
+	var user_data = {}
+	for (var i = 0; i < users.length; i++) {
+		var user = users[i]
+		var firsts = 0
+		var eventlist = Object.keys(info.data)
+		for (var n = 0; n < eventlist.length; n++) {
+			var event = eventlist[n]
+			var ranks = info.getLeaderboardRanks(event)
+			var rank = ranks.indexOf(user)
+			if (rank == 0) firsts += 1
+		}
+		user_data[user] = firsts
+	}
+	users.sort((a, b) => {
+		if (user_data[a] < user_data[b]) {
+			return -1;
+		}
+		if (user_data[a] > user_data[b]) {
+			return 1;
+		}
+		// a must be equal to b
+		return 0;
+	})
+	users.reverse()
+	for (var i = 0; i < users.length; i++) {
+		var user = users[i]
+		var firsts = user_data[user]
+		// Create the element
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].setAttribute("style", "text-align: right;")
+			e.children[0].appendChild(document.createElement("a"))
+				e.children[0].children[0].href = "/profile/" + user
+				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[0].children[0].innerText = user
+		e.appendChild(document.createElement("td"))
+			e.children[1].setAttribute("class", "outline")
+			e.children[1].setAttribute("style", `color: ${getColor(i)};`)
+			e.children[1].innerHTML = addCommas(firsts)
+		document.querySelector("#athl tbody").appendChild(e)
+	}
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

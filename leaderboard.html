@@ -21,7 +21,7 @@
 			<tr>
 				<th>Rank</th>
 				<th>Name</th>
-				<th>Score</th>
+				<th id="score_head">Score</th>
 				<th id="badge_head">Badges</th>
 			</tr>
 		</table>
@@ -35,6 +35,7 @@ getData().then((info) => {
 	if (is_specialty) {
 		document.querySelector("#badge_head").remove()
 	}
+	if (info.data["{{NAME}}"].isTime) document.querySelector("#score_head").innerText = "Time"
 	var i = 0;
 	for (; i < ranks.length; i++) {
 		var e = document.createElement("tr")
@@ -50,7 +51,12 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			e.children[2].classList.add("outline")
 			e.children[2].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
-			e.children[2].innerText = addCommas(info.getScore(ranks[i], "{{NAME}}"))
+			var score = info.getScore(ranks[i], "{{NAME}}")
+			if (info.data["{{NAME}}"].isTime) {
+				e.children[2].innerText = formatTime(score)
+			} else {
+				e.children[2].innerText = addCommas(score)
+			}
 		if (!is_specialty) {
 			e.appendChild(document.createElement("td"))
 			// Badges

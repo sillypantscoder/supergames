@@ -54,7 +54,7 @@ getData().then((info) => {
 		e.appendChild(n)
 		for (var x = 0; x < badge_set.length; x++) {
 			var n = document.createElement("td")
-			n.innerText = addCommas(badge_set[x])
+			n.innerText = info.data[names[i]].isTime ? formatTime(badge_set[x]) : addCommas(badge_set[x])
 			var bl = document.createElement("a")
 			bl.href = "/badges/" + names[i] + "/" + x
 			n.appendChild(bl)

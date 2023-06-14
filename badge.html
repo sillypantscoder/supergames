@@ -36,7 +36,7 @@ h2 {
 getData().then((info) => {
 	var badge_value = info.data["{{NAME}}"].badges[{{RANK}}]
 	var badge_desc = info.data["{{NAME}}"].desc
-	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", addCommas(badge_value))}`
+	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", info.data["{{NAME}}"].isTime ? formatTime(badge_value) : addCommas(badge_value))}`
 	// owners
 	var owners = info.getBadgeOwners("{{NAME}}", {{RANK}})
 	for (var i = 0; i < owners.length; i++) {
@@ -47,7 +47,12 @@ getData().then((info) => {
 			e.children[0].appendChild(document.createElement("b"))
 				e.children[0].children[0].innerText = owners[i]
 		e.appendChild(document.createElement("span"))
-			e.children[1].innerText = ` with ${addCommas(info.getScore(owners[i], "{{NAME}}"))} points`
+			var score = info.getScore(owners[i], "{{NAME}}")
+			if (info.data["{{NAME}}"].isTime) {
+				e.children[1].innerText = ` at ${formatTime(score)}`
+			} else {
+				e.children[1].innerText = ` with ${addCommas(score)} points`
+			}
 		document.querySelector("#owners").appendChild(e)
 	}
 })

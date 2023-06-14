@@ -42,7 +42,7 @@
 			<tbody>
 				<tr>
 					<th>Leaderboard</th>
-					<th>Points</th>
+					<th>Points/Time</th>
 					<th>Badges</th>
 					<th>Leaderboard ranking</th>
 				</tr>
@@ -89,7 +89,12 @@ getData().then((info) => {
 				e.children[0].children[0].innerText = eventlist[eventno]
 		e.appendChild(document.createElement("td"))
 			e.children[1].setAttribute("style", "text-align: right;")
-			e.children[1].innerText = addCommas(info.getScore("{{NAME}}", eventlist[eventno]))
+			var score = info.getScore("{{NAME}}", eventlist[eventno])
+			if (info.data[eventlist[eventno]].isTime) {
+				e.children[1].innerText = formatTime(score)
+			} else {
+				e.children[1].innerText = addCommas(score)
+			}
 		e.appendChild(document.createElement("td"))
 			var badgeno = info.getBadgeCount("{{NAME}}", eventlist[eventno])
 			for (var i = 0; i < badgeno; i++) {

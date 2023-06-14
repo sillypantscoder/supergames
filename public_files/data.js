@@ -2,6 +2,7 @@ window.addEventListener("error", (e) => alert(`${e.message} @${e.filename}:${e.l
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 function addCommas(t) { t = String(t); var i = t.lastIndexOf(".") - 3; if (i == -4) { i = t.length - 3 } for (; i > 0; i -= 3) { t = t.substring(0, i) + "," + t.substring(i, t.length) } return t }
+function formatTime(t) { var s = ""; if (t > 60) { s += String(Math.floor(t / 60)) + "m" } s += String(Math.floor(t % 60)); if (t % 1 != 0) { s += "." + String(Math.round((t % 1) * 1000)).padEnd(3, "0") } s += "s"; return s }
 function getColor(i) {
 	if (i == 0) return "#FFFF00";
 	else if (i == 1) return "#999999";
@@ -70,14 +71,16 @@ function getData() {
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
-						if (entry_info[1] >= e_values[0]) names[entry_info[0]][0] += 1
-						if (entry_info[1] >= e_values[1]) names[entry_info[0]][0] += 1
-						if (entry_info[1] >= e_values[2]) names[entry_info[0]][0] += 1
-						if (entry_info[1] >= e_values[3]) names[entry_info[0]][1] += 1
-						if (entry_info[1] >= e_values[4]) names[entry_info[0]][1] += 1
-						if (entry_info[1] >= e_values[5]) names[entry_info[0]][2] += 1
-						if (entry_info[1] >= e_values[6]) names[entry_info[0]][2] += 1
-						if (entry_info[1] >= e_values[7]) names[entry_info[0]][3] += 1
+						var f = (entry, badge) => (entry >= badge)
+						if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
+						if (f(entry_info[1], e_values[0])) names[entry_info[0]][0] += 1
+						if (f(entry_info[1], e_values[1])) names[entry_info[0]][0] += 1
+						if (f(entry_info[1], e_values[2])) names[entry_info[0]][0] += 1
+						if (f(entry_info[1], e_values[3])) names[entry_info[0]][1] += 1
+						if (f(entry_info[1], e_values[4])) names[entry_info[0]][1] += 1
+						if (f(entry_info[1], e_values[5])) names[entry_info[0]][2] += 1
+						if (f(entry_info[1], e_values[6])) names[entry_info[0]][2] += 1
+						if (f(entry_info[1], e_values[7])) names[entry_info[0]][3] += 1
 					}
 				}
 				// 3. Format & sort the data
@@ -113,14 +116,16 @@ function getData() {
 					// 2. Loop over the different entries
 					for (var i = 0; i < event.length; i++) {
 						var entry_info = event[i]
-						if (entry_info[1] >= e_values[0]) badges[0] += 1
-						if (entry_info[1] >= e_values[1]) badges[0] += 1
-						if (entry_info[1] >= e_values[2]) badges[0] += 1
-						if (entry_info[1] >= e_values[3]) badges[1] += 1
-						if (entry_info[1] >= e_values[4]) badges[1] += 1
-						if (entry_info[1] >= e_values[5]) badges[2] += 1
-						if (entry_info[1] >= e_values[6]) badges[2] += 1
-						if (entry_info[1] >= e_values[7]) badges[3] += 1
+						var f = (entry, badge) => (entry >= badge)
+						if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
+						if (f(entry_info[1], e_values[0])) badges[0] += 1
+						if (f(entry_info[1], e_values[1])) badges[0] += 1
+						if (f(entry_info[1], e_values[2])) badges[0] += 1
+						if (f(entry_info[1], e_values[3])) badges[1] += 1
+						if (f(entry_info[1], e_values[4])) badges[1] += 1
+						if (f(entry_info[1], e_values[5])) badges[2] += 1
+						if (f(entry_info[1], e_values[6])) badges[2] += 1
+						if (f(entry_info[1], e_values[7])) badges[3] += 1
 					}
 				}
 				return badges
@@ -141,14 +146,16 @@ function getData() {
 						var e_values = info.data[event].badges
 						if (e_values.length == 0) return 0; // Specialty leaderboard
 						var n_badges = 0
-						if (entry_info[1] >= e_values[0]) n_badges += 1
-						if (entry_info[1] >= e_values[1]) n_badges += 1
-						if (entry_info[1] >= e_values[2]) n_badges += 1
-						if (entry_info[1] >= e_values[3]) n_badges += 1
-						if (entry_info[1] >= e_values[4]) n_badges += 1
-						if (entry_info[1] >= e_values[5]) n_badges += 1
-						if (entry_info[1] >= e_values[6]) n_badges += 1
-						if (entry_info[1] >= e_values[7]) n_badges += 1
+						var f = (entry, badge) => (entry >= badge)
+						if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
+						if (f(entry_info[1], e_values[0])) n_badges += 1
+						if (f(entry_info[1], e_values[1])) n_badges += 1
+						if (f(entry_info[1], e_values[2])) n_badges += 1
+						if (f(entry_info[1], e_values[3])) n_badges += 1
+						if (f(entry_info[1], e_values[4])) n_badges += 1
+						if (f(entry_info[1], e_values[5])) n_badges += 1
+						if (f(entry_info[1], e_values[6])) n_badges += 1
+						if (f(entry_info[1], e_values[7])) n_badges += 1
 						return n_badges
 					}
 				}
@@ -160,8 +167,9 @@ function getData() {
 					var entry_info = event_info[i]
 					// Get badges
 					var e_values = info.data[event].badges
-					var n_badges = 0
-					if (entry_info[1] >= e_values[level]) users.push(entry_info[0])
+					var f = (entry, badge) => (entry >= badge)
+					if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
+					if (f(entry_info[1], e_values[level])) users.push(entry_info[0])
 				}
 				users.sort((a, b) => {
 					return getScore(b, event) - getScore(a, event)
