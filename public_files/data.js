@@ -8,8 +8,8 @@ function getColor(i) {
 	else if (i == 1) return "#999999";
 	else if (i == 2) return "#c27c53";
 	else if (i < 10) return "#05ffe6";
-	else if (i < 50) return "#148012";
-	else if (i < 100) return "#6f1eba";
+	else if (i < 50) return "#fa48eb";
+	else if (i < 100) return "#148012";
 	else if (i < 500) return "#ff8103";
 	else if (i < 1000) return "#0000c8";
 	else if (i < 5000) return "#cf40cc";

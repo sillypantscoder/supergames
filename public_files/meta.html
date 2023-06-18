@@ -5,6 +5,37 @@
 		<link rel="stylesheet" type="text/css" href="/theme.css" />
 		<script src="/background.js"></script>
 		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<style>
+.tooltip {
+	background: blue;
+	font-size: 0.9rem;
+	border-radius: 50%;
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	outline: 1px solid black;
+	text-align: center;
+	position: relative;
+	font-family: sans-serif;
+}
+.tooltip::before {
+	content: "?";
+	color: white;
+}
+.tooltip:hover::after {
+	content: var(--tooltip-text);
+	background: white;
+	border-radius: 1em;
+	padding: 1em;
+	margin: 1em;
+	position: absolute;
+	left: -300%;
+	width: 30vw;
+	top: 0%;
+	font-weight: normal;
+	box-shadow: 0px 8px 12px 0px black;
+}
+		</style>
 	</head>
 	<body>
 		<div class="tabs">
@@ -13,16 +44,15 @@
 			<a class="tab" href="/list.html">Leaderboard List</a>
 			<a class="tab" href="/badges.html">Badges</a>
 			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="meta.html">Meta</a>
-			<a class="tab selected">ATH Leaderboard</a>
+			<a class="tab selected">Meta</a>
 		</div>
-		<h1>ATH Leaderboard</h1>
+		<h1 class="no-outline"><span class="outline">Meta Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. The winner is the person with the least number of points.';"></span></h1>
 		<div>
 			<table id="athl">
 				<tbody>
 					<tr>
 						<th>Name</th>
-						<th class="outline" style="color: #FF0;">1sts</th>
+						<th>Points</th>
 					</tr>
 				</tbody>
 			</table>
@@ -34,15 +64,16 @@ getData().then((info) => {
 	var user_data = {}
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i]
-		var firsts = 0
+		var points = 0
 		var eventlist = Object.keys(info.data)
 		for (var n = 0; n < eventlist.length; n++) {
 			var event = eventlist[n]
 			var ranks = info.getLeaderboardRanks(event)
 			var rank = ranks.indexOf(user)
-			if (rank == 0) firsts += 1
+			if (rank == -1) points += users.length
+			else points += rank + 1
 		}
-		user_data[user] = firsts
+		user_data[user] = points
 	}
 	users.sort((a, b) => {
 		if (user_data[a] < user_data[b]) {
@@ -54,7 +85,6 @@ getData().then((info) => {
 		// a must be equal to b
 		return 0;
 	})
-	users.reverse()
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i]
 		var firsts = user_data[user]
