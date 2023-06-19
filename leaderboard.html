@@ -6,6 +6,7 @@
 		<script src="/background.js"></script>
 		<link rel="stylesheet" type="text/css" href="/table.css" />
 		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
 	</head>
 	<body>
 		<div class="tabs">
@@ -15,9 +16,9 @@
 			<a class="tab selected">Leaderboard for {{NAME}}</a>
 			<a class="tab" href="/badges.html">Badges</a>
 			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="meta.html">Meta</a>
+			<a class="tab" href="/meta.html">Meta</a>
 		</div>
-		<h1>Leaderboard for <b>{{NAME}}</b></h1>
+		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';"></span></h1>
 		<table>
 			<tr>
 				<th>Rank</th>
@@ -39,11 +40,18 @@ getData().then((info) => {
 	if (info.data["{{NAME}}"].isTime) document.querySelector("#score_head").innerText = "Time"
 	var i = 0;
 	for (; i < ranks.length; i++) {
+		var duplicates = info.getDuplicates("{{NAME}}", info.getScore(ranks[i], "{{NAME}}"))
+		var pcscore = i + 0
+		for (var n = i - 1; n >= 0; n--) {
+			if (duplicates.includes(ranks[n])) {
+				pcscore -= 1
+			}
+		}
 		var e = document.createElement("tr")
 		e.appendChild(document.createElement("td"))
 			e.children[0].classList.add("outline")
-			e.children[0].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
-			e.children[0].innerText = String(i + 1) + getSuffix(i + 1)
+			e.children[0].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
+			e.children[0].innerHTML = (duplicates.length > 1 ? "<i>T</i> " : "") + String(pcscore + 1) + getSuffix(pcscore + 1)
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
 				e.children[1].children[0].href = "/profile/" + ranks[i]
@@ -51,7 +59,7 @@ getData().then((info) => {
 				e.children[1].children[0].innerText = ranks[i]
 		e.appendChild(document.createElement("td"))
 			e.children[2].classList.add("outline")
-			e.children[2].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
+			e.children[2].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
 			var score = info.getScore(ranks[i], "{{NAME}}")
 			if (info.data["{{NAME}}"].isTime) {
 				e.children[2].innerText = formatTime(score)

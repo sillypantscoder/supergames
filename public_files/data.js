@@ -4,15 +4,20 @@ Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 function addCommas(t) { t = String(t); var i = t.lastIndexOf(".") - 3; if (i == -4) { i = t.length - 3 } for (; i > 0; i -= 3) { t = t.substring(0, i) + "," + t.substring(i, t.length) } return t }
 function formatTime(t) { var s = ""; if (t > 60) { s += String(Math.floor(t / 60)) + "m" } s += String(Math.floor(t % 60)); if (t % 1 != 0) { s += "." + String(Math.round((t % 1) * 1000)).padEnd(3, "0") } s += "s"; return s }
 function getColor(i) {
-	if (i == 0) return "#FFFF00";
+	if (i == 0) return "#FFCC01";
 	else if (i == 1) return "#999999";
 	else if (i == 2) return "#c27c53";
 	else if (i < 10) return "#05ffe6";
 	else if (i < 50) return "#fa48eb";
-	else if (i < 100) return "#148012";
-	else if (i < 500) return "#ff8103";
-	else if (i < 1000) return "#0000c8";
-	else if (i < 5000) return "#cf40cc";
+	else if (i < 100) return "#14b412";
+	else if (i < 500) return "#FFFF00";
+	else if (i < 1000) return "#000064";
+	else if (i < 5000) return "#FF7D00";
+	else if (i < 10000) return "#7D00FF";
+	else if (i < 50000) return "#7D7DFF";
+	else if (i < 100000) return "#69C896";
+	else if (i < 500000) return "#695596";
+	else if (i < 1000000) return "#FFFFFF";
 	return "inherit";
 }
 function getSuffix(i) {
@@ -137,6 +142,15 @@ function getData() {
 					if (entry_info[0] == user) return entry_info[1]
 				}
 			}
+			function getDuplicates(event, score) {
+				var users = []
+				var event_info = info.data[event].entries
+				for (var i = 0; i < event_info.length; i++) {
+					var entry_info = event_info[i]
+					if (entry_info[1] == score) users.push(entry_info[0])
+				}
+				return users
+			}
 			function getBadgeCount(user, event) {
 				var event_info = info.data[event].entries
 				for (var i = 0; i < event_info.length; i++) {
@@ -233,6 +247,7 @@ function getData() {
 				getBadgeTypeCounts,
 				getTotalBadgeCounts,
 				getScore,
+				getDuplicates,
 				getBadgeCount,
 				getBadgeOwners,
 				getEventList,

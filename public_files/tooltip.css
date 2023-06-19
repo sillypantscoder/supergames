@@ -1,0 +1,29 @@
+.tooltip {
+	background: blue;
+	font-size: 0.9rem;
+	border-radius: 50%;
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	outline: 1px solid black;
+	text-align: center;
+	position: relative;
+	font-family: sans-serif;
+}
+.tooltip::before {
+	content: "?";
+	color: white;
+}
+.tooltip:hover::after {
+	content: var(--tooltip-text);
+	background: white;
+	border-radius: 1em;
+	padding: 1em;
+	margin: 1em;
+	position: absolute;
+	left: -300%;
+	width: 30vw;
+	top: 0%;
+	font-weight: normal;
+	box-shadow: 0px 8px 12px 0px black;
+}

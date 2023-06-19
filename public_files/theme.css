@@ -39,7 +39,7 @@ body {
 	font-family: 'Jellee';
 	src: url('/Jellee-Roman.otf') format('opentype');
 }
-h1, h2, .outline {
+h1:not(.no-outline), h2, .outline {
 	color: white;
 	text-shadow:
 		-1px -1px 0 #000,
