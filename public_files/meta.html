@@ -17,6 +17,7 @@
 			<a class="tab selected">Meta</a>
 		</div>
 		<h1 class="no-outline"><span class="outline">Meta Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. The winner is the person with the least number of points.';"></span></h1>
+		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
 		<div>
 			<table id="athl">
 				<tbody>
@@ -90,6 +91,28 @@ getData().then((info) => {
 	}
 })
 if (top != window) document.querySelector("#sites-tab").remove()
+function scrollToEntry() {
+	var i = Number(document.querySelector("#e").value)
+	var elm = document.querySelector(`table tr:nth-child(${i + 1})`)
+	window.scrollBy({
+		left: 0,
+		top: elm.getBoundingClientRect().y - (window.innerHeight / 2),
+		behavior: "smooth"
+	})
+	var oleft = elm.children[elm.children.length - 1].getBoundingClientRect().right
+	var newE = document.createElement("div")
+	newE.setAttribute("style", `position: absolute; top: ${window.scrollY + elm.getBoundingClientRect().y}px; left: calc(${oleft}px + 5em); display: inline-block; width: 5em; height: ${elm.getBoundingClientRect().height}px; background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgoJPHBhdGggZD0iTSAwIDEuNSBMIDIgMCBMIDIgMyBaIiBmaWxsPSJ5ZWxsb3ciIC8+Cgk8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iNCIgaGVpZ2h0PSIxIiBmaWxsPSJ5ZWxsb3ciIC8+Cjwvc3ZnPg==) no-repeat; transition: opacity 2s linear, left 2s cubic-bezier(0.04, 0.43, 0.23, 1.01); opacity: 1;`)
+	document.body.appendChild(newE)
+	requestAnimationFrame(() => {
+		newE.setAttribute("style", `position: absolute; top: ${window.scrollY + elm.getBoundingClientRect().y}px; left: ${oleft}px; display: inline-block; width: 5em; height: ${elm.getBoundingClientRect().height}px; background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgoJPHBhdGggZD0iTSAwIDEuNSBMIDIgMCBMIDIgMyBaIiBmaWxsPSJ5ZWxsb3ciIC8+Cgk8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iNCIgaGVpZ2h0PSIxIiBmaWxsPSJ5ZWxsb3ciIC8+Cjwvc3ZnPg==) no-repeat; transition: opacity 2s linear, left 2s cubic-bezier(0.04, 0.43, 0.23, 1.01); opacity: 1;`)
+	})
+	setTimeout(() => {
+		newE.setAttribute("style", `position: absolute; top: ${window.scrollY + elm.getBoundingClientRect().y}px; left: ${oleft}px; display: inline-block; width: 5em; height: ${elm.getBoundingClientRect().height}px; background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1IDMiPgoJPHBhdGggZD0iTSAwIDEuNSBMIDIgMCBMIDIgMyBaIiBmaWxsPSJ5ZWxsb3ciIC8+Cgk8cmVjdCB4PSIxIiB5PSIxIiB3aWR0aD0iNCIgaGVpZ2h0PSIxIiBmaWxsPSJ5ZWxsb3ciIC8+Cjwvc3ZnPg==) no-repeat; transition: opacity 2s linear, left 2s cubic-bezier(0.04, 0.43, 0.23, 1.01); opacity: 0;`)
+	}, 2000)
+	setTimeout(() => {
+		newE.remove()
+	}, 4000)
+}
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>
