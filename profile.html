@@ -125,6 +125,57 @@ getData().then((info) => {
 			document.querySelector("table tbody").appendChild(e)
 		}
 	}
+	// meta
+	var users = info.getUserList()
+	users.reverse()
+	var user_data = {}
+	for (var i = 0; i < users.length; i++) {
+		var user = users[i]
+		user_data[user] = info.getMetaPoints(user)
+	}
+	users.sort((a, b) => {
+		if (user_data[a] < user_data[b]) {
+			return -1;
+		}
+		if (user_data[a] > user_data[b]) {
+			return 1;
+		}
+		// a must be equal to b
+		return 0;
+	})
+	var meta_rank = users.indexOf("{{NAME}}")
+	var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].setAttribute("colspan", "3")
+			e.children[0].innerText = "Meta Leaderboard"
+		e.appendChild(document.createElement("td"))
+			e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(meta_rank)};">${meta_rank + 1}${getSuffix(meta_rank + 1)} place</b>`
+		document.querySelector("table tbody").appendChild(e)
+	// activity leaderboard
+	var users = info.getUserList()
+	var user_data = {}
+	for (var i = 0; i < users.length; i++) {
+		var user = users[i]
+		user_data[user] = info.getActivityPoints(user)
+	}
+	users.sort((a, b) => {
+		if (user_data[a] < user_data[b]) {
+			return 1;
+		}
+		if (user_data[a] > user_data[b]) {
+			return -1;
+		}
+		// a must be equal to b
+		return 0;
+	})
+	var active_rank = users.indexOf("{{NAME}}")
+	var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].setAttribute("colspan", "3")
+			e.children[0].innerText = "Activity Leaderboard"
+		e.appendChild(document.createElement("td"))
+			e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(active_rank)};">${active_rank + 1}${getSuffix(active_rank + 1)} place</b>`
+		document.querySelector("table tbody").appendChild(e)
 	// Hint
 	if (document.querySelector("table tbody").children.length <= 2) {
 		document.querySelector("#hint").removeAttribute("style")

@@ -91,7 +91,7 @@ getData().then((info) => {
 	} else {
 		document.querySelectorAll("#badges, :has( + #badges)").forEach((e) => e.remove())
 	}
-	document.querySelector("#e").setAttribute("max", i + 1)
+	document.querySelector("#e").setAttribute("max", i)
 })
 if (top != window) document.querySelector("#sites-tab").remove()
 function scrollToEntry() {

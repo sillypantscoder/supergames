@@ -35,18 +35,7 @@ getData().then((info) => {
 	var user_data = {}
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i]
-		var firsts = 0
-		var eventlist = Object.keys(info.data)
-		for (var n = 0; n < eventlist.length; n++) {
-			var event = eventlist[n]
-			var score = info.getScore(user, event)
-			if (score == undefined) continue;
-			var vassal = info.data[event].badges
-			if (vassal.length > 0) vassal = vassal[1]
-			else continue;
-			firsts += Math.round(score / (vassal / 25))
-		}
-		user_data[user] = firsts
+		user_data[user] = info.getActivityPoints(user)
 	}
 	users.sort((a, b) => {
 		if (user_data[a] < user_data[b]) {

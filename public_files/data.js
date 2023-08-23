@@ -4,19 +4,19 @@ Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 function addCommas(t) { t = String(t); var i = t.lastIndexOf(".") - 3; if (i == -4) { i = t.length - 3 } for (; i > 0; i -= 3) { t = t.substring(0, i) + "," + t.substring(i, t.length) } return t }
 function formatTime(t) { var s = ""; if (t > 3600) { s += String(Math.floor(t / 3600)) + "h " } if (t > 60) { s += String(Math.floor((t % 3600) / 60)) + "m " } s += String(Math.floor(t % 60)); if (t % 1 != 0) { s += "." + String(Math.round((t % 1) * 1000)).padEnd(3, "0") } s += "s"; return s }
 function getColor(i) {
-	if (i == 0) return "#FFCC01";
-	else if (i == 1) return "#999999";
-	else if (i == 2) return "#c27c53";
-	else if (i < 10) return "#05ffe6";
-	else if (i < 50) return "#fa48eb";
-	else if (i < 100) return "#14b412";
-	else if (i < 500) return "#FFFF00";
-	else if (i < 1000) return "#000064";
-	else if (i < 5000) return "#FF7D00";
-	else if (i < 10000) return "#7D00FF";
-	else if (i < 50000) return "#69C8FF";
-	else if (i < 100000) return "#69C896";
-	else if (i < 500000) return "#695596";
+	if (i == 0) return "#FFE085";
+	else if (i == 1) return "#C3C3C3";
+	else if (i == 2) return "#FE8585";
+	else if (i < 10) return "#80F4F4";
+	else if (i < 50) return "#FC83FB";
+	else if (i < 100) return "#85FF85";
+	else if (i < 500) return "#FFFF85";
+	else if (i < 1000) return "#8585FF";
+	else if (i < 5000) return "#FECE83";
+	else if (i < 10000) return "#CB82FB";
+	else if (i < 50000) return "#93B7F1";
+	else if (i < 100000) return "#BDE2A8";
+	else if (i < 500000) return "#C0B3ED";
 	else if (i < 1000000) return "#FFFFFF";
 	return "inherit";
 }
@@ -242,6 +242,33 @@ function getData() {
 					if (thisname == user) return info.users[i]
 				}
 			}
+			function getMetaPoints(user) {
+				var users = getUserList()
+				var points = 0
+				var eventlist = Object.keys(info.data)
+				for (var n = 0; n < eventlist.length; n++) {
+					var event = eventlist[n]
+					var ranks = getLeaderboardRanks(event)
+					var rank = ranks.indexOf(user)
+					if (rank == -1) points += users.length
+					else points += rank + 1
+				}
+				return points
+			}
+			function getActivityPoints(user) {
+				var firsts = 0
+				var eventlist = Object.keys(info.data)
+				for (var n = 0; n < eventlist.length; n++) {
+					var event = eventlist[n]
+					var score = getScore(user, event)
+					if (score == undefined) continue;
+					var vassal = info.data[event].badges
+					if (vassal.length > 0) vassal = vassal[1]
+					else continue;
+					firsts += Math.round(score / (vassal / 25))
+				}
+				return firsts
+			}
 			resolve({
 				getUserList,
 				getBadgeTypeCounts,
@@ -253,6 +280,8 @@ function getData() {
 				getEventList,
 				getLeaderboardRanks,
 				getUserObject,
+				getMetaPoints,
+				getActivityPoints,
 				data: info.data,
 				users: info.users
 			})

@@ -38,16 +38,7 @@ getData().then((info) => {
 	var user_data = {}
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i]
-		var points = 0
-		var eventlist = Object.keys(info.data)
-		for (var n = 0; n < eventlist.length; n++) {
-			var event = eventlist[n]
-			var ranks = info.getLeaderboardRanks(event)
-			var rank = ranks.indexOf(user)
-			if (rank == -1) points += users.length
-			else points += rank + 1
-		}
-		user_data[user] = points
+		user_data[user] = info.getMetaPoints(user)
 	}
 	users.sort((a, b) => {
 		if (user_data[a] < user_data[b]) {
@@ -91,6 +82,7 @@ getData().then((info) => {
 			e.children[2].innerHTML = addCommas(firsts)
 		document.querySelector("#athl tbody").appendChild(e)
 	}
+	document.querySelector("#e").setAttribute("max", i)
 })
 if (top != window) document.querySelector("#sites-tab").remove()
 function scrollToEntry() {
