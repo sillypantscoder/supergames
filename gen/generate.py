@@ -9,10 +9,10 @@ data = json.loads(f.read())
 f.close()
 
 newData = {}
-for line in d[1:]:
+for line in d:
 	if line[0] == "DONTREGISTER": continue;
 	newData[line[0]] = {
-		"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
+		"badges": [int(x) for x in line[1:-4]] if line[1] != '' else [],
 		"desc": line[-4],
 		"entries": [],
 		"isTime": line[-2] == "Time",

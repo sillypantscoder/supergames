@@ -229,7 +229,7 @@ function getData() {
 					// a must be equal to b
 					return 0;
 				})
-				list_data.reverse()
+				if (!info.data[event].reverseOrder) list_data.reverse()
 				var ret_data = []
 				for (var i = 0; i < list_data.length; i++) {
 					ret_data.push(list_data[i][0])
