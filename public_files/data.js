@@ -2,7 +2,7 @@ window.addEventListener("error", (e) => alert(`${e.message} @${e.filename}:${e.l
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 function addCommas(t) { t = String(t); var i = t.lastIndexOf(".") - 3; if (i == -4) { i = t.length - 3 } for (; i > 0; i -= 3) { t = t.substring(0, i) + "," + t.substring(i, t.length) } return t }
-function formatTime(t) { var s = ""; if (t > 60) { s += String(Math.floor(t / 60)) + "m" } s += String(Math.floor(t % 60)); if (t % 1 != 0) { s += "." + String(Math.round((t % 1) * 1000)).padEnd(3, "0") } s += "s"; return s }
+function formatTime(t) { var s = ""; if (t > 3600) { s += String(Math.floor(t / 3600)) + "h " } if (t > 60) { s += String(Math.floor((t % 3600) / 60)) + "m " } s += String(Math.floor(t % 60)); if (t % 1 != 0) { s += "." + String(Math.round((t % 1) * 1000)).padEnd(3, "0") } s += "s"; return s }
 function getColor(i) {
 	if (i == 0) return "#FFCC01";
 	else if (i == 1) return "#999999";
@@ -14,7 +14,7 @@ function getColor(i) {
 	else if (i < 1000) return "#000064";
 	else if (i < 5000) return "#FF7D00";
 	else if (i < 10000) return "#7D00FF";
-	else if (i < 50000) return "#7D7DFF";
+	else if (i < 50000) return "#69C8FF";
 	else if (i < 100000) return "#69C896";
 	else if (i < 500000) return "#695596";
 	else if (i < 1000000) return "#FFFFFF";

@@ -5,6 +5,7 @@
 		<link rel="stylesheet" type="text/css" href="/theme.css" />
 		<script src="/background.js"></script>
 		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
 	</head>
 	<body>
 		<div class="tabs">
@@ -14,16 +15,15 @@
 			<a class="tab" href="/badges.html">Badges</a>
 			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
 			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab selected">ATH Leaderboard</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
+			<a class="tab selected">Activity Leaderboard</a>
 		</div>
-		<h1>ATH Leaderboard</h1>
+		<h1 class="no-outline"><span class="outline">Activity Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'You get a point each time you get 1/25 of Vassal for each leaderboard.';"></span></h1>
 		<div>
 			<table id="athl">
 				<tbody>
 					<tr>
 						<th>Name</th>
-						<th class="outline" style="color: #FF0;">1sts</th>
+						<th>Points</th>
 					</tr>
 				</tbody>
 			</table>
@@ -39,23 +39,25 @@ getData().then((info) => {
 		var eventlist = Object.keys(info.data)
 		for (var n = 0; n < eventlist.length; n++) {
 			var event = eventlist[n]
-			var ranks = info.getLeaderboardRanks(event)
-			var rank = ranks.indexOf(user)
-			if (rank == 0) firsts += 1
+			var score = info.getScore(user, event)
+			if (score == undefined) continue;
+			var vassal = info.data[event].badges
+			if (vassal.length > 0) vassal = vassal[1]
+			else continue;
+			firsts += Math.round(score / (vassal / 25))
 		}
 		user_data[user] = firsts
 	}
 	users.sort((a, b) => {
 		if (user_data[a] < user_data[b]) {
-			return -1;
+			return 1;
 		}
 		if (user_data[a] > user_data[b]) {
-			return 1;
+			return -1;
 		}
 		// a must be equal to b
 		return 0;
 	})
-	users.reverse()
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i]
 		var firsts = user_data[user]
