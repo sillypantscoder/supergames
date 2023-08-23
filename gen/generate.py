@@ -21,7 +21,11 @@ for line in d:
 
 for name in data:
 	if name not in newData.keys():
-		newData[name] = data[name]
+		do = True
+		print(f"Warning: {name} is not in the CSV file!")
+		i = input(f"\tThere are {len(data[name]['entries'])} entries, delete this leaderboard? :")
+		if len(i) == 0: do = False
+		if do: newData[name] = data[name]
 	else:
 		newData[name]["entries"] = data[name]["entries"]
 
