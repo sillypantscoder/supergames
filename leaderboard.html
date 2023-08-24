@@ -7,6 +7,31 @@
 		<link rel="stylesheet" type="text/css" href="/table.css" />
 		<link rel="stylesheet" type="text/css" href="/badges.css" />
 		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
+		<style>
+.bar {
+	font-size: 0.7em;
+	margin-left: 1em;
+	display: inline-block;
+	font-family: sans-serif;
+	background: #03fccf;
+	border-radius: 1em;
+	padding: 0 0.5em;
+	position: relative;
+	overflow: hidden;
+	color: black;
+	text-decoration: none;
+}
+.bar::before {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: #0005;
+	width: calc(var(--amount) * 100%);
+	height: 100%;
+}
+		</style>
 	</head>
 	<body>
 		<div class="tabs">
@@ -19,7 +44,7 @@
 			<a class="tab" href="/meta.html">Meta</a>
 			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
 		</div>
-		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';"></span></h1>
+		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';" tabindex="0"></span></h1>
 		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
 		<table>
 			<tr>
@@ -51,9 +76,20 @@ getData().then((info) => {
 		}
 		var e = document.createElement("tr")
 		e.appendChild(document.createElement("td"))
-			e.children[0].classList.add("outline")
-			e.children[0].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
-			e.children[0].innerHTML = (duplicates.length > 1 ? "<i>T</i> " : "") + String(pcscore + 1) + getSuffix(pcscore + 1)
+			e.children[0].appendChild(document.createElement("span"))
+				e.children[0].children[0].classList.add("outline")
+				e.children[0].children[0].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
+				e.children[0].children[0].innerHTML = (duplicates.length > 1 ? "<i>T</i> " : "") + String(pcscore + 1) + getSuffix(pcscore + 1)
+		if (i > 0 && (! info.data["{{NAME}}"].reverseOrder)) {
+			var bar = document.createElement("a")
+			bar.classList.add("bar")
+			bar.innerText = String(pcscore) + getSuffix(pcscore)
+			var nextValue = info.getScore(ranks[pcscore - 1], "{{NAME}}")
+			var thisValue = info.getScore(ranks[pcscore], "{{NAME}}")
+			var prevValue = info.getScore(ranks[pcscore + 1], "{{NAME}}")
+			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)};`);
+			e.children[0].appendChild(bar)
+		}
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
 				e.children[1].children[0].href = "/profile/" + ranks[i]
@@ -74,6 +110,16 @@ getData().then((info) => {
 			var badgeno = info.getBadgeCount(ranks[i], "{{NAME}}")
 			for (var x = 0; x < badgeno; x++) {
 				e.children[3].innerHTML += `<a href="/badges/{{NAME}}/${x}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
+			}
+			if (badgeno < 8) {
+				var bar = document.createElement("a")
+				bar.setAttribute("href", `/badges/{{NAME}}/${badgeno}`)
+				bar.classList.add("bar")
+				bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
+				var nextValue = info.data["{{NAME}}"].badges[badgeno]
+				var prevValue = [0, ...info.data["{{NAME}}"].badges][badgeno]
+				bar.setAttribute("style", `--amount: ${(score - prevValue) / (nextValue - prevValue)};`);
+				e.children[3].appendChild(bar)
 			}
 		}
 		document.querySelector("table tbody").appendChild(e)
