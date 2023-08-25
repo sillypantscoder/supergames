@@ -54,6 +54,7 @@
 		<h2 class="rm">Info</h2>
 		<div class="rm physics">This is profile number <span id="profilen"></span>.</div>
 		<div class="rm physics">Joined on <span id="joindate"></span></div>
+		<div class="physics" id="self"></div>
 		<h2 id="header">Stats</h2>
 		<table class="rm">
 			<tbody>
@@ -86,6 +87,7 @@ tabs.extra(0, "Profile: {{NAME}}");
 	}
 })();
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var this_user_obj = info.getUserObject("{{NAME}}")
 	var userlist = info.getUserList()
 	if (! userlist.includes("{{NAME}}")) {
@@ -103,7 +105,7 @@ getData().then((info) => {
 		var e = document.createElement("tr")
 		e.appendChild(document.createElement("td"))
 			e.children[0].appendChild(document.createElement("a"))
-				e.children[0].children[0].href = "/leaderboard/" + eventlist[eventno]
+				e.children[0].children[0].href = "/leaderboard/" + eventlist[eventno] + location.search
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].innerText = eventlist[eventno]
 		e.appendChild(document.createElement("td"))
@@ -117,14 +119,14 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			var badgeno = info.getBadgeCount("{{NAME}}", eventlist[eventno])
 			for (var i = 0; i < badgeno; i++) {
-				e.children[2].innerHTML += `<a href="/badges/${eventlist[eventno]}/${i}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
+				e.children[2].innerHTML += `<a href="/badges/${eventlist[eventno]}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
 			}
 		if (badgeno < 8) {
 			if (info.data[eventlist[eventno]].badges.length == 0) {
 				e.children[2].innerHTML = "<i style='font-family: sans-serif; font-size: 0.7em;'>Specialty leaderboard</i>"
 			} else {
 				var bar = document.createElement("a")
-				bar.setAttribute("href", `/badges/${eventlist[eventno]}/${badgeno}`)
+				bar.setAttribute("href", `/badges/${eventlist[eventno]}/${badgeno}${location.search}`)
 				bar.classList.add("bar")
 				bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
 				var nextValue = info.data[eventlist[eventno]].badges[badgeno]

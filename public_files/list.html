@@ -31,12 +31,13 @@
 		<script>
 tabs();
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	document.querySelector("#buttons").innerText = ""
 	var keys = Object.keys(info.data)
 	for (var i = 0; i < keys.length; i++) {
 		var e = document.createElement("a")
 		e.innerText = keys[i]
-		e.href = "/leaderboard/" + keys[i]
+		e.href = "/leaderboard/" + keys[i] + location.search
 		document.querySelector("#buttons").appendChild(e)
 	}
 })

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+	</head>
+	<body>
+		<div class="tabs"></div>
+		<h1>Login</h1>
+		<p>Username: <input type="text" id="username"></p>
+		<p>Password: <input type="text" id="password"></p>
+		<p><button onclick="finish()">Log In</button></p>
+		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
+		<script>
+tabs();
+function finish() {
+	var u = document.querySelector("#username").value
+	var p = document.querySelector("#password").value
+	location.replace("/user_id_create?" + u + "&" + p)
+}
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

@@ -30,6 +30,7 @@
 		<script>
 tabs();
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var list_data = info.getBadgeTypeCounts()
 	for (var i = 0; i < list_data.length; i++) {
 		var username = list_data[i][0]
@@ -39,7 +40,7 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			e.children[0].setAttribute("style", "text-align: right;")
 			e.children[0].appendChild(document.createElement("a"))
-				e.children[0].children[0].href = "/profile/" + username
+				e.children[0].children[0].href = "/profile/" + username + location.search
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].innerText = username
 		e.appendChild(document.createElement("td"))

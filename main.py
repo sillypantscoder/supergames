@@ -4,6 +4,7 @@ import time
 import json
 import datetime
 import traceback
+from urllib.parse import unquote
 
 vandalize = False
 
@@ -27,6 +28,39 @@ def write_file(filename, content):
 	f.write(content)
 	f.close()
 
+def multiply(s1, s2):
+	i1 = list(s1.encode("UTF-8"))
+	i2 = list(s2.encode("UTF-8"))
+	f = [0, 0, 0, 0, 0]
+	for startIndex in range(len(f)):
+		xpos = startIndex + 0
+		for i in range(len(i1)):
+			f[xpos] += i1[i]
+			xpos += 1
+			if xpos >= len(f): xpos -= len(f)
+	for startIndex in range(len(f)):
+		xpos = startIndex + 0
+		for i in range(len(i2)):
+			f[xpos] += i2[i]
+			xpos += 1
+			if xpos >= len(f): xpos -= len(f)
+	return (f[0] * 16) * (f[1] * 8) * (f[2] * 4) * (f[3] * 2) * (f[4] * 1)
+
+def getUserFromID(id):
+	ou = json.loads(read_file("users.json"))
+	for n in ou:
+		uid = multiply(n["name"], n["password"])
+		if str(uid) == id:
+			return n
+	return None
+
+def getIDFromUser(name, pwd):
+	ou = json.loads(read_file("users.json"))
+	for n in ou:
+		if name == n["name"] and pwd == n["password"]:
+			return str(multiply(n["name"], n["password"]))
+	return None
+
 def get(path):
 	if vandalize:
 		return {
@@ -36,7 +70,19 @@ def get(path):
 			},
 			"content": "<!DOCTYPE html><html><head></head><body>Hahaha! The website is gone!!!</body></html>"
 		}
-	if os.path.isfile("public_files" + path.split("?")[0]):
+	user = getUserFromID(''.join(path.split("?")[1:]))
+	if path == "/users.json":
+		ou = json.loads(read_file("users.json"))
+		for n in ou:
+			del n["password"]
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "application.json"
+			},
+			"content": json.dumps(ou)
+		}
+	elif os.path.isfile("public_files" + path.split("?")[0]):
 		return {
 			"status": 200,
 			"headers": {
@@ -54,13 +100,13 @@ def get(path):
 			},
 			"content": bin_read_file("public_files" + path.split("?")[0])
 		}
-	elif path == "/":
+	elif path.split("?")[0] == "/":
 		return {
 			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<!DOCTYPE html><html><head></head><body><script>location.replace('/home.html');</script></body></html>"
+			"content": f"<!DOCTYPE html><html><head></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
 		}
 	elif path.startswith("/leaderboard/"):
 		name = path.split("?")[0][13:]
@@ -83,7 +129,7 @@ def get(path):
 		}
 	elif path.startswith("/profile/"):
 		name = path.split("?")[0].split("/")[2]
-		userlist = [x["name"] for x in json.loads(read_file("public_files/users.json"))]
+		userlist = [x["name"] for x in json.loads(read_file("users.json"))]
 		if name in userlist:
 			return {
 				"status": 200,
@@ -115,6 +161,25 @@ def get(path):
 				"Content-Type": "text/html"
 			},
 			"content": read_file("entryeditor.html")
+		}
+	elif path.split("?")[0] == "/usercheck":
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "application/json"
+			},
+			"content": json.dumps([{"name": user["name"]}]) if user != None else "[]"
+		}
+	elif path.split("?")[0] == "/user_id_create":
+		u = path.split("?")[1].split("&")[0]
+		p = path.split("?")[1].split("&")[1]
+		id = getIDFromUser(unquote(u), unquote(p))
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": f"<script>location.replace('/?{id}')</script>"
 		}
 	else: # 404 page
 		return {

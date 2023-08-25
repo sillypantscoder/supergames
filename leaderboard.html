@@ -50,8 +50,9 @@
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
 		<script>
-tabs.extra(1, "Leaderboard for {{NAME}}");
+tabs.extra(2, "Leaderboard for {{NAME}}");
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var ranks = info.getLeaderboardRanks("{{NAME}}")
 	var is_specialty = info.data["{{NAME}}"].badges.length == 0
 	if (is_specialty) {
@@ -85,7 +86,7 @@ getData().then((info) => {
 		}
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
-				e.children[1].children[0].href = "/profile/" + ranks[i]
+				e.children[1].children[0].href = "/profile/" + ranks[i] + location.search
 				e.children[1].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[1].children[0].innerText = ranks[i]
 		e.appendChild(document.createElement("td"))
@@ -102,11 +103,11 @@ getData().then((info) => {
 			// Badges
 			var badgeno = info.getBadgeCount(ranks[i], "{{NAME}}")
 			for (var x = 0; x < badgeno; x++) {
-				e.children[3].innerHTML += `<a href="/badges/{{NAME}}/${x}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
+				e.children[3].innerHTML += `<a href="/badges/{{NAME}}/${x}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
 			}
 			if (badgeno < 8) {
 				var bar = document.createElement("a")
-				bar.setAttribute("href", `/badges/{{NAME}}/${badgeno}`)
+				bar.setAttribute("href", `/badges/{{NAME}}/${badgeno}${location.search}`)
 				bar.classList.add("bar")
 				bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
 				var nextValue = info.data["{{NAME}}"].badges[badgeno]
@@ -119,14 +120,14 @@ getData().then((info) => {
 	}
 	if (!is_specialty) {
 		var e = document.querySelector("#badges") // NVAPREMU
-		e.innerHTML += `<a href="/badges/{{NAME}}/0"><div class="badge badge-bronze">N</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/1"><div class="badge badge-bronze">V</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/2"><div class="badge badge-bronze">A</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/3"><div class="badge badge-silver">P</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/4"><div class="badge badge-silver">R</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/5"><div class="badge badge-gold">E</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/6"><div class="badge badge-gold">M</div></a>`
-		e.innerHTML += `<a href="/badges/{{NAME}}/7"><div class="badge badge-platinum">U</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/0${location.search}"><div class="badge badge-bronze">N</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/1${location.search}"><div class="badge badge-bronze">V</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/2${location.search}"><div class="badge badge-bronze">A</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/3${location.search}"><div class="badge badge-silver">P</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/4${location.search}"><div class="badge badge-silver">R</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/5${location.search}"><div class="badge badge-gold">E</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/6${location.search}"><div class="badge badge-gold">M</div></a>`
+		e.innerHTML += `<a href="/badges/{{NAME}}/7${location.search}"><div class="badge badge-platinum">U</div></a>`
 	} else {
 		document.querySelectorAll("#badges, :has( + #badges)").forEach((e) => e.remove())
 	}

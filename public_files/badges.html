@@ -40,19 +40,20 @@
 		<script>
 tabs();
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var names = Object.keys(info.data)
 	for (var i = 0; i < names.length; i++) {
 		var badge_set = info.data[names[i]].badges
 		if (badge_set.length == 0) continue;
 		var e = document.createElement("tr")
 		var n = document.createElement("td")
-		n.innerHTML = `<a href="/leaderboard/${names[i]}" style="color: rgb(0, 0, 200);">${names[i]}</a>`
+		n.innerHTML = `<a href="/leaderboard/${names[i]}${location.search}" style="color: rgb(0, 0, 200);">${names[i]}</a>`
 		e.appendChild(n)
 		for (var x = 0; x < badge_set.length; x++) {
 			var n = document.createElement("td")
 			n.innerText = info.data[names[i]].isTime ? formatTime(badge_set[x]) : addCommas(badge_set[x])
 			var bl = document.createElement("a")
-			bl.href = "/badges/" + names[i] + "/" + x
+			bl.href = "/badges/" + names[i] + "/" + x + location.search
 			n.appendChild(bl)
 			var b = document.createElement("div")
 			b.classList.add("badge")

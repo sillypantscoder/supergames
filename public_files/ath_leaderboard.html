@@ -24,6 +24,7 @@
 		<script>
 tabs();
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var users = info.getUserList()
 	var user_data = {}
 	for (var i = 0; i < users.length; i++) {
@@ -57,7 +58,7 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			e.children[0].setAttribute("style", "text-align: right;")
 			e.children[0].appendChild(document.createElement("a"))
-				e.children[0].children[0].href = "/profile/" + user
+				e.children[0].children[0].href = "/profile/" + user + location.search
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].innerText = user
 		e.appendChild(document.createElement("td"))

@@ -31,11 +31,13 @@ function getData() {
 	return new Promise((resolve) => {
 		var info = {
 			users: null,
-			data: null
+			data: null,
+			profile: null
 		}
 		function finish() {
 			if (info.users == null) return
 			if (info.data == null) return
+			if (info.profile == null) return
 			generateObject(info)
 		}
 		var x1 = new XMLHttpRequest()
@@ -52,6 +54,13 @@ function getData() {
 			finish()
 		})
 		x2.send()
+		var x3 = new XMLHttpRequest()
+		x3.open("GET", "/usercheck" + location.search)
+		x3.addEventListener("loadend", (e) => {
+			info.profile = JSON.parse(e.target.responseText)
+			finish()
+		})
+		x3.send()
 		// generator
 		function generateObject(info) {
 			function getUserList() {
@@ -283,7 +292,8 @@ function getData() {
 				getMetaPoints,
 				getActivityPoints,
 				data: info.data,
-				users: info.users
+				users: info.users,
+				profile: info.profile
 			})
 		}
 	})

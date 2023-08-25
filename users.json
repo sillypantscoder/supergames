@@ -2,6 +2,7 @@
 	{
 		"name": "test user",
 		"date": "1970-01-01",
-		"email": ""
+		"email": "",
+		"password": "whatever"
 	}
 ]

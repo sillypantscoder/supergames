@@ -1,9 +1,10 @@
 var tabs_default = [
-	'<a class="tab" href="/list.html">Leaderboard List</a>',
-	'<a class="tab" href="/badges.html">Badges</a>',
-	'<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>',
-	'<a class="tab" href="/meta.html">Meta</a>',
-	'<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>'
+	`<a class="tab" href="/login.html${location.search}" id="login-tab"><b>Login</b></a>`,
+	`<a class="tab" href="/list.html${location.search}">Leaderboard List</a>`,
+	`<a class="tab" href="/badges.html${location.search}">Badges</a>`,
+	`<a class="tab" href="/badge_leaderboard.html${location.search}">Badge Leaderboard</a>`,
+	`<a class="tab" href="/meta.html${location.search}">Meta</a>`,
+	`<a class="tab" href="/activity_leaderboard.html${location.search}">Activity Leaderboard</a>`
 ]
 function beginTabs() {
 	var e = document.createElement("div")
@@ -25,7 +26,7 @@ tabs = () => {
 			addTab('<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>')
 		}
 		var elm = addTab(tabs_default[i])
-		if (tabs_default[i].match(/href="([\/a-z_\.]+)"/)[1] == location.pathname) {
+		if (tabs_default[i].match(/href="([\/a-z_\.]+)(\?[0-9]*)?"/)[1] == location.pathname) {
 			elm.removeAttribute("href")
 			elm.classList.add("selected")
 		}
@@ -47,3 +48,19 @@ tabs.extra = (tabi, tabname) => {
 		addTab('<a class="tab selected">' + tabname + '</a>')
 	}
 };
+tabs.userfix = (profile) => {
+	if (profile.length == 0) return;
+	else profile = profile[0]
+	// We are logged in
+	document.querySelector("#login-tab").innerText = "My Profile"
+	document.querySelector("#login-tab").href = "/profile/" + profile.name + location.search
+	if (location.pathname == "/profile/" + encodeURIComponent(profile.name)) {
+		document.querySelector("#login-tab").remove()
+		// We are on our own profile page!
+		document.querySelector("#self").innerHTML = "<b>This is your profile page.</b> <a style='color: rgb(0, 0, 200);' href='/'>Sign Out</a>"
+	} else {
+		if (document.querySelector("#self")) {
+			document.querySelector("#self").remove()
+		}
+	}
+}

@@ -22,13 +22,14 @@ h2 {
 		</div>
 		<div>
 			<h2>Leaderboard</h2>
-			<a href="/leaderboard/{{NAME}}" style="color: rgb(0, 0, 200);" class="physics">Show leaderboard for {{SNAME}}</a>
+			<a href="/leaderboard/{{NAME}}" id="leaderboard_link" style="color: rgb(0, 0, 200);" class="physics">Show leaderboard for {{SNAME}}</a>
 		</div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
 		<script>
-tabs.extra(2, "{{SRANK}} {{SNAME}}")
+tabs.extra(3, "{{SRANK}} {{SNAME}}")
 getData().then((info) => {
+	tabs.userfix(info.profile);
 	var badge_value = info.data["{{NAME}}"].badges[{{RANK}}]
 	var badge_desc = info.data["{{NAME}}"].desc
 	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", info.data["{{NAME}}"].isTime ? formatTime(badge_value) : addCommas(badge_value))}`
@@ -37,7 +38,7 @@ getData().then((info) => {
 	for (var i = 0; i < owners.length; i++) {
 		var e = document.createElement("li")
 		e.appendChild(document.createElement("a"))
-			e.children[0].href = "/profile/" + owners[i]
+			e.children[0].href = "/profile/" + owners[i] + location.search
 			e.children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 			e.children[0].appendChild(document.createElement("b"))
 				e.children[0].children[0].innerText = owners[i]
@@ -52,6 +53,7 @@ getData().then((info) => {
 	}
 })
 if (top != window) document.querySelector("#sites-tab").remove()
+document.querySelector("#leaderboard_link").href += location.search
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

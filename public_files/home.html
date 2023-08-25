@@ -49,6 +49,7 @@ h2 {
 		<h1>SUPERGAMES</h1>
 		<h2>For gamers that demand more</h2>
 		<div class="buttons">
+			<a href="/login.html">Login</a>
 			<a href="/list.html">Leaderboard List</a>
 			<a href="/badges.html">Badge List</a>
 			<a href="/badge_leaderboard.html">Badge Leaderboard</a>
@@ -63,5 +64,19 @@ h2 {
 			<div>Version 3.3.8</div>
 		</div>
 		<script src="/background.js"></script>
+		<script>
+(() => {
+	var elms = document.querySelectorAll(".buttons > a")
+	for (var i = 0; i < elms.length; i++) {
+		if (i == 0) {
+			if (location.search != "") {
+				elms[i].remove()
+			}
+		} else {
+			elms[i].href += location.search
+		}
+	}
+})();
+		</script>
 	</body>
 </html>
