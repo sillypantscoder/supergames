@@ -7,15 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="/table.css" />
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab selected">Rank Color Testing</a>
-		</div>
+		<div class="tabs"></div>
 		<h1>Rank Color Testing</h1>
 		<div>
 			<table id="rct_table">
@@ -28,7 +20,9 @@
 			</table>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs.extra(5, "Rank Color Testing")
 for (var i = 0; i < 1000000; i = 1 + Math.floor(i * 1.1)) {
 	// Create the element
 	var e = document.createElement("tr")

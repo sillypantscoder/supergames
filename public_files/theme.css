@@ -7,11 +7,17 @@ body {
 	margin-left: 1em;
 }
 .tabs {
-	/* background: #44e494; */
+	width: 100%;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tabwrapcontainer {
 	padding-top: 1em;
 	display: flex;
 	flex-direction: row;
 	border-bottom: 2px solid #666;
+	width: max-content;
 }
 .tab {
 	position: relative;

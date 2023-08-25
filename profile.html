@@ -48,16 +48,7 @@
 		</style>
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab selected">Profile: {{NAME}}</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<div class="rm" id="stuff"></div>
 		<h1>Profile: <b>{{NAME}}</b></h1>
 		<h2 class="rm">Info</h2>
@@ -81,7 +72,9 @@
 			<p>Once your submission is accepted, this message will go away. You can find this button on the home page (second-to-right button).</p>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs.extra(0, "Profile: {{NAME}}");
 (() => {
 	if ([/*"Epicrafter", */"General Hunter"].includes("{{NAME}}") || location.search == "?bored") {
 		var x = new XMLHttpRequest()
@@ -148,6 +141,17 @@ getData().then((info) => {
 			s += `color: ${getColor(i)};`
 			s += "'>"
 			e.children[3].innerHTML = `${s}${i + 1}${getSuffix(i + 1)} place</span>`
+		if (i > 0) {
+			var ranks = info.getLeaderboardRanks(eventlist[eventno])
+			var bar = document.createElement("a")
+			bar.classList.add("bar")
+			bar.innerText = String(i) + getSuffix(i)
+			var nextValue = info.getScore(ranks[i - 1], eventlist[eventno])
+			var thisValue = info.getScore(ranks[i], eventlist[eventno])
+			var prevValue = info.getScore(ranks[i + 1], eventlist[eventno])
+			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)};`);
+			e.children[3].appendChild(bar)
+		}
 		document.querySelector("table tbody").appendChild(e)
 	}
 	// badge leaderboard

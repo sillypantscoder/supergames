@@ -8,15 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab selected">Meta</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<h1 class="no-outline"><span class="outline">Meta Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. The winner is the person with the least number of points.';" tabindex="0"></span></h1>
 		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
 		<div>
@@ -31,7 +23,9 @@
 			</table>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs();
 getData().then((info) => {
 	var users = info.getUserList()
 	users.reverse()

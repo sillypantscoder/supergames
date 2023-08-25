@@ -34,16 +34,7 @@
 		</style>
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab selected">Leaderboard for {{NAME}}</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';" tabindex="0"></span></h1>
 		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
 		<table>
@@ -57,7 +48,9 @@
 		<h2>Badges for {{NAME}}</h2>
 		<div id="badges"></div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs.extra(1, "Leaderboard for {{NAME}}");
 getData().then((info) => {
 	var ranks = info.getLeaderboardRanks("{{NAME}}")
 	var is_specialty = info.data["{{NAME}}"].badges.length == 0

@@ -13,16 +13,7 @@ h2 {
 		</style>
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab selected">{{SRANK}} {{SNAME}}</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<h1><b>{{SRANK}} {{SNAME}}</b> badge</h1>
 		<div id="badge_desc" class="physics"></div>
 		<div>
@@ -34,7 +25,9 @@ h2 {
 			<a href="/leaderboard/{{NAME}}" style="color: rgb(0, 0, 200);" class="physics">Show leaderboard for {{SNAME}}</a>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs.extra(2, "{{SRANK}} {{SNAME}}")
 getData().then((info) => {
 	var badge_value = info.data["{{NAME}}"].badges[{{RANK}}]
 	var badge_desc = info.data["{{NAME}}"].desc

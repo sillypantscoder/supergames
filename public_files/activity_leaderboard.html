@@ -8,15 +8,7 @@
 		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab" href="/badges.html">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab selected">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<h1 class="no-outline"><span class="outline">Activity Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'You get a point each time you get 1/25 of Vassal for each leaderboard.';" tabindex="0"></span></h1>
 		<div>
 			<table id="athl">
@@ -30,7 +22,9 @@
 			</table>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs();
 getData().then((info) => {
 	var users = info.getUserList()
 	var user_data = {}

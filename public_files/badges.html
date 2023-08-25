@@ -13,15 +13,7 @@
 		</style>
 	</head>
 	<body>
-		<div class="tabs">
-			<a href="/"><img src="/logo.png"></a>
-			<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>
-			<a class="tab" href="/list.html">Leaderboard List</a>
-			<a class="tab selected">Badges</a>
-			<a class="tab" href="/badge_leaderboard.html">Badge Leaderboard</a>
-			<a class="tab" href="/meta.html">Meta</a>
-			<a class="tab" href="/activity_leaderboard.html">Activity Leaderboard</a>
-		</div>
+		<div class="tabs"></div>
 		<h1>Badges</h1>
 		<table>
 			<tr>
@@ -44,7 +36,9 @@
 			<div class="physics" style="color: #00ffff;">There is nothing so rare, so pure as one of these platinum badges. Only a selected few ever reach this level of greatness!!!</div>
 		</div>
 		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
 		<script>
+tabs();
 getData().then((info) => {
 	var names = Object.keys(info.data)
 	for (var i = 0; i < names.length; i++) {
