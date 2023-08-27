@@ -70,7 +70,16 @@ h2 {
 	for (var i = 0; i < elms.length; i++) {
 		if (i == 0) {
 			if (location.search != "") {
-				elms[i].remove()
+				elms[i].innerText = "My Profile";
+				((i) => {
+					var x = new XMLHttpRequest()
+					x.open("GET", "/usercheck" + location.search)
+					x.addEventListener("loadend", (e) => {
+						var profile = JSON.parse(e.target.responseText)
+						elms[i].href = "/profile/" + profile[0].name + location.search
+					})
+					x.send()
+				})(i);
 			}
 		} else {
 			elms[i].href += location.search

@@ -8,6 +8,7 @@ body {
 }
 .tabs {
 	width: 100%;
+	overflow: auto;
 }
 .tabs::-webkit-scrollbar {
   display: none;

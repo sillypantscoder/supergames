@@ -224,8 +224,33 @@ getData().then((info) => {
 	if (document.querySelector("table tbody").children.length <= 2) {
 		document.querySelector("#hint").removeAttribute("style")
 	}
+	// Are we on our own profile page?
+	if (document.querySelector("#self")) {
+		// Yes we are!
+		document.querySelector("#self").innerHTML = "<b>This is your profile page.</b> <a style='color: rgb(0, 0, 200);' href='/'>Sign Out</a> <a style='color: rgb(0, 0, 200);' href='javascript:void(changepwd());'>Change Password</a>"
+		if (info.profile[0].admin) {
+			document.querySelector("#self").innerHTML += " <a style='color: rgb(0, 0, 200);' href='javascript:void(changeuser());'>Change User</a>"
+			window.changeuser = () => {
+				var newUser = prompt("Enter the new username")
+				if (newUser == null) return;
+				location.replace("/user_id_create/sudo?" + location.search.substr(1) + "&" + newUser)
+			}
+		}
+	}
 })
 if (top != window) document.querySelector("#sites-tab").remove()
+function changepwd() {
+	var newPwd = prompt("Enter the new password")
+	if (newPwd == null) return;
+	if (confirm("Are you sure you want to change your password? (You will be logged out.)")) {
+		var x = new XMLHttpRequest()
+		x.open("POST", "/setting/pwd")
+		x.addEventListener("loadend", (e) => {
+			location.replace("/login.html")
+		})
+		x.send(location.search.substr(1) + "\n" + newPwd)
+	}
+}
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

@@ -3,6 +3,14 @@
 		"name": "test user",
 		"date": "1970-01-01",
 		"email": "",
-		"password": "whatever"
+		"password": "whatever",
+		"admin": true
+	},
+	{
+		"name": "another test user",
+		"date": "1970-01-01",
+		"email": "",
+		"password": "ag ag ag ag ag",
+		"admin": false
 	}
 ]

@@ -54,6 +54,13 @@ def getUserFromID(id):
 			return n
 	return None
 
+def getPwdFromUser(name):
+	ou = json.loads(read_file("users.json"))
+	for n in ou:
+		if name == n["name"]:
+			return n["password"]
+	return None
+
 def getIDFromUser(name, pwd):
 	ou = json.loads(read_file("users.json"))
 	for n in ou:
@@ -75,6 +82,7 @@ def get(path):
 		ou = json.loads(read_file("users.json"))
 		for n in ou:
 			del n["password"]
+			del n["admin"]
 		return {
 			"status": 200,
 			"headers": {
@@ -168,7 +176,7 @@ def get(path):
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"content": json.dumps([{"name": user["name"]}]) if user != None else "[]"
+			"content": json.dumps([{"name": user["name"], "admin": user["admin"]}]) if user != None else "[]"
 		}
 	elif path.split("?")[0] == "/user_id_create":
 		u = path.split("?")[1].split("&")[0]
@@ -180,6 +188,26 @@ def get(path):
 				"Content-Type": "text/html"
 			},
 			"content": f"<script>location.replace('/?{id}')</script>"
+		}
+	elif path.split("?")[0] == "/user_id_create/sudo":
+		u = path.split("?")[1].split("&")[0]
+		p = path.split("?")[1].split("&")[1]
+		user = getUserFromID(u)
+		if user["admin"]:
+			newID = getIDFromUser(p, getPwdFromUser(p))
+			return {
+				"status": 200,
+				"headers": {
+					"Content-Type": "text/html"
+				},
+				"content": f"<script>location.replace('/?{newID}')</script>"
+			}
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": f"<script>location.replace('/?{u}')</script>"
 		}
 	else: # 404 page
 		return {
@@ -267,6 +295,18 @@ def post(path, body):
 		# Finish
 		return {
 			"status": 301,
+			"headers": {},
+			"content": f""
+		}
+	elif path == "/setting/pwd":
+		bodydata = body.decode("UTF-8").split("\n")
+		ou = json.loads(read_file("users.json"))
+		for n in ou:
+			if str(multiply(n["name"], n["password"])) == bodydata[0]:
+				n["password"] = bodydata[1]
+		write_file("users.json", json.dumps(ou, indent='\t'))
+		return {
+			"status": 200,
 			"headers": {},
 			"content": f""
 		}

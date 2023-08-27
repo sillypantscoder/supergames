@@ -26,6 +26,40 @@ function getSuffix(i) {
 	if (i == 13) return 'th'
 	return ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"][Number(String(i)[String(i).length - 1])]
 }
+function describe(key, obj) {
+	var e = frame.createElement("div")
+	e.setAttribute("style", "font-family: monospace;")
+	if (typeof obj == "string") {
+		e.innerHTML = `${key}: <span style="color: orange;">"` + obj + '"</span>'
+	} else if (typeof obj == "number") {
+		e.innerHTML = `${key}: <span style="color: blue;">${obj}</span>`
+	} else if (typeof obj == "object") {
+		if (Array.isArray(obj)) {
+			e.innerHTML = `<span><span>&gt;</span> <span>${key}: [${obj.length} items]</span></span>`
+		} else {
+			e.innerHTML = `<span><span>&gt;</span> <span>${key}: {...}</span></span>`
+		}
+		e.children[0].addEventListener("click", expand)
+	}
+	var expanded = false
+	function expand() {
+		if (! expanded) {
+			e.children[0].children[0].innerText = "x"
+			expanded = true
+			e.appendChild(frame.createElement("div"))
+			e.children[1].setAttribute("style", "margin-left: 4ch;")
+			var items = [Object.keys(obj), Object.values(obj)]
+			for (var i = 0; i < items[0].length; i++) {
+				e.children[1].appendChild(describe(items[0][i], items[1][i]))
+			}
+		} else {
+			e.children[0].children[0].innerText = ">"
+			expanded = false
+			e.children[1].remove()
+		}
+	}
+	return e
+}
 
 function getData() {
 	return new Promise((resolve) => {
