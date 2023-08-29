@@ -42,6 +42,17 @@ h2 {
 	text-decoration: none;
 	background: #03fccf;
 }
+
+.card {
+	background: #03fccf;
+	width: 75vw;
+	border-radius: 1em;
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	text-align: center;
+	font-family: sans-serif;
+}
 		</style>
 	</head>
 	<body>
@@ -59,6 +70,18 @@ h2 {
 			<a href="/apply.html"><b>Apply Now!</b></a>
 			<a href="https://docs.google.com/forms/d/e/1FAIpQLSc58l5O1rnrituu9xOfaD-vZZjgaLCCF73MaljxQGQM-7jy9w/viewform?usp=sf_link">Submit rankings or feedback</a>
 			<a href="https://docs.google.com/forms/d/e/1FAIpQLSclZPRNT6wJKfaCd5_V7SQ1jxlfZFfbL_15CILIMtD5teiChA/viewform?usp=sf_link">Vote for new features</a>
+			<a href="/conduct.html">Code of Conduct</a>
+		</div>
+		<div class="card">
+			<h4>Welcome to SuperGames!</h4>
+			<p><b>SuperGames</b> is a place for gamers that demand more than just what video games can provide. There are leaderboards to climb and badges to earn by completing in-game activities. Just <a href="/apply.html">join and try it out</a>. If you are a gamer, I guarantee you will like it. Know that you will need an active Nintendo Switch Online Play membership to achieve certain badges.</p>
+			<p><i style="font-size: 0.8em;">(Note: SuperGames is hosted on Replit, so make sure *.repl.co is allowed on your device or else you cannot access the website. Sometimes repl.co gets blacklisted for some reason. The issue usually sorts itself out in 3 hours or so.)</i></p>
+			<p>
+				<div>Idea by: Epicrafter</div>
+				<div>Features by: Epicrafter, Jacksondbf, and Woodmarxer.</div>
+				<div>Code by: Epicrafter and Sillypantscoder.</div>
+				<div>Final Product code by: Sillypantscoder.</div>
+			</p>
 		</div>
 		<div>
 			<div>Version 3.3.8</div>
@@ -77,8 +100,10 @@ h2 {
 					x.addEventListener("loadend", (e) => {
 						var profile = JSON.parse(e.target.responseText)
 						elms[i].href = "/profile/" + profile[0].name + location.search
+						alert("Ended")
 					})
 					x.send()
+					alert("Started")
 				})(i);
 			}
 		} else {

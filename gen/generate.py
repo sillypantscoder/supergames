@@ -12,8 +12,10 @@ newData = {}
 for line in d:
 	if line[0] == "DONTREGISTER": continue;
 	newData[line[0]] = {
-		"badges": [int(x) for x in line[1:-4]] if line[1] != '' else [],
-		"desc": line[-4],
+		"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
+		"badge_desc": line[-5],
+		"leaderboard_desc": line[-4],
+		"desc": line[-5],
 		"entries": [],
 		"isTime": line[-2] == "Time",
 		"reverseOrder": line[-3] == "Lowest"
@@ -21,11 +23,9 @@ for line in d:
 
 for name in data:
 	if name not in newData.keys():
-		do = True
 		print(f"Warning: {name} is not in the CSV file!")
-		i = input(f"\tThere are {len(data[name]['entries'])} entries, delete this leaderboard? :")
-		if len(i) == 0: do = False
-		if do: newData[name] = data[name]
+		i = input(f"\tThere are {len(data[name]['entries'])} entries, delete this leaderboard? [y/N]:")
+		if i != "yes": newData[name] = data[name]
 	else:
 		newData[name]["entries"] = data[name]["entries"]
 

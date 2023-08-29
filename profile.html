@@ -152,7 +152,7 @@ getData().then((info) => {
 			else s += " style='font-size: 0.8em; opacity: 0.7; "
 			s += `color: ${getColor(pcscore)};`
 			s += "'>"
-			if (duplicates.length > 1) s += "<i>(T)</i> "
+			if (duplicates.length > 1) s += "<i>T</i> "
 			e.children[3].innerHTML = `${s}${pcscore + 1}${getSuffix(pcscore + 1)} place</span>`
 		if (pcscore > 0) {
 			var ranks = info.getLeaderboardRanks(eventlist[eventno])

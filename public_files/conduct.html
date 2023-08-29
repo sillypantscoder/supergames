@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<style>
+body {
+	min-height: 50vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+img {
+	max-width: 15vw;
+	margin: 2em;
+	margin-top: 4em;
+}
+.buttons {
+	display: flex;
+	width: 100%;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+.buttons a {
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 1em;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+}
+
+h4 {
+	margin-top: 0;
+}
+.card {
+	background: #03fccf;
+	width: 75vw;
+	border-radius: 1em;
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	/* text-align: center; */
+	font-family: sans-serif;
+}
+		</style>
+	</head>
+	<body>
+		<img src="/logo.png">
+		<div class="buttons">
+			<a href="/home.html">Back Home</a>
+		</div>
+		<div class="card">
+			<h4>Code of Conduct</h4>
+			<ul>
+				<li><b>You cannot have an inappropriate nickname.</b> If you apply for an account and input an inappropriate nickname your account will not be created. If you try to change your username to an inappropriate one we will make your account inactive for 1 day the first time, 2 days the second time, etc. each time you try to change your username.</li>
+				<li><b>You cannot submit inappropriate content</b> through the google forms. Submitting inappropriate content through the google forms will result in your account being deleted.</li>
+				<li><b>Do not cheat.</b> We have a way to know if you are cheating or not. If we find out or hear about someone cheating then the person cheating will have their stats reverted and will have an inactive account for 1 month for the first time, 5 months the second time, and an account deletion the 3rd time.</li>
+				<li><b>Do not lie about your stats</b> (that includes ranks on leaderboards, badges you have, etc). If you lie 1 time then your account will be inactive for 1 day, if you lie 2 times then your account will be inactive for 2 days, etc. If you say you're in a spot on the leaderboard that you are actually in but cheated to get there, your account will be deleted. If you lie and say you're lower then you actually are (say you're actually in 147th and you say you're in 10,000th) then you will get "I Am Bored" pasted all over your profile page for 1 week each time you lie in this specific way. This way other users will know what you've done.</li>
+				<li>You will see in the Apply Now Page it asks you to put in a username and an email. We ask for this information so we can know we are recieving specific data from an actual person for each SuperGames user and because you will be able to use that email to:
+					<ul>
+						<li>Vote on potential updates</li>
+						<li>Ask questions</li>
+						<li>Request stat updates</li>
+						<li>Suggest ideas</li>
+						<li>Report bugs</li>
+						<li>Recieve important info/updates about SuperGames</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<script src="/background.js"></script>
+		<script>
+(() => {
+	var elms = document.querySelectorAll(".buttons > a")
+	for (var i = 0; i < elms.length; i++) {
+		elms[i].href += location.search
+	}
+})();
+		</script>
+	</body>
+</html>
