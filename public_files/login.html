@@ -6,10 +6,21 @@
 		<script src="/background.js"></script>
 		<link rel="stylesheet" type="text/css" href="/table.css" />
 		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<style>
+#invalid {
+	background: #FAA;
+	border: 1px solid red;
+	font-family: sans-serif;
+	margin: 1em;
+	padding: 1em;
+	border-radius: 1em;
+}
+		</style>
 	</head>
 	<body>
 		<div class="tabs"></div>
 		<h1>Login</h1>
+		<div style="display: none;" id="invalid">The username or password was incorrect.<br><br><button onclick="this.parentNode.remove()">Close</button></div>
 		<p>Username: <input type="text" id="username"></p>
 		<p>Password: <input type="password" id="password"></p>
 		<p><b>Note:</b> If you have not yet changed your password, your password is the same as your username. Please change your password soon!</p>
@@ -24,6 +35,7 @@ function finish() {
 	location.replace("/user_id_create?" + u + "&" + p)
 }
 if (top != window) document.querySelector("#sites-tab").remove()
+if (location.hash == "#invalid") document.querySelector("#invalid").removeAttribute("style")
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

@@ -182,6 +182,15 @@ def get(path):
 		u = path.split("?")[1].split("&")[0]
 		p = path.split("?")[1].split("&")[1]
 		id = getIDFromUser(unquote(u), unquote(p))
+		# print(repr(u), repr(p), repr(id))
+		if id == None:
+			return {
+				"status": 200,
+				"headers": {
+					"Content-Type": "text/html"
+				},
+				"content": f"<script>location.replace('/login.html#invalid')</script>"
+			}
 		return {
 			"status": 200,
 			"headers": {
@@ -200,7 +209,7 @@ def get(path):
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": f"<script>location.replace('/?{newID}')</script>"
+				"content": f"<script>location.replace('/profile/{getUserFromID(newID)['name']}?{newID}')</script>"
 			}
 		return {
 			"status": 200,
@@ -274,7 +283,15 @@ def post(path, body):
 		c = read_file("public_files/users.json")
 		now = datetime.datetime.now()
 		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}"
-		c = c[:-2] + ',\n\t{\n\t\t"name": "' + bodydata[0] + '",\n\t\t"date": "' + date + '",\n\t\t"email": "' + bodydata[1] + '"\n\t}\n]'
+		c = c[:-2] + f''',
+	{{
+		"name": {bodydata[0]},
+		"date": {date},
+		"email": {bodydata[1]},
+		"password": {bodydata[0]},
+		"admin": false
+	}}
+]'''
 		write_file("public_files/users.json", c)
 		# Update applications
 		c = read_file("public_files/applications.txt")
@@ -304,6 +321,18 @@ def post(path, body):
 		for n in ou:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["password"] = bodydata[1]
+		write_file("users.json", json.dumps(ou, indent='\t'))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": f""
+		}
+	elif path == "/setting/desc":
+		bodydata = body.decode("UTF-8").split("\n")
+		ou = json.loads(read_file("users.json"))
+		for n in ou:
+			if str(multiply(n["name"], n["password"])) == bodydata[0]:
+				n["desc"] = '\n'.join(bodydata[1:])
 		write_file("users.json", json.dumps(ou, indent='\t'))
 		return {
 			"status": 200,

@@ -100,10 +100,8 @@ h2 {
 					x.addEventListener("loadend", (e) => {
 						var profile = JSON.parse(e.target.responseText)
 						elms[i].href = "/profile/" + profile[0].name + location.search
-						alert("Ended")
 					})
 					x.send()
-					alert("Started")
 				})(i);
 			}
 		} else {

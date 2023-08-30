@@ -61,9 +61,6 @@ tabs.userfix = (profile) => {
 	if (location.pathname == "/profile/" + encodeURIComponent(profile.name)) {
 		document.querySelector("#login-tab").remove()
 		// We are on our own profile page!
-	} else {
-		if (document.querySelector("#self")) {
-			document.querySelector("#self").remove()
-		}
+		window.isOwnProfile = true
 	}
 }
