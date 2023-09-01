@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<style>
+#buttons {
+	display: flex;
+	flex-wrap: wrap;
+	/* justify-content: center; */
+}
+#buttons a {
+	display: inline-block;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+	border: 1px solid #666;
+	margin: 1em;
+	padding: 1em;
+	border-radius: 1em;
+}
+		</style>
+	</head>
+	<body>
+		<div class="tabs"></div>
+		<h1>Forms</h1>
+		<div id="buttons">Loading form list...</div>
+		<script src="/data.js"></script>
+		<script src="/tabs.js"></script>
+		<script>
+tabs();
+getData().then((info) => {
+	tabs.userfix(info.profile);
+	var x = new XMLHttpRequest()
+	x.open("GET", "/forms.json")
+	x.addEventListener("loadend", (e) => {
+		var forms = JSON.parse(e.target.responseText)
+		document.querySelector("#buttons").innerText = ""
+		for (var i = 0; i < forms.length; i++) {
+			var e = document.createElement("a")
+			e.innerText = forms[i].name
+			e.href = `/form/${i}${location.search}`
+			document.querySelector("#buttons").appendChild(e)
+		}
+	})
+	x.send()
+})
+if (top != window) document.querySelector("#sites-tab").remove()
+		</script>
+		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
+		<script src="/matter2.js"></script>
+	</body>
+</html>

@@ -64,3 +64,28 @@ h2 {
 	font-size: 1em;
 	color: #66b3e3;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* body {
+	filter: url(/goo.xml#fancy-goo);
+}
+@keyframes goo {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+} */

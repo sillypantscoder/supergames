@@ -4,7 +4,8 @@ var tabs_default = [
 	`<a class="tab" href="/badges.html${location.search}">Badges</a>`,
 	`<a class="tab" href="/badge_leaderboard.html${location.search}">Badge Leaderboard</a>`,
 	`<a class="tab" href="/meta.html${location.search}">Meta</a>`,
-	`<a class="tab" href="/activity_leaderboard.html${location.search}">Activity Leaderboard</a>`
+	`<a class="tab" href="/activity_leaderboard.html${location.search}">Activity Leaderboard</a>`,
+	`<a class="tab" href="/form_list.html${location.search}">Forms</a>`
 ]
 function beginTabs() {
 	var e = document.createElement("div")

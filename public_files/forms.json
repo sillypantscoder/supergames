@@ -1,0 +1,25 @@
+[
+	{
+		"name": "Report a Bug",
+		"questions": [
+			{
+				"type": "multiplechoice",
+				"title": "Select the bug type:",
+				"options": [
+					"Fatal (everything is gone / many dialogs show up on the screen)",
+					"Error (some page elements are missing / one dialog shows up)",
+					"Mistake (some elements are out of place or have the wrong color)"
+				]
+			},
+			{
+				"type": "text",
+				"title": "When did you start seeing this bug?"
+			},
+			{
+				"type": "text",
+				"title": "Please describe the bug, including facts like what page the bug is on, etc."
+			}
+		],
+		"responses": []
+	}
+]

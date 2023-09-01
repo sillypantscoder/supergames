@@ -103,7 +103,8 @@ def get(path):
 					"jpeg": "image/jpeg",
 					"png": "image/png",
 					"js": "application/javascript",
-					"txt": "text/plain"
+					"txt": "text/plain",
+					"xml": "image/svg+xml"
 				}[path.split("?")[0].split(".")[-1]]
 			},
 			"content": bin_read_file("public_files" + path.split("?")[0])
@@ -161,6 +162,25 @@ def get(path):
 				"Content-Type": "text/html"
 			},
 			"content": read_file("profile.html").replace("{{NAME}}", name.replace("%20", " "))
+		}
+	elif path.startswith("/form/"):
+		formid = path.split("?")[0].split("/")[2]
+		formlist = [x["name"] for x in json.loads(read_file("public_files/forms.json"))]
+		if formid.isdigit() and int(formid) < len(formlist):
+			name = formlist[int(formid)]
+			return {
+				"status": 200,
+				"headers": {
+					"Content-Type": "text/html"
+				},
+				"content": read_file("form.html").replace("{{NAME}}", name).replace("{{FORMID}}", formid)
+			}
+		return {
+			"status": 404,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": f"<script>location.replace('/form_list.html')</script>"
 		}
 	elif path == "/entryeditor":
 		return {
@@ -334,6 +354,34 @@ def post(path, body):
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["desc"] = '\n'.join(bodydata[1:])
 		write_file("users.json", json.dumps(ou, indent='\t'))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": f""
+		}
+	elif path == "/submit_form":
+		bodydata = json.loads(body.decode("UTF-8"))
+		forms = json.loads(read_file("public_files/forms.json"))
+		forms[bodydata["id"]]["responses"].append({
+			"user": getUserFromID(bodydata["user"])["name"],
+			"results": bodydata["results"]
+		})
+		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": f""
+		}
+	elif path == "/delete_submission":
+		bodydata = body.decode("UTF-8").split("\n")
+		if getUserFromID(bodydata[0])["admin"] == False: return {
+			"status": 404,
+			"headers": {},
+			"content": f""
+		}
+		forms = json.loads(read_file("public_files/forms.json"))
+		del forms[int(bodydata[1])]["responses"][int(bodydata[2])]
+		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
 		return {
 			"status": 200,
 			"headers": {},
