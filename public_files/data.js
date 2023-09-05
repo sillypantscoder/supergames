@@ -315,8 +315,20 @@ function getData() {
 					var event = eventlist[n]
 					var ranks = getLeaderboardRanks(event)
 					var rank = ranks.indexOf(user)
+					var score = getScore(user, event)
 					if (rank == -1) points += users.length
-					else points += rank + 1
+					else {
+						// Find real score
+						var duplicates = getDuplicates(eventlist[n], score)
+						var pcscore = rank + 0
+						for (var xn = rank - 1; xn >= 0; xn--) {
+							if (duplicates.includes(ranks[xn])) {
+								pcscore -= 1
+							}
+						}
+						// Give points
+						points += pcscore + 1
+					}
 				}
 				return points
 			}
