@@ -77,7 +77,7 @@
 		<div class="rm physics" id="hint" style="display: none;">
 			<h2>Hey!</h2>
 			<p>It looks like you haven't done anything yet. To get badges, you need to submit your scores from various games. Use the link below to submit scores!</p>
-			<p style="padding: 1em;"><a href="https://docs.google.com/forms/d/e/1FAIpQLSc58l5O1rnrituu9xOfaD-vZZjgaLCCF73MaljxQGQM-7jy9w/viewform?usp=sf_link">Submit your scores!</a></p>
+			<p style="padding: 1em;"><a id="submitscoresbtn">Submit your scores!</a></p>
 			<p>Once your submission is accepted, this message will go away. You can find this button on the home page (second-to-right button).</p>
 		</div>
 		<script src="/data.js"></script>
@@ -241,18 +241,22 @@ getData().then((info) => {
 		e.appendChild(document.createElement("td"))
 			e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(active_rank)};">${active_rank + 1}${getSuffix(active_rank + 1)} place</b>`
 		document.querySelector("table tbody").appendChild(e)
-	// Hint
-	if (document.querySelector("table tbody").children.length <= 2) {
-		document.querySelector("#hint").removeAttribute("style")
-	}
 	// Are we on our own profile page?
 	if (window.isOwnProfile) {
 		// Yes we are!
+		// Add buttons
 		document.querySelector("#self").innerHTML = "<b>This is your profile page.</b> <a style='color: rgb(0, 0, 200);' href='/'>Sign Out</a> <a style='color: rgb(0, 0, 200);' href='javascript:void(changepwd());'>Change Password</a>"
+		// Add "change description" button
 		document.querySelector("#desc").insertAdjacentElement("afterBegin", document.createElement("div"))
 		document.querySelector("#desc").childNodes[0].appendChild(document.createElement("button"))
 		document.querySelector("#desc").childNodes[0].children[0].innerText = "edit"
 		document.querySelector("#desc").childNodes[0].children[0].setAttribute("onclick", "changedesc()")
+		// Hint
+		if (document.querySelector("table tbody").children.length <= 4) {
+			document.querySelector("#hint").removeAttribute("style")
+			document.querySelector("#submitscoresbtn").setAttribute("href", "/form/0" + location.search)
+		}
+		// Admin tools
 		if (info.profile[0].admin) {
 			// document.querySelector("#self").innerHTML += " <a style='color: rgb(0, 0, 200);' href='javascript:void(changeuser());'>Change User</a>"
 			window.changeuser = () => {

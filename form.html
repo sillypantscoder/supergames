@@ -209,7 +209,10 @@ function fillResponse(response) {
 			elms[i].children[1].appendChild(document.createElement("iframe"))
 			elms[i].children[1].children[0].setAttribute("src", result)
 		} else if (qtype == "multiplechoice") {
-			elms[i].children[1].children[result].children[0].setAttribute("checked", "")
+			if (result != -1) {
+				var newE = elms[i].children[1].children[result]
+				newE.children[0].setAttribute("checked", "")
+			}
 		}
 	}
 }

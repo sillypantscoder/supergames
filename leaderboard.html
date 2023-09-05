@@ -74,7 +74,7 @@ getData().then((info) => {
 				e.children[0].children[0].classList.add("outline")
 				e.children[0].children[0].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
 				e.children[0].children[0].innerHTML = (duplicates.length > 1 ? "<i>T</i> " : "") + String(pcscore + 1) + getSuffix(pcscore + 1)
-		if (i > 0 && (! info.data["{{NAME}}"].reverseOrder)) {
+		if (pcscore > 0 && (! info.data["{{NAME}}"].reverseOrder)) {
 			var bar = document.createElement("a")
 			bar.classList.add("bar")
 			bar.innerText = String(pcscore) + getSuffix(pcscore)
