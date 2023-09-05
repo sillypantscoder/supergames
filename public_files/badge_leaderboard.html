@@ -70,7 +70,6 @@ getData().then((info) => {
 		`<div class="physics">Total badges available to earn:</div>` +
 		`<span class="physics"><div class='badge badge-bronze'></div>${total_events * 3}</span> <span class="physics"><div class='badge badge-silver'></div>${total_events * 2}</span> <span class="physics"><div class='badge badge-gold'></div>${total_events * 2}</span> <span class="physics"><div class='badge badge-platinum'></div>${total_events * 1}</span>`
 })
-if (top != window) document.querySelector("#sites-tab").remove()
 function scrollToEntrySpecial() {
 	document.querySelector("#e").valueAsNumber -= 1
 	scrollToEntry()

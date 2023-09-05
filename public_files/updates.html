@@ -23,7 +23,6 @@ p {
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 
-if (top != window) document.querySelector("#sites-tab").remove()
 tabs.extra(4, "Updates")
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>

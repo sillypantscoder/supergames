@@ -24,7 +24,6 @@ tabs = () => {
 	for (var i = 0; i < tabs_default.length; i++) {
 		if (i == 0) {
 			addTab(`<a href="/${location.search}"><img src="/logo.png"></a>`)
-			addTab('<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>')
 		}
 		var elm = addTab(tabs_default[i])
 		if (tabs_default[i].match(/href="([\/a-z_\.]+)(\?[0-9]*)?"/) && tabs_default[i].match(/href="([\/a-z_\.]+)(\?[0-9]*)?"/)[1] == location.pathname) {
@@ -38,7 +37,6 @@ tabs.extra = (tabi, tabname) => {
 	for (var i = 0; i < tabs_default.length; i++) {
 		if (i == 0) {
 			addTab(`<a href="/${location.search}"><img src="/logo.png"></a>`)
-			addTab('<a class="tab" id="sites-tab" href="https://sites.google.com/svvsd.org/supergames/home">Google Sites Home</a>')
 		}
 		if (i == tabi) {
 			addTab('<a class="tab selected">' + tabname + '</a>')
