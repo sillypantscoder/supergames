@@ -207,6 +207,13 @@ function getData() {
 					if (entry_info[0] == user) return entry_info[1]
 				}
 			}
+			function getDesc(user, event) {
+				var event_info = info.data[event].entries
+				for (var i = 0; i < event_info.length; i++) {
+					var entry_info = event_info[i]
+					if (entry_info[0] == user) return entry_info[3]
+				}
+			}
 			function getDuplicates(event, score) {
 				var users = []
 				var event_info = info.data[event].entries
@@ -351,6 +358,7 @@ function getData() {
 				getBadgeTypeCounts,
 				getTotalBadgeCounts,
 				getScore,
+				getDesc,
 				getDuplicates,
 				getBadgeCount,
 				getBadgeOwners,

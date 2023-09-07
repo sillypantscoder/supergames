@@ -43,6 +43,7 @@
 				<th>Name</th>
 				<th id="score_head">Score</th>
 				<th id="badge_head">Badges</th>
+				<th>Note</th>
 			</tr>
 		</table>
 		<h2>Badges for {{NAME}}</h2>
@@ -51,7 +52,7 @@
 		<script src="/tabs.js"></script>
 		<script>
 tabs.extra(2, "Leaderboard for {{NAME}}");
-getData().then((info) => {
+getData().then((info) => { try {
 	tabs.userfix(info.profile);
 	var ranks = info.getLeaderboardRanks("{{NAME}}")
 	var is_specialty = info.data["{{NAME}}"].badges.length == 0
@@ -118,6 +119,9 @@ getData().then((info) => {
 				e.children[3].appendChild(bar)
 			}
 		}
+		var newE = document.createElement("td")
+		newE.innerText = info.getDesc(ranks[i], "{{NAME}}")
+		e.appendChild(newE)
 		document.querySelector("table tbody").appendChild(e)
 	}
 	if (!is_specialty) {
@@ -134,6 +138,7 @@ getData().then((info) => {
 		document.querySelectorAll("#badges, :has( + #badges)").forEach((e) => e.remove())
 	}
 	document.querySelector("#e").setAttribute("max", i)
+}catch(e){alert(e)}
 })
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>

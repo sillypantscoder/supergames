@@ -21,6 +21,7 @@
 			<option value="replace">Replace</option>
 			<option value="max">Max</option>
 		</select></div>
+		<div>Note: <input id="desc" type="text"></div>
 		<div><button onclick="go()">Submit</button></div>
 		<div id="result"></div>
 		<script>window.addEventListener("error", (e) => alert(`${e.message}`))</script>
@@ -59,7 +60,7 @@ function go() {
 	x.addEventListener("loadend", (e) => {
 		document.body.querySelector("#result").innerText = e.target.responseText
 	})
-	x.send(`${eventname.value}\n${username.value}\n${score.value}\n${mode.value}`)
+	x.send(`${eventname.value}\n${username.value}\n${score.value}\n${mode.value}\n${desc.value}`)
 }
 function getScore() {
 	var user = username.value

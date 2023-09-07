@@ -28,6 +28,14 @@ def write_file(filename, content):
 	f.write(content)
 	f.close()
 
+def log(msg):
+	f = open("log.txt", "a")
+	f.write(datetime.datetime.now().isoformat())
+	f.write(" - ")
+	f.write(msg)
+	f.write("\n")
+	f.close()
+
 def multiply(s1, s2):
 	i1 = list(s1.encode("UTF-8"))
 	i2 = list(s2.encode("UTF-8"))
@@ -211,6 +219,7 @@ def get(path):
 				},
 				"content": f"<script>location.replace('/login.html#invalid')</script>"
 			}
+		log("User " + u + " logged in!")
 		return {
 			"status": 200,
 			"headers": {
@@ -258,28 +267,30 @@ def post(path, body):
 			username = bodydata[1]
 			score = bodydata[2]
 			mode = bodydata[3]
+			note = bodydata[4]
 			if eventname in data:
 				for d in data[eventname]["entries"]:
 					if d[0] == username:
 						# Update existing entry
-						update = f"Updated entry\n\tevent: {eventname}\n\tuser: {username}\n\told score: {d[1]}\n\tnew score: {score}\n\tmode: {mode}"
+						update = f"Updated entry\n\tevent: {eventname}\n\tuser: {username}\n\told score: {d[1]}\n\tnew score: {score}\n\tmode: {mode}\n\tnote: {note}"
 						if mode == "add": d[1] += float(score)
 						elif mode == "replace": d[1] = float(score)
 						else: d[1] = max(d[1], float(score))
 						d[2] = datetime.datetime.now().isoformat()
+						d[3] = note
 						update += f"\n\tregistered score: {d[1]}"
 						finished = True
 				if not finished:
 					# Create new entry
-					update = f"Created entry\n\tevent: {eventname}\n\tuser: {username}\n\tnew score: {score}"
-					data[eventname]["entries"].append([username, float(score), datetime.datetime.now().isoformat()])
+					update = f"Created entry\n\tevent: {eventname}\n\tuser: {username}\n\tnew score: {score}\n\tnote: {note}"
+					data[eventname]["entries"].append([username, float(score), datetime.datetime.now().isoformat(), note])
 			else:
-				update += f"\n\nERROR: Unknown event: {eventname}\nRequest data:\n\tuser: {username}\n\tscore: {score}\n\tmode: {mode}"
+				update += f"\n\nERROR: Unknown event: {eventname}\nRequest data:\n\tuser: {username}\n\tscore: {score}\n\tmode: {mode}\n\tnote: {note}"
 			write_file("public_files/data.json", json.dumps(data, indent='\t'))
 		except Exception as e:
 			update += "\nError was:\n\n"
 			update += ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-		print(update)
+		log("entryeditor: " + update)
 		return {
 			"status": 200,
 			"headers": {
@@ -291,6 +302,7 @@ def post(path, body):
 		bodydata = body.decode("UTF-8").split("\n")
 		c = read_file("public_files/applications.txt")
 		c = f"""\n==========\nUsername: {bodydata[0]}\nEmail address: {bodydata[1]}\n==========\n\n\n{c}"""
+		log(f"create application (username={bodydata[0]}, email={bodydata[1]})")
 		write_file("public_files/applications.txt", c)
 		return {
 			"status": 301,
@@ -312,6 +324,7 @@ def post(path, body):
 		"admin": false
 	}}
 ]'''
+		log("accept application for " + bodydata[0])
 		write_file("public_files/users.json", c)
 		# Update applications
 		c = read_file("public_files/applications.txt")
@@ -328,6 +341,7 @@ def post(path, body):
 		# Update applications
 		c = read_file("public_files/applications.txt")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Rejected]")
+		log("reject application for " + bodydata[0])
 		write_file("public_files/applications.txt", c)
 		# Finish
 		return {
@@ -338,9 +352,12 @@ def post(path, body):
 	elif path == "/setting/pwd":
 		bodydata = body.decode("UTF-8").split("\n")
 		ou = json.loads(read_file("users.json"))
+		name = "<error>"
 		for n in ou:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["password"] = bodydata[1]
+				name = n["name"]
+		log(f"{bodydata[0]} update pwd")
 		write_file("users.json", json.dumps(ou, indent='\t'))
 		return {
 			"status": 200,
@@ -350,9 +367,12 @@ def post(path, body):
 	elif path == "/setting/desc":
 		bodydata = body.decode("UTF-8").split("\n")
 		ou = json.loads(read_file("users.json"))
+		name = "<error>"
 		for n in ou:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["desc"] = '\n'.join(bodydata[1:])
+				name = n["name"]
+		log(f"{name} update desc")
 		write_file("users.json", json.dumps(ou, indent='\t'))
 		return {
 			"status": 200,
@@ -362,10 +382,12 @@ def post(path, body):
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
 		forms = json.loads(read_file("public_files/forms.json"))
+		name = getUserFromID(bodydata["user"])["name"]
 		forms[bodydata["id"]]["responses"].append({
-			"user": getUserFromID(bodydata["user"])["name"],
+			"user": name,
 			"results": bodydata["results"]
 		})
+		log(f"{name} submit form")
 		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
 		return {
 			"status": 200,
