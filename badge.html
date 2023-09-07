@@ -31,7 +31,7 @@ tabs.extra(3, "{{SRANK}} {{SNAME}}")
 getData().then((info) => {
 	tabs.userfix(info.profile);
 	var badge_value = info.data["{{NAME}}"].badges[{{RANK}}]
-	var badge_desc = info.data["{{NAME}}"].desc
+	var badge_desc = info.data["{{NAME}}"].badge_desc
 	document.querySelector("#badge_desc").innerText = `${badge_desc.replaceAll("%s", info.data["{{NAME}}"].isTime ? formatTime(badge_value) : addCommas(badge_value))}`
 	// owners
 	var owners = info.getBadgeOwners("{{NAME}}", {{RANK}})

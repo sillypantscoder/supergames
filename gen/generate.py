@@ -15,7 +15,6 @@ for line in d:
 		"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
 		"badge_desc": line[-5],
 		"leaderboard_desc": line[-4],
-		"desc": line[-5],
 		"entries": [],
 		"isTime": line[-2] == "Time",
 		"reverseOrder": line[-3] == "Lowest"

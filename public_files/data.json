@@ -10,7 +10,8 @@
 			1000000,
 			10000000
 		],
-		"desc": "Get %s points in something or rather",
+		"badge_desc": "Get %s points in something or rather",
+		"leaderboard_desc": "Get points in something or rather",
 		"entries": [
 			[
 				"test user",
@@ -24,7 +25,8 @@
 	},
 	"Example Specialty": {
 		"badges": [],
-		"desc": "",
+		"badge_desc": "",
+		"leaderboard_desc": "Do stuff",
 		"entries": [
 			[
 				"test user",
