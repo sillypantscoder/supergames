@@ -164,7 +164,7 @@ getData().then((info) => {
 			s += "'>"
 			if (duplicates.length > 1) s += "<i>T</i> "
 			e.children[3].innerHTML = `${s}${pcscore + 1}${getSuffix(pcscore + 1)} place</span>`
-		if (pcscore > 0) {
+		if (pcscore > 0 && (! info.data[eventlist[eventno]].reverseOrder)) {
 			var ranks = info.getLeaderboardRanks(eventlist[eventno])
 			var bar = document.createElement("a")
 			bar.classList.add("bar")
@@ -172,7 +172,9 @@ getData().then((info) => {
 			var nextValue = info.getScore(ranks[pcscore - 1], eventlist[eventno])
 			var thisValue = info.getScore(ranks[pcscore], eventlist[eventno])
 			var prevValue = info.getScore(ranks[pcscore + 1], eventlist[eventno])
-			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)};`);
+			if (prevValue == undefined) prevValue = 0
+			// bar.innerText = `${prevValue} - ${thisValue} - ${nextValue}`
+			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(pcscore - 1)};`);
 			e.children[3].appendChild(bar)
 		}
 		document.querySelector("table tbody").appendChild(e)

@@ -36,6 +36,11 @@ def log(msg):
 	f.write("\n")
 	f.close()
 
+def log_existence_check():
+	if os.path.isfile("log.txt"):
+		if "-" not in read_file("log.txt"):
+			os.remove("log.txt")
+
 def multiply(s1, s2):
 	i1 = list(s1.encode("UTF-8"))
 	i2 = list(s2.encode("UTF-8"))
@@ -77,6 +82,7 @@ def getIDFromUser(name, pwd):
 	return None
 
 def get(path):
+	log_existence_check()
 	if vandalize:
 		return {
 			"status": 200,
@@ -248,6 +254,7 @@ def get(path):
 			"content": f"<script>location.replace('/?{u}')</script>"
 		}
 	else: # 404 page
+		log("404 encountered: " + path)
 		return {
 			"status": 404,
 			"headers": {

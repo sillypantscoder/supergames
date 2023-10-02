@@ -37,6 +37,13 @@
 		<div class="tabs"></div>
 		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';" tabindex="0"></span></h1>
 		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
+		<p>Time range: <select oninput="filter(Number(this.value))">
+			<option value="10000">All time</option>
+			<option value="365">Yearly</option>
+			<option value="30">Monthly</option>
+			<option value="7">Weekly</option>
+			<option value="1">Daily</option>
+		</select></p>
 		<p id="desc"></p>
 		<table>
 			<tr>
@@ -75,22 +82,36 @@ getData().then((info) => { try {
 			}
 		}
 		var e = document.createElement("tr")
+		e._EntryTime = info.getTimeForEntry(ranks[i], "{{NAME}}")
 		e.appendChild(document.createElement("td"))
 			e.children[0].appendChild(document.createElement("span"))
 				e.children[0].children[0].classList.add("outline")
 				e.children[0].children[0].setAttribute("style", `color: ${getColor(pcscore)}; opacity: 0.7;${pcscore >= 3 ? " font-size: 0.8em;" : ""}`)
 				e.children[0].children[0].innerHTML = (duplicates.length > 1 ? "<i>T</i> " : "") + String(pcscore + 1) + getSuffix(pcscore + 1)
-		if (pcscore > 0 && (! info.data["{{NAME}}"].reverseOrder)) {
-			var bar = document.createElement("a")
-			bar.classList.add("bar")
-			bar.innerText = String(pcscore) + getSuffix(pcscore)
-			var nextValue = info.getScore(ranks[pcscore - 1], "{{NAME}}")
-			var thisValue = info.getScore(ranks[pcscore], "{{NAME}}")
-			var prevValue = info.getScore(ranks[pcscore + 1], "{{NAME}}")
-			if (prevValue == undefined) prevValue = 0
-			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)};`);
-			// bar.innerText += `, ${prevValue}, ${thisValue}, ${nextValue}`
-			e.children[0].appendChild(bar)
+		if (pcscore > 0) {
+			if (! info.data["{{NAME}}"].reverseOrder) {
+				var bar = document.createElement("a")
+				bar.classList.add("bar")
+				bar.innerText = String(pcscore) + getSuffix(pcscore)
+				var nextValue = info.getScore(ranks[pcscore - 1], "{{NAME}}")
+				var thisValue = info.getScore(ranks[pcscore], "{{NAME}}")
+				var prevValue = info.getScore(ranks[pcscore + 1], "{{NAME}}")
+				if (prevValue == undefined) prevValue = 0
+				bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(pcscore - 1)};`);
+				// bar.innerText += `, ${prevValue}, ${thisValue}, 	${nextValue}`
+				e.children[0].appendChild(bar)
+			} else if (pcscore != ranks.length - 1) {
+				var bar = document.createElement("a")
+				bar.classList.add("bar")
+				bar.innerText = String(pcscore) + getSuffix(pcscore)
+				var nextValue = -info.getScore(ranks[pcscore - 1], "{{NAME}}")
+				var thisValue = -info.getScore(ranks[pcscore], "{{NAME}}")
+				var prevValue = -info.getScore(ranks[pcscore + 1], "{{NAME}}")
+				if (prevValue == undefined) prevValue = 0
+				bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(pcscore - 1)};`);
+				// bar.innerText += `, ${prevValue}, ${thisValue}, 	${nextValue}`
+				e.children[0].appendChild(bar)
+			}
 		}
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
@@ -145,6 +166,16 @@ getData().then((info) => { try {
 	document.querySelector("#e").setAttribute("max", i)
 }catch(e){alert(e)}
 })
+function filter(days) {
+	var rows = [...document.querySelectorAll("table tbody tr:not(:first-child)")]
+	var targetDate = new Date()
+	targetDate.setDate(targetDate.getDate() - days)
+	for (var i = 0; i < rows.length; i++) {
+		if (rows[i]._EntryTime.getTime() < targetDate.getTime()) {
+			rows[i].setAttribute("style", `display: none;`)
+		} else rows[i].removeAttribute("style")
+	}
+}
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

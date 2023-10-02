@@ -22,7 +22,7 @@
 	box-shadow: 0px 10px 20px 0px #0006;
 	font-family: sans-serif;
 }
-button {
+button:not(.notspecial) {
 	display: inline-block;
 	color: black;
 	background: #99ffed;
@@ -109,11 +109,33 @@ function createFileQuestionElement(question) {
 	e.children[0].classList.add("title")
 	e.children[0].innerText = question.title
 	e.appendChild(document.createElement("div"))
+	e.children[1].appendChild(document.createElement("k-supergames-dynamic-file-input"))
+	e.children[1].children[0].setAccept([
+		"image/*", ".png", ".jpg", ".jpeg",
+		"text/plain", ".txt",
+		"text/html", ".html"
+	])
+	e.children[1].appendChild(document.createElement("div"))
+	e.children[1].children[1].setAttribute("style", "font-style: italic; font-size: 0.8em;")
+	e.children[1].children[1].innerHTML = "<span style='color: red; font-weight: bold;'>Please do not upload large files!</span> If you have a large video you want to send us, please upload it to Google Drive, and share the file with Anyone with the link. Then paste the link below and press 'Attach link'."
 	e.children[1].appendChild(document.createElement("input"))
-	e.children[1].children[0].setAttribute("type", "file")
+	e.children[1].children[2].setAttribute("type", "text")
+	e.children[1].appendChild(document.createElement("button"))
+	e.children[1].children[3].classList.add("notspecial")
+	e.children[1].children[3].innerText = "Attach link"
+	e.children[1].children[3].addEventListener("click", () => {
+		var contents = [
+			"[Uploaded Link]\n",
+			e.children[1].children[2].value
+		]
+		var file = new File(contents, "Link", {
+			"type": "text/plain"
+		})
+		e.children[1].children[0].setFile(file)
+	})
 	e._QuestionObject = question
 	e._QuestionResult = async function () {
-		var file = e.children[1].children[0].files[0]
+		var file = e.children[1].children[0].getFile()
 		const reader = new FileReader();
 		var result = await new Promise((resolve) => {
 			reader.addEventListener("load", () => {
@@ -204,9 +226,12 @@ function fillResponse(response) {
 		if (qtype == "text") {
 			elms[i].children[1].children[0].value = result
 		} else if (qtype == "file") {
-			elms[i].children[1].children[0].remove()
+			[...elms[i].children[1].children].forEach((e) => e.remove())
 			elms[i].children[1].appendChild(document.createElement("iframe"))
 			elms[i].children[1].children[0].setAttribute("src", result)
+			elms[i].children[1].appendChild(document.createElement("button"))
+			elms[i].children[1].children[1].setAttribute("onclick", () => window.open(result))
+			elms[i].children[1].children[1].innerText = "Download"
 		} else if (qtype == "multiplechoice") {
 			if (result != -1) {
 				var newE = elms[i].children[1].children[result]
@@ -215,6 +240,54 @@ function fillResponse(response) {
 		}
 	}
 }
+class DynamicFileInput extends HTMLElement {
+	constructor() {
+		super()
+		this.fileInputElm = document.createElement("input")
+		this.fileInputElm.setAttribute("type", "file")
+	}
+	connectedCallback() {
+		this.appendChild(document.createElement("button"))
+		this.children[0].classList.add("notspecial")
+		this.children[0].innerText = "Choose File"
+		this.appendChild(document.createElement("div"))
+		this.children[1].setAttribute("style", `display: inline-block; font-size: 0.8em; padding-left: 1ch;`)
+		this.appendChild(this.fileInputElm)
+		this.fileInputElm.setAttribute("style", `display: none;`)
+		this.updateFileList()
+		this.updateDisplay()
+		var _this = this;
+		this.addEventListener("click", () => {
+			_this.fileInputElm.click()
+		})
+		this.fileInputElm.addEventListener("input", (v) => {
+			_this.updateFileList()
+			_this.updateDisplay()
+		})
+	}
+	setAccept(types) {
+		this.fileInputElm.setAttribute("accept", types.join(","))
+	}
+	updateFileList() {
+		this.files = [...this.fileInputElm.files]
+	}
+	updateDisplay() {
+		if (this.files.length == 0) {
+			this.children[1].innerText = "no file selected"
+		} else {
+			var file = this.files[0]
+			this.children[1].innerText = file.name
+		}
+	}
+	setFile(file) {
+		this.files = [file]
+		this.updateDisplay()
+	}
+	getFile() {
+		return this.files[0]
+	}
+}
+customElements.define("k-supergames-dynamic-file-input", DynamicFileInput)
 		</script>
 		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
 		<script src="/matter2.js"></script>

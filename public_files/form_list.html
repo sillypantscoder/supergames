@@ -19,6 +19,16 @@
 	margin: 1em;
 	padding: 1em;
 	border-radius: 1em;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+#buttons a span.responses {
+	display: inline-block;
+	margin-left: 1em;
+	padding: 0.5em;
+	border-radius: 0.5em;
+	background: #FFFA;
 }
 		</style>
 	</head>
@@ -39,8 +49,18 @@ getData().then((info) => {
 		document.querySelector("#buttons").innerText = ""
 		for (var i = 0; i < forms.length; i++) {
 			var e = document.createElement("a")
-			e.innerText = forms[i].name
+			e.appendChild(document.createElement("span"))
+			e.children[0].innerText = forms[i].name
 			e.href = `/form/${i}${location.search}`
+			if (info.profile[0] && info.profile[0].admin) {
+				var n_responses = forms[i].responses.length
+				if (n_responses > 0) {
+					var s = document.createElement("span")
+					s.classList.add("responses")
+					s.innerText = n_responses
+					e.appendChild(s)
+				}
+			}
 			document.querySelector("#buttons").appendChild(e)
 		}
 	})
