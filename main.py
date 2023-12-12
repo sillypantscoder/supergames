@@ -1,6 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
-import time
 import json
 import datetime
 import traceback
@@ -12,24 +11,18 @@ vandalize = False
 hostName = "0.0.0.0"
 serverPort = 8080
 
-def read_file(filename):
-	f = open(filename, "r")
-	t = f.read()
-	f.close()
-	return t
-
-def bin_read_file(filename):
+def read_file(filename: str) -> bytes:
 	f = open(filename, "rb")
 	t = f.read()
 	f.close()
 	return t
 
-def write_file(filename, content):
+def write_file(filename: str, content: str):
 	f = open(filename, "w")
 	f.write(content)
 	f.close()
 
-def log(msg):
+def log(msg: str):
 	f = open("log.txt", "a")
 	f.write(datetime.datetime.now().isoformat())
 	f.write(" - ")
@@ -39,10 +32,10 @@ def log(msg):
 
 def log_existence_check():
 	if os.path.isfile("log.txt"):
-		if "-" not in read_file("log.txt"):
+		if b"-" not in read_file("log.txt"):
 			os.remove("log.txt")
 
-def multiply(s1, s2):
+def multiply(s1: str, s2: str) -> int:
 	i1 = list(s1.encode("UTF-8"))
 	i2 = list(s2.encode("UTF-8"))
 	f = [0, 0, 0, 0, 0]
@@ -60,29 +53,29 @@ def multiply(s1, s2):
 			if xpos >= len(f): xpos -= len(f)
 	return (f[0] * 16) * (f[1] * 8) * (f[2] * 4) * (f[3] * 2) * (f[4] * 1)
 
-def getUserFromID(id):
+def getUserFromID(userid: str) -> dict | None:
 	ou = json.loads(read_file("users.json"))
 	for n in ou:
 		uid = multiply(n["name"], n["password"])
-		if str(uid) == id:
+		if str(uid) == userid:
 			return n
 	return None
 
-def getPwdFromUser(name):
+def getPwdFromUser(name: str) -> str | None:
 	ou = json.loads(read_file("users.json"))
 	for n in ou:
 		if name == n["name"]:
 			return n["password"]
 	return None
 
-def getIDFromUser(name, pwd):
+def getIDFromUser(name: str, pwd: str) -> str | None:
 	ou = json.loads(read_file("users.json"))
 	for n in ou:
 		if name == n["name"] and pwd == n["password"]:
 			return str(multiply(n["name"], n["password"]))
 	return None
 
-def get(path):
+def get(path: str):
 	log_existence_check()
 	if vandalize:
 		return {
@@ -122,7 +115,7 @@ def get(path):
 					"xml": "image/svg+xml"
 				}[path.split("?")[0].split(".")[-1]]
 			},
-			"content": bin_read_file("public_files" + path.split("?")[0])
+			"content": read_file("public_files" + path.split("?")[0])
 		}
 	elif path.split("?")[0] == "/":
 		return {
@@ -130,7 +123,7 @@ def get(path):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<!DOCTYPE html><html><head></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
+			"content": "<!DOCTYPE html><html><head></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
 		}
 	elif path.startswith("/leaderboard/"):
 		name = path.split("?")[0][13:]
@@ -139,7 +132,7 @@ def get(path):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("leaderboard.html").replace("{{NAME}}", name.replace("%20", " "))
+			"content": read_file("leaderboard.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/badges/"):
 		name = path.split("?")[0].split("/")[2]
@@ -149,18 +142,22 @@ def get(path):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("badge.html").replace("{{NAME}}", name.replace("%20", " ")).replace("{{RANK}}", rank).replace("{{SRANK}}", ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][int(rank)]).replace("{{SNAME}}", name[0].upper() + name[1:].replace("%20", " "))
+			"content": read_file("badge.html")
+				.replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+				.replace(b"{{RANK}}", rank.encode("UTF-8"))
+				.replace(b"{{SRANK}}", ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][int(rank)].encode("UTF-8"))
+				.replace(b"{{SNAME}}", (name[0].upper() + name[1:].replace("%20", " ")).encode("UTF-8"))
 		}
 	elif path.startswith("/profile/"):
 		name = path.split("?")[0].split("/")[2]
-		userlist = [x["name"] for x in json.loads(read_file("users.json"))]
+		userlist: list[str] = [x["name"] for x in json.loads(read_file("users.json"))]
 		if name in userlist:
 			return {
 				"status": 200,
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": read_file("profile.html").replace("{{NAME}}", name.replace("%20", " "))
+				"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 			}
 		elif name.isdigit() and int(name) - 1 < len(userlist):
 			name = userlist[int(name) - 1]
@@ -169,18 +166,18 @@ def get(path):
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": read_file("profile.html").replace("{{NAME}}", name.replace("%20", " "))
+				"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 			}
 		return {
 			"status": 404,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("profile.html").replace("{{NAME}}", name.replace("%20", " "))
+			"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/form/"):
 		formid = path.split("?")[0].split("/")[2]
-		formlist = [x["name"] for x in json.loads(read_file("public_files/forms.json"))]
+		formlist: list[str] = [x["name"] for x in json.loads(read_file("public_files/forms.json"))]
 		if formid.isdigit() and int(formid) < len(formlist):
 			name = formlist[int(formid)]
 			return {
@@ -188,14 +185,14 @@ def get(path):
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": read_file("form.html").replace("{{NAME}}", name).replace("{{FORMID}}", formid)
+				"content": read_file("form.html").replace(b"{{NAME}}", name.encode("UTF-8")).replace(b"{{FORMID}}", formid.encode("UTF-8"))
 			}
 		return {
 			"status": 404,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/form_list.html')</script>"
+			"content": "<script>location.replace('/form_list.html')</script>"
 		}
 	elif path == "/entryeditor":
 		return {
@@ -216,15 +213,15 @@ def get(path):
 	elif path.split("?")[0] == "/user_id_create":
 		u = path.split("?")[1].split("&")[0]
 		p = path.split("?")[1].split("&")[1]
-		id = getIDFromUser(unquote(u), unquote(p))
+		userid = getIDFromUser(unquote(u), unquote(p))
 		# print(repr(u), repr(p), repr(id))
-		if id == None:
+		if userid == None:
 			return {
 				"status": 200,
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": f"<script>location.replace('/login.html#invalid')</script>"
+				"content": "<script>location.replace('/login.html#invalid')</script>"
 			}
 		log("User " + u + " logged in!")
 		return {
@@ -232,15 +229,16 @@ def get(path):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?{id}')</script>"
+			"content": f"<script>location.replace('/?{userid}')</script>"
 		}
 	elif path.split("?")[0] == "/user_id_create/sudo":
 		u = path.split("?")[1].split("&")[0]
 		p = path.split("?")[1].split("&")[1]
 		user = getUserFromID(u)
+		if user == None: return {"status": 404, "headers": {}, "content": ""}
 		if user["admin"]:
-			newID = getIDFromUser(p, getPwdFromUser(p))
-			newname = getUserFromID(newID)['name']
+			newID = getIDFromUser(p, getPwdFromUser(p)) # type: ignore
+			newname = getUserFromID(newID)['name'] # type: ignore
 			log("User " + user["name"] + " switch to " + newname)
 			return {
 				"status": 200,
@@ -258,16 +256,16 @@ def get(path):
 		}
 	elif path.startswith("/graph/"):
 		event = path.split("/")[2]
-		type = path.split("/")[3]
+		graph_type = path.split("/")[3]
 		event_data = json.loads(read_file("public_files/data.json"))[event]["entries"]
 		entries = {}
 		for d in event_data:
 			entries[d[0]] = d[1]
 		data = {
-			"type": type,
+			"type": graph_type,
 			"data": entries
 		}
-		subprocess.run(["python3", "chart.py", json.dumps(data)])
+		subprocess.run(["python3", "chart.py", json.dumps(data)], check=False)
 		chart = read_file("chart.svg")
 		return {
 			"status": 200,
@@ -283,7 +281,7 @@ def get(path):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f""
+			"content": ""
 		}
 
 def post(path, body):
@@ -337,7 +335,7 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/add_application":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -348,12 +346,12 @@ def post(path, body):
 		return {
 			"status": 301,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/createuser":
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update user list
-		c = read_file("users.json")
+		c = read_file("users.json").decode("UTF-8")
 		now = datetime.datetime.now()
 		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}"
 		c = c[:-2] + f''',
@@ -369,19 +367,19 @@ def post(path, body):
 		log("accept application for " + bodydata[0])
 		write_file("users.json", c)
 		# Update applications
-		c = read_file("public_files/applications.txt")
+		c = read_file("public_files/applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Accepted]")
 		write_file("public_files/applications.txt", c)
 		# Finish
 		return {
 			"status": 301,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/rejectprofile":
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update applications
-		c = read_file("public_files/applications.txt")
+		c = read_file("public_files/applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Rejected]")
 		log("reject application for " + bodydata[0])
 		write_file("public_files/applications.txt", c)
@@ -389,7 +387,7 @@ def post(path, body):
 		return {
 			"status": 301,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/setting/pwd":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -404,7 +402,7 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/setting/desc":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -422,12 +420,12 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
 		forms = json.loads(read_file("public_files/forms.json"))
-		name = getUserFromID(bodydata["user"])["name"]
+		name = getUserFromID(bodydata["user"])["name"] # type: ignore
 		forms[bodydata["id"]]["responses"].append({
 			"user": name,
 			"results": bodydata["results"]
@@ -437,14 +435,14 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/delete_submission":
 		bodydata = body.decode("UTF-8").split("\n")
-		if getUserFromID(bodydata[0])["admin"] == False: return {
+		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
 			"status": 404,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 		forms = json.loads(read_file("public_files/forms.json"))
 		del forms[int(bodydata[1])]["responses"][int(bodydata[2])]
@@ -452,14 +450,14 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	elif path == "/handle_entry":
 		bodydata = body.decode("UTF-8").split("\n")
-		if getUserFromID(bodydata[0])["admin"] == False: return {
+		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
 			"status": 404,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 		forms = json.loads(read_file("public_files/entries.json"))
 		i = forms[int(bodydata[2])]
@@ -480,7 +478,7 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": f""
+			"content": ""
 		}
 	else:
 		return {
@@ -488,7 +486,7 @@ def post(path, body):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f""
+			"content": ""
 		}
 
 class MyServer(BaseHTTPRequestHandler):
@@ -521,7 +519,7 @@ if __name__ == "__main__":
 	running = True
 	webServer = HTTPServer((hostName, serverPort), MyServer)
 	webServer.timeout = 1
-	print("Server started http://%s:%s" % (hostName, serverPort))
+	print(f"Server started http://{hostName}:{serverPort}/")
 	while running:
 		try:
 			webServer.handle_request()

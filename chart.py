@@ -1,4 +1,6 @@
 import math
+import sys
+import json
 
 def getColors():
 	patterns = [a+b+c for a in "08F" for b in "08F" for c in "08F"][1:]
@@ -64,7 +66,7 @@ def generateBar2Chart(data: dict[str, int]):
 	r += '</g></svg>'
 	return r
 
-def movePoint(X,Y,angle,distance):
+def movePoint(X: float, Y: float, angle: float, distance: float) -> tuple[float, float]:
 	# 0 degrees = North, 90 = East, 180 = South, 270 = West
 	dY = distance*math.cos(math.radians(angle+180))
 	dX = distance*math.sin(math.radians(angle+180))
@@ -95,21 +97,19 @@ def generatePieChart(data: dict[str, int]):
 	deg_per_point = 360 / total_points
 	cum_deg = 0
 	point_center = [img_size * 1.5, img_size * 0.5]
-	prev_point = movePoint(*point_center, 0, img_size * 0.4)
+	prev_point = movePoint(point_center[0], point_center[1], 0, img_size * 0.4)
 	for i in range(len(usernames)):
 		deg_amt = deg_per_point * data[usernames[i]]
 		deg_dist = [deg_amt, img_size * 0.4]
 		deg_dist[0] += cum_deg
-		new_point = movePoint(*point_center, *deg_dist)
+		new_point = movePoint(point_center[0], point_center[1], *deg_dist)
 		r += f'<g><path d="M {point_center[0]} {point_center[1]} L {prev_point[0]} {prev_point[1]} A 40 40 0 {1 if deg_amt > 180 else 0} 0 {new_point[0]} {new_point[1]} Z" fill="#{colors[i]}" /></g>'
 		prev_point = [*new_point]
 		cum_deg = deg_dist[0]
 	r += '</g></svg>'
 	return r
 
-if __name__ == "__main__":
-	import sys
-	import json
+def main():
 	data = json.loads(sys.argv[1])
 	# { type: str, data: dict[str, int] }
 	chartType = {
@@ -120,3 +120,6 @@ if __name__ == "__main__":
 	f = open("chart.svg", "w")
 	f.write(chart)
 	f.close()
+
+if __name__ == "__main__":
+	main()
