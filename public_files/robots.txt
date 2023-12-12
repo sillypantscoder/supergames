@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://supergames.jasonroman.repl.co/sitemap.xml

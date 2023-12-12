@@ -9,8 +9,10 @@ data = json.loads(f.read())
 f.close()
 
 newData = {}
+newentries = []
 for line in d:
 	if line[0] == "DONTREGISTER": continue;
+	newentries.append(line[0])
 	newData[line[0]] = {
 		"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
 		"badge_desc": line[-5],
@@ -27,6 +29,10 @@ for name in data:
 		if i != "yes": newData[name] = data[name]
 	else:
 		newData[name]["entries"] = data[name]["entries"]
+		newentries.remove(name)
+
+print("New leaderboards:")
+for x in newentries: print("\t" + x)
 
 f = open("public_files/data.json", "w")
 f.write(json.dumps(newData, indent='\t'))

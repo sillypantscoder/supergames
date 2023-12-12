@@ -4,6 +4,7 @@ import time
 import json
 import datetime
 import traceback
+import subprocess
 from urllib.parse import unquote
 
 vandalize = False
@@ -239,12 +240,14 @@ def get(path):
 		user = getUserFromID(u)
 		if user["admin"]:
 			newID = getIDFromUser(p, getPwdFromUser(p))
+			newname = getUserFromID(newID)['name']
+			log("User " + user["name"] + " switch to " + newname)
 			return {
 				"status": 200,
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": f"<script>location.replace('/profile/{getUserFromID(newID)['name']}?{newID}')</script>"
+				"content": f"<script>location.replace('/profile/{newname}?{newID}')</script>"
 			}
 		return {
 			"status": 200,
@@ -252,6 +255,26 @@ def get(path):
 				"Content-Type": "text/html"
 			},
 			"content": f"<script>location.replace('/?{u}')</script>"
+		}
+	elif path.startswith("/graph/"):
+		event = path.split("/")[2]
+		type = path.split("/")[3]
+		event_data = json.loads(read_file("public_files/data.json"))[event]["entries"]
+		entries = {}
+		for d in event_data:
+			entries[d[0]] = d[1]
+		data = {
+			"type": type,
+			"data": entries
+		}
+		subprocess.run(["python3", "chart.py", json.dumps(data)])
+		chart = read_file("chart.svg")
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "image/svg+xml"
+			},
+			"content": chart
 		}
 	else: # 404 page
 		log("404 encountered: " + path)
@@ -305,6 +328,17 @@ def post(path, body):
 			},
 			"content": update
 		}
+	elif path == "/tryaddentry":
+		bodydata = json.loads(body.decode("UTF-8"))
+		forms = json.loads(read_file("public_files/entries.json"))
+		forms.append(bodydata)
+		write_file("public_files/entries.json", json.dumps(forms, indent='\t'))
+		log("Tried to add an entry...\n\t" + repr(bodydata))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": f""
+		}
 	elif path == "/add_application":
 		bodydata = body.decode("UTF-8").split("\n")
 		c = read_file("public_files/applications.txt")
@@ -319,20 +353,21 @@ def post(path, body):
 	elif path == "/createuser":
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update user list
-		c = read_file("public_files/users.json")
+		c = read_file("users.json")
 		now = datetime.datetime.now()
 		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}"
 		c = c[:-2] + f''',
 	{{
-		"name": {bodydata[0]},
-		"date": {date},
-		"email": {bodydata[1]},
-		"password": {bodydata[0]},
-		"admin": false
+		"name": {repr(bodydata[0])},
+		"date": "{date}",
+		"email": {repr(bodydata[1])},
+		"password": {repr(bodydata[0])},
+		"admin": false,
+		"desc": ""
 	}}
 ]'''
 		log("accept application for " + bodydata[0])
-		write_file("public_files/users.json", c)
+		write_file("users.json", c)
 		# Update applications
 		c = read_file("public_files/applications.txt")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Accepted]")
@@ -364,7 +399,7 @@ def post(path, body):
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["password"] = bodydata[1]
 				name = n["name"]
-		log(f"{bodydata[0]} update pwd")
+		log(f"{name} update pwd")
 		write_file("users.json", json.dumps(ou, indent='\t'))
 		return {
 			"status": 200,
@@ -375,11 +410,14 @@ def post(path, body):
 		bodydata = body.decode("UTF-8").split("\n")
 		ou = json.loads(read_file("users.json"))
 		name = "<error>"
+		desc_from = "<error>"
+		newdesc = '\n'.join(bodydata[1:])
 		for n in ou:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
-				n["desc"] = '\n'.join(bodydata[1:])
+				desc_from = n["desc"]
+				n["desc"] = newdesc
 				name = n["name"]
-		log(f"{name} update desc")
+		log(f"{name} update desc\n\tfrom: {repr(desc_from)}\n\tto: {repr(newdesc)}")
 		write_file("users.json", json.dumps(ou, indent='\t'))
 		return {
 			"status": 200,
@@ -394,7 +432,7 @@ def post(path, body):
 			"user": name,
 			"results": bodydata["results"]
 		})
-		log(f"{name} submit form")
+		log(f"{name} submit form {forms[bodydata['id']]['name']}: " + json.dumps(bodydata["results"], indent='\t'))
 		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
 		return {
 			"status": 200,
@@ -416,6 +454,34 @@ def post(path, body):
 			"headers": {},
 			"content": f""
 		}
+	elif path == "/handle_entry":
+		bodydata = body.decode("UTF-8").split("\n")
+		if getUserFromID(bodydata[0])["admin"] == False: return {
+			"status": 404,
+			"headers": {},
+			"content": f""
+		}
+		forms = json.loads(read_file("public_files/entries.json"))
+		i = forms[int(bodydata[2])]
+		del forms[int(bodydata[2])]
+		write_file("public_files/entries.json", json.dumps(forms, indent='\t'))
+		if bodydata[1] == "1":
+			# Accepted the entry!
+			log("entry submissions: accepted an entry\n\t" + repr(i))
+			post("/addentry", '\n'.join([
+				i["event"],
+				i["user"],
+				str(i["newscore"]),
+				i["mode"],
+				i["note"]
+			]).encode("UTF-8"))
+		else:
+			log("entry submissions: rejected an entry\n\t" + repr(i))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": f""
+		}
 	else:
 		return {
 			"status": 404,
@@ -427,14 +493,13 @@ def post(path, body):
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_GET(self):
-		global running
 		res = get(self.path)
 		self.send_response(res["status"])
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])
 		self.end_headers()
 		c = res["content"]
-		if type(c) == str: c = c.encode("utf-8")
+		if isinstance(c, str): c = c.encode("utf-8")
 		self.wfile.write(c)
 	def do_POST(self):
 		res = post(self.path, self.rfile.read(int(self.headers["Content-Length"])))
@@ -443,14 +508,14 @@ class MyServer(BaseHTTPRequestHandler):
 			self.send_header(h, res["headers"][h])
 		self.end_headers()
 		self.wfile.write(res["content"].encode("utf-8"))
-	def log_message(self, format: str, *args) -> None:
-		return;
-		if 400 <= int(args[1]) < 500:
-			# Errored request!
-			print(u"\u001b[31m", end="")
-		print(args[0].split(" ")[0], "request to", args[0].split(" ")[1], "(status code:", args[1] + ")")
-		print(u"\u001b[0m", end="")
-		# don't output requests
+	def log_message(self, _: str, *args) -> None:
+		return
+		# if 400 <= int(args[1]) < 500:
+		# 	# Errored request!
+		# 	print(u"\u001b[31m", end="")
+		# print(args[0].split(" ")[0], "request to", args[0].split(" ")[1], "(status code:", args[1] + ")")
+		# print(u"\u001b[0m", end="")
+		# # don't output requests
 
 if __name__ == "__main__":
 	running = True
