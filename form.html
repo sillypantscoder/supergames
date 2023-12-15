@@ -52,7 +52,7 @@ iframe {
 		<h1>Form: {{NAME}}</h1>
 		<div id="responses"></div>
 		<div id="questions"></div>
-		<div><button onclick="submit()" id="endbtn">Submit!</button></div>
+		<div><button onclick="submit()" id="endbtn">Submit!</button><button onclick="location.reload()" id="cancelbtn" style="display: none;">Back</button></div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
 		<script>
@@ -96,6 +96,7 @@ function createTextQuestionElement(question) {
 	e.appendChild(document.createElement("div"))
 	e.children[1].appendChild(document.createElement("textarea"))
 	e.children[1].children[0].value = ""
+	e.children[1].children[0].setAttribute("style", "width: 60em; height: 30em;")
 	e._QuestionObject = question
 	e._QuestionResult = async function () {
 		return e.children[1].children[0].value
@@ -206,6 +207,7 @@ function addResponseBoard(responses) {
 			fillResponse(response)
 			document.querySelector("#endbtn").innerText = "Delete Response"
 			document.querySelector("#endbtn").setAttribute("onclick", "deleteResponse()")
+			document.querySelector("#cancelbtn").removeAttribute("style")
 			window.deleteResponse = function () {
 				var x = new XMLHttpRequest()
 				x.open("POST", "/delete_submission")
@@ -239,6 +241,7 @@ function fillResponse(response) {
 			}
 		}
 	}
+	[...document.querySelectorAll("#responses > *")].forEach((e) => e.remove())
 }
 class DynamicFileInput extends HTMLElement {
 	constructor() {

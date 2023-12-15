@@ -9,7 +9,7 @@ from urllib.parse import unquote
 vandalize = False
 
 hostName = "0.0.0.0"
-serverPort = 8080
+serverPort = 12344
 
 def read_file(filename: str) -> bytes:
 	f = open(filename, "rb")

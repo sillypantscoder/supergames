@@ -109,12 +109,42 @@ def generatePieChart(data: dict[str, int]):
 	r += '</g></svg>'
 	return r
 
+def generateStackedColumnChart(data: dict[str, int]):
+	colors = [
+		"F00", "0F0", "00F",
+		"0FF", "F0F", "FF0",
+	#	"000", "888", "FFF",
+		"800", "080", "008",
+		"088", "808", "880",
+		"8F0", "F80", "F08"
+		"80F", "08F", "0F8"
+	]
+	usernames = [*data.keys()]
+	usernames.sort(key=lambda x: -data[x])
+	img_size = 100
+	total_points = sum([data[u] for u in usernames])
+	r = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 {(img_size * 2) + 10} {img_size + 10}"><g>'
+	for i in range(len(usernames)):
+		pc = round((data[usernames[i]] / total_points) * 100 * 100) / 100
+		pc = int(pc) if int(pc)==pc else pc
+		r += f'<g><rect x="10" y="{1 + i}0" width="10" height="10" fill="#{colors[i]}" /><text x="25" y="{(i + 1.8) * 10}" font-size="10">{usernames[i]} ({pc}%)</text></g>'
+	r += '</g><g>'
+	deg_per_point = img_size / total_points
+	cum_deg = 0
+	for i in range(len(usernames)):
+		deg_amt = deg_per_point * data[usernames[i]]
+		r += f'<g><rect x="{img_size * 1.2}" y="{(img_size - cum_deg) - deg_amt}" width="{img_size * 0.7}" height="{deg_amt}" fill="#{colors[i]}" /></g>'
+		cum_deg += deg_amt
+	r += '</g></svg>'
+	return r
+
 def main():
 	data = json.loads(sys.argv[1])
 	# { type: str, data: dict[str, int] }
 	chartType = {
 		"bar": generateBar2Chart,
-		"pie": generatePieChart
+		"pie": generatePieChart,
+		"column": generateStackedColumnChart
 	}[data["type"]]
 	chart = chartType(data["data"])
 	f = open("chart.svg", "w")
