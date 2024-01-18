@@ -134,10 +134,25 @@ function submit() {
 	}))
 }
 function addResponseBoard(responses) {
+	var e = document.createElement("button")
+	e.innerText = "Search Responses"
+	e.addEventListener("click", () => {
+		var s = prompt("Enter the search term")
+		/** @type {HTMLButtonElement[]} */
+		var elms = [...document.querySelectorAll("[data-searchterms]")]
+		for (var i = 0; i < elms.length; i++) {
+			var terms = elms[i].dataset.searchterms
+			if (! terms.includes(s)) {
+				elms[i].remove()
+			}
+		}
+	})
+	document.querySelector("#responses").appendChild(e)
 	for (var res = 0; res < responses.length; res++) {
 		var response = responses[res]
 		var e = document.createElement("button")
 		e.innerText = `Entry from ${response.user}`
+		e.dataset.searchterms = `${response.user} ${response.event} ${response.note}`
 		e.addEventListener("click", ((response, res) => (() => {
 			fillResponse(response)
 			document.querySelector("#endbtn").innerText = "Reject"
@@ -167,6 +182,13 @@ function addResponseBoard(responses) {
 	}
 }
 function fillResponse(response) {
+	[...document.querySelectorAll("#responses button")].forEach((e) => e.remove())
+	var e = document.createElement("button")
+	e.innerText = "Cancel"
+	e.addEventListener("click", () => {
+		location.reload()
+	})
+	document.querySelector("#responses").appendChild(e)
 	document.querySelector("#eventselect").value = response.event
 	document.querySelector("#newscore").value = response.newscore
 	document.querySelector("#modeselect").value = response.mode
