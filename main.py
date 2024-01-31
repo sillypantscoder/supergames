@@ -356,10 +356,10 @@ def post(path, body):
 		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}"
 		c = c[:-2] + f''',
 	{{
-		"name": {repr(bodydata[0])},
+		"name": {json.dumps(bodydata[0])},
 		"date": "{date}",
-		"email": {repr(bodydata[1])},
-		"password": {repr(bodydata[0])},
+		"email": {json.dumps(bodydata[1])},
+		"password": {json.dumps(bodydata[0])},
 		"admin": false,
 		"desc": ""
 	}}
