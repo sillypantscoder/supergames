@@ -75,6 +75,49 @@ def getIDFromUser(name: str, pwd: str) -> str | None:
 			return str(multiply(n["name"], n["password"]))
 	return None
 
+def generateDataFileFromCSV(csv: str):
+	log("[csv-loader] Starting!")
+	# Load the CSV data
+	d = [x.split(",") for x in csv.split("\n")[1:]]
+	# Load the old data
+	f = open("public_files/data.json", "r")
+	data = json.loads(f.read())
+	f.close()
+	# Go through the CSV file and register the events
+	newData = {}
+	newentries = []
+	for line in d:
+		if line[0] == "DONTREGISTER": continue
+		newentries.append(line[0])
+		newData[line[0]] = {
+			"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
+			"badge_desc": line[-5],
+			"leaderboard_desc": line[-4],
+			"entries": [],
+			"isTime": line[-2] == "Time",
+			"reverseOrder": line[-3] == "Lowest"
+		}
+	# Go through the old data and see if there are any
+	# leaderboards missing from the CSV file
+	for name in data:
+		if name not in newData.keys():
+			log(f"[csv-loader] Warning: {name} is not in the CSV file!")
+			log(f"[csv-loader] \tThere are {len(data[name]['entries'])} entries")
+			log("[csv-loader] \tThe leaderboard is not being deleted")
+			newData[name] = data[name]
+		else:
+			newData[name]["entries"] = data[name]["entries"]
+			newentries.remove(name)
+	# List of new leaderboards
+	log("[csv-loader] New leaderboards:")
+	for x in newentries: log("[csv-loader]\t" + x)
+	# Save the data!
+	f = open("public_files/data.json", "w")
+	f.write(json.dumps(newData, indent='\t'))
+	f.close()
+	# Finish
+	log("[csv-loader] Finished!")
+
 def get(path: str):
 	log_existence_check()
 	if vandalize:
@@ -194,14 +237,6 @@ def get(path: str):
 			},
 			"content": "<script>location.replace('/form_list.html')</script>"
 		}
-	elif path == "/entryeditor":
-		return {
-			"status": 200,
-			"headers": {
-				"Content-Type": "text/html"
-			},
-			"content": read_file("entryeditor.html")
-		}
 	elif path.split("?")[0] == "/usercheck":
 		return {
 			"status": 200,
@@ -233,13 +268,13 @@ def get(path: str):
 		}
 	elif path.split("?")[0] == "/user_id_create/sudo":
 		u = path.split("?")[1].split("&")[0]
-		p = path.split("?")[1].split("&")[1]
+		p = unquote(path.split("?")[1].split("&")[1])
 		user = getUserFromID(u)
 		if user == None: return {"status": 404, "headers": {}, "content": ""}
 		if user["admin"]:
 			newID = getIDFromUser(p, getPwdFromUser(p)) # type: ignore
 			newname = getUserFromID(newID)['name'] # type: ignore
-			log("User " + user["name"] + " switch to " + newname)
+			log("User " + repr(user["name"]) + " switch to " + repr(newname))
 			return {
 				"status": 200,
 				"headers": {
@@ -254,6 +289,24 @@ def get(path: str):
 			},
 			"content": f"<script>location.replace('/?{u}')</script>"
 		}
+	elif path.split("?")[0] == "/applications.txt":
+		u = path.split("?")[1]
+		user = getUserFromID(u)
+		if user and user["admin"]:
+			ou = read_file("applications.txt")
+			return {
+				"status": 200,
+				"headers": {
+					"Content-Type": "text/plain"
+				},
+				"content": ou
+			}
+		else:
+			return {
+				"status": 404,
+				"headers": {},
+				"content": ""
+			}
 	elif path.startswith("/graph/"):
 		event = path.split("/")[2]
 		graph_type = path.split("/")[3]
@@ -339,10 +392,10 @@ def post(path, body):
 		}
 	elif path == "/add_application":
 		bodydata = body.decode("UTF-8").split("\n")
-		c = read_file("public_files/applications.txt")
+		c = read_file("applications.txt")
 		c = f"""\n==========\nUsername: {bodydata[0]}\nEmail address: {bodydata[1]}\n==========\n\n\n{c}"""
 		log(f"create application (username={bodydata[0]}, email={bodydata[1]})")
-		write_file("public_files/applications.txt", c)
+		write_file("applications.txt", c)
 		return {
 			"status": 301,
 			"headers": {},
@@ -367,9 +420,9 @@ def post(path, body):
 		log("accept application for " + bodydata[0])
 		write_file("users.json", c)
 		# Update applications
-		c = read_file("public_files/applications.txt").decode("UTF-8")
+		c = read_file("applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Accepted]")
-		write_file("public_files/applications.txt", c)
+		write_file("applications.txt", c)
 		# Finish
 		return {
 			"status": 301,
@@ -379,10 +432,10 @@ def post(path, body):
 	elif path == "/rejectprofile":
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update applications
-		c = read_file("public_files/applications.txt").decode("UTF-8")
+		c = read_file("applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Rejected]")
 		log("reject application for " + bodydata[0])
-		write_file("public_files/applications.txt", c)
+		write_file("applications.txt", c)
 		# Finish
 		return {
 			"status": 301,
@@ -475,6 +528,20 @@ def post(path, body):
 			]).encode("UTF-8"))
 		else:
 			log("entry submissions: rejected an entry\n\t" + repr(i))
+		return {
+			"status": 200,
+			"headers": {},
+			"content": ""
+		}
+	elif path == "/upload_csv":
+		bodydata = body.decode("UTF-8").split("\n")
+		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
+			"status": 404,
+			"headers": {},
+			"content": ""
+		}
+		csv = "\n".join(bodydata[1:])
+		generateDataFileFromCSV(csv)
 		return {
 			"status": 200,
 			"headers": {},

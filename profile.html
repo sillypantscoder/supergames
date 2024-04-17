@@ -261,6 +261,7 @@ getData().then((info) => {
 		// Admin tools
 		if (info.profile[0].admin) {
 			// document.querySelector("#self").innerHTML += " <a style='color: rgb(0, 0, 200);' href='javascript:void(changeuser());'>Change User</a>"
+			document.querySelector("#self").innerHTML += ` <a style='color: rgb(0, 0, 200);' href='/admin.html${location.search}'>Admin Board</a>`
 			window.changeuser = () => {
 				var newUser = prompt("Enter the new username")
 				if (newUser == null) return;

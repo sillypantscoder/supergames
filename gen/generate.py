@@ -11,7 +11,7 @@ f.close()
 newData = {}
 newentries = []
 for line in d:
-	if line[0] == "DONTREGISTER": continue;
+	if line[0] == "DONTREGISTER": continue
 	newentries.append(line[0])
 	newData[line[0]] = {
 		"badges": [int(x) for x in line[1:-5]] if line[1] != '' else [],
