@@ -290,6 +290,11 @@ def get(path: str):
 			"content": f"<script>location.replace('/?{u}')</script>"
 		}
 	elif path.split("?")[0] == "/applications.txt":
+		if "?" not in path: return {
+			"status": 404,
+			"headers": {},
+			"content": ""
+		}
 		u = path.split("?")[1]
 		user = getUserFromID(u)
 		if user and user["admin"]:
@@ -384,7 +389,7 @@ def post(path, body):
 		forms = json.loads(read_file("public_files/entries.json"))
 		forms.append(bodydata)
 		write_file("public_files/entries.json", json.dumps(forms, indent='\t'))
-		log("Tried to add an entry...\n\t" + repr(bodydata))
+		# log("Tried to add an entry...\n\t" + repr(bodydata))
 		return {
 			"status": 200,
 			"headers": {},
@@ -547,7 +552,55 @@ def post(path, body):
 			"headers": {},
 			"content": ""
 		}
+	elif path == "/add_event":
+		bodydata = json.loads(body.decode("UTF-8"))
+		data = json.loads(read_file("public_files/data.json"))
+		if bodydata["name"] not in data.keys():
+			data[bodydata["name"]] = bodydata["data"]
+			log("Created new event with name " + repr(bodydata["name"]) + "!")
+			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+		else:
+			log("Failed to create new event with name " + repr(bodydata["name"]))
+		return {
+			"status": 302,
+			"headers": {},
+			"content": ""
+		}
+	elif path == "/error":
+		log("User encountered error: " + body.decode("UTF-8"))
+		return {
+			"status": 302,
+			"headers": {},
+			"content": ""
+		}
+	elif path == "/remove_entry":
+		bodydata = body.decode("UTF-8").split("\n")
+		user = getUserFromID(bodydata[0])
+		if user == None: return {"status": 404, "headers": {}, "content": ""}
+		if user["admin"]:
+			log("Removing an entry with user " + repr(bodydata[2]) + " from leaderboard " + repr(bodydata[1]))
+			# remove the entry
+			data = json.loads(read_file("public_files/data.json"))
+			entries = data[bodydata[1]]["entries"]
+			for i in range(len(entries)):
+				if entries[i][0] == bodydata[2]:
+					entries.remove(entries[i])
+			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+			# return
+			return {
+				"status": 302,
+				"headers": {},
+				"content": ""
+			}
+		return {
+			"status": 404,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": ""
+		}
 	else:
+		log("404 POST encountered: " + path)
 		return {
 			"status": 404,
 			"headers": {

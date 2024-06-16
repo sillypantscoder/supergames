@@ -10,6 +10,16 @@
 h2 {
 	color: white;
 }
+.disabled {
+	opacity: 0.75;
+	text-decoration: line-through;
+}
+.disabled > :is(input, br) {
+	display: none;
+}
+.badgev {
+	width: 4em;
+}
 		</style>
 	</head>
 	<body>
@@ -20,6 +30,24 @@ h2 {
 		<h3>Update Event List:</h3>
 		<p>To get the file, go to the Google Sheets event list, then click on File > Export > Comma Separated Values. Then upload the file here.</p>
 		<p><input type="file" id="eventList"><button onclick="this.previousElementSibling.files[0].text().then((e) => uploadCSV(e))">Upload</button></p>
+		<h3>Add New Event</h3>
+		<div>Name: <input type="text" id="new-event-name"></div>
+		<div>Is specialty leaderboard: <input type="checkbox" id="specialty" oninput="if(this.checked){this.parentNode.nextElementSibling.classList.add('disabled')}else{this.parentNode.nextElementSibling.classList.remove('disabled')}"></div>
+		<div>Badges:<br>
+			Novice <input type="number" class="badgev"><br>
+			Vassal <input type="number" class="badgev"><br>
+			Apprentice <input type="number" class="badgev"><br>
+			Prospect <input type="number" class="badgev"><br>
+			Artisan <input type="number" class="badgev"><br>
+			Expert <input type="number" class="badgev"><br>
+			Master <input type="number" class="badgev"><br>
+			Ultimate Master <input type="number" class="badgev"><br>
+			Badge Description (put %s in place of badge value):<br><input type="text" style="width: 60em; margin-left: 2em;" id="desc-badge">
+		</div>
+		<div>Leaderboard Description:<br><input type="text" style="width: 60em; margin-left: 2em;" id="desc-event"></div>
+		<div>Best score: <select id="bestscore"><option value="false">Highest</option><option value="true">Lowest</option></select></div>
+		<div><input type="checkbox" id="istime"> Is time leaderboard</div>
+		<div><button onclick="addLeaderboard()">Add Leaderboard</button></div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
 		<script>
@@ -61,8 +89,28 @@ function uploadCSV(data) {
 	x.addEventListener("loadend", () => location.replace("/"))
 	x.send(location.search.substr(1) + "\n" + data)
 }
+// Add a single event:
+function addLeaderboard() {
+	var q = (e) => document.getElementById(e)
+	var isSpecialty = q("specialty").checked
+	var data = {
+		"name": q("new-event-name").value,
+		"data": {
+			"badges": isSpecialty ? [] :
+				[...document.querySelectorAll(".badgev")].map((v) => v.valueAsNumber),
+			"badge_desc": isSpecialty ? "" : q("desc-badge").value,
+			"leaderboard_desc": q("desc-event").value,
+			"entries": [],
+			"reverseOrder": q("bestscore").value == "true",
+			"isTime": q("istime").checked
+		}
+	}
+	var x = new XMLHttpRequest()
+	x.open("POST", "/add_event")
+	x.send(JSON.stringify(data))
+}
 		</script>
-		<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>
-		<script src="/matter2.js"></script>
+		<!--<script src="https://matterjstest.jasonroman.repl.co/matter.js"></script>-->
+		<!--<script src="/matter2.js"></script>-->
 	</body>
 </html>

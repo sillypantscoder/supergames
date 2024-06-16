@@ -1,5 +1,10 @@
 function _choice(items) { return items[Math.floor(Math.random()*items.length)]; }
-window.addEventListener("error", (e) => alert(`${e.message} @${e.filename}:${e.lineno}`))
+window.addEventListener("error", (e) => {
+	alert(`${e.message} @${e.filename}:${e.lineno}`)
+	var x = new XMLHttpRequest()
+	x.open("POST", "/error")
+	x.send(`${e.message} @${e.filename}:${e.lineno}`)
+})
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 function addCommas(t) { t = String(t); var i = t.lastIndexOf(".") - 3; if (i == -4) { i = t.length - 3 } for (; i > 0; i -= 3) { t = t.substring(0, i) + "," + t.substring(i, t.length) } return t }

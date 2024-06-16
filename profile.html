@@ -84,16 +84,6 @@
 		<script src="/tabs.js"></script>
 		<script>
 tabs.extra(0, "Profile: {{NAME}}");
-(() => {
-	if ([/*"Epicrafter", */"General Hunter"].includes("{{NAME}}") || location.search == "?bored") {
-		var x = new XMLHttpRequest()
-		x.open("GET", "/bored.txt")
-		x.addEventListener("loadend", (e) => {
-			document.querySelector("#stuff").innerText = e.target.responseText
-		})
-		x.send()
-	}
-})();
 getData().then((info) => {
 	tabs.userfix(info.profile);
 	var this_user_obj = info.getUserObject("{{NAME}}")
@@ -112,12 +102,15 @@ getData().then((info) => {
 	// Get data
 	var eventlist = info.getEventList("{{NAME}}")
 	for (var eventno = 0; eventno < eventlist.length; eventno++) {
+		// Create the row
 		var e = document.createElement("tr")
+		// 1st column: Leaderboard name
 		e.appendChild(document.createElement("td"))
 			e.children[0].appendChild(document.createElement("a"))
 				e.children[0].children[0].href = "/leaderboard/" + eventlist[eventno] + location.search
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].innerText = eventlist[eventno]
+		// 2nd column: Score
 		e.appendChild(document.createElement("td"))
 			e.children[1].setAttribute("style", "text-align: right;")
 			var score = info.getScore("{{NAME}}", eventlist[eventno])
@@ -126,11 +119,13 @@ getData().then((info) => {
 			} else {
 				e.children[1].innerText = addCommas(score)
 			}
+		// 3rd column: Badges
 		e.appendChild(document.createElement("td"))
 			var badgeno = info.getBadgeCount("{{NAME}}", eventlist[eventno])
 			for (var i = 0; i < badgeno; i++) {
 				e.children[2].innerHTML += `<a href="/badges/${eventlist[eventno]}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
 			}
+		// Progress bar: Distance to next badge
 		if (badgeno < 8) {
 			if (info.data[eventlist[eventno]].badges.length == 0) {
 				e.children[2].innerHTML = "<i style='font-family: sans-serif; font-size: 0.7em;'>Specialty leaderboard</i>"
@@ -145,6 +140,7 @@ getData().then((info) => {
 				e.children[2].appendChild(bar)
 			}
 		}
+		// 4th column: Rank
 		e.appendChild(document.createElement("td"))
 			var ranks = info.getLeaderboardRanks(eventlist[eventno])
 			var i = ranks.indexOf("{{NAME}}")
@@ -164,6 +160,7 @@ getData().then((info) => {
 			s += "'>"
 			if (duplicates.length > 1) s += "<i>T</i> "
 			e.children[3].innerHTML = `${s}${pcscore + 1}${getSuffix(pcscore + 1)} place</span>`
+		// Progress bar: Distance to next place
 		if (pcscore > 0 && (! info.data[eventlist[eventno]].reverseOrder)) {
 			var ranks = info.getLeaderboardRanks(eventlist[eventno])
 			var bar = document.createElement("a")
@@ -177,6 +174,7 @@ getData().then((info) => {
 			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(pcscore - 1)};`);
 			e.children[3].appendChild(bar)
 		}
+		// Add the row to the table
 		document.querySelector("table tbody").appendChild(e)
 	}
 	// badge leaderboard
