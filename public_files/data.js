@@ -3,7 +3,7 @@ window.addEventListener("error", (e) => {
 	alert(`${e.message} @${e.filename}:${e.lineno}`)
 	var x = new XMLHttpRequest()
 	x.open("POST", "/error")
-	x.send(`${e.message} @${e.filename}:${e.lineno}`)
+	x.send(`user: ${location.search}; message: ${e.message} @${e.filename}:${e.lineno}`)
 })
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
