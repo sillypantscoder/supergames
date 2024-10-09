@@ -123,349 +123,475 @@ function scrollToEntry(i) { // i = Number(document.querySelector("#e").value)
 	}, 4000)
 }
 
-function getData() {
-	return new Promise((resolve) => {
-		var info = {
-			users: null,
-			data: null,
-			profile: null
-		}
-		function finish() {
-			if (info.users == null) return
-			if (info.data == null) return
-			if (info.profile == null) return
-			generateObject(info)
-		}
-		var x1 = new XMLHttpRequest()
-		x1.open("GET", "/users.json")
-		x1.addEventListener("loadend", () => {
-			info.users = JSON.parse(x1.responseText)
-			finish()
-		})
-		x1.send()
-		var x2 = new XMLHttpRequest()
-		x2.open("GET", "/data.json")
-		x2.addEventListener("loadend", () => {
-			info.data = JSON.parse(x2.responseText)
-			finish()
-		})
-		x2.send()
-		var x3 = new XMLHttpRequest()
-		x3.open("GET", "/usercheck" + location.search)
-		x3.addEventListener("loadend", () => {
-			info.profile = JSON.parse(x3.responseText)
-			finish()
-		})
-		x3.send()
-		// generator
+class BulkDownloader {
+	/**
+	 * @param {string[]} urls
+	 */
+	constructor(urls) {
+		this.urls = urls
 		/**
-		 * @param {any} info
+		 * @type {XMLHttpRequest[]}
 		 */
-		function generateObject(info) {
-			function getUserList() {
-				var userlist = []
-				for (var i = info.users.length - 1; i >= 0; i--) {
-					userlist.push(info.users[i].name)
-				}
-				return userlist
-			}
-			function getBadgeTypeCounts() {
-				var userlist = getUserList()
-				/** @type {Object<any, number[]>} */
-				var names = {}
-				for (var i = 0; i < userlist.length; i++) {
-					names[userlist[i]] = [0, 0, 0, 0]
-				}
-				// 1. Loop over the different events
-				var eventnames = Object.keys(info.data)
-				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event = 	info.data[eventnames[eventno]].entries
-					var e_values = 	info.data[eventnames[eventno]].badges
-					if (e_values.length == 0) continue; // Specialty leaderboard
-					// 2. Loop over the different entries
-					for (var i = 0; i < event.length; i++) {
-						var entry_info = event[i]
-						var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
-						if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
-						if (f(entry_info[1], e_values[0])) names[entry_info[0]][0] += 1
-						if (f(entry_info[1], e_values[1])) names[entry_info[0]][0] += 1
-						if (f(entry_info[1], e_values[2])) names[entry_info[0]][0] += 1
-						if (f(entry_info[1], e_values[3])) names[entry_info[0]][1] += 1
-						if (f(entry_info[1], e_values[4])) names[entry_info[0]][1] += 1
-						if (f(entry_info[1], e_values[5])) names[entry_info[0]][2] += 1
-						if (f(entry_info[1], e_values[6])) names[entry_info[0]][2] += 1
-						if (f(entry_info[1], e_values[7])) names[entry_info[0]][3] += 1
-					}
-				}
-				// 3. Format & sort the data
-				var list_data = []
-				var keys = Object.keys(names)
-				for (var i = 0; i < keys.length; i++) {
-					var thisBadges = names[keys[i]]
-					list_data.push([keys[i], thisBadges])
-				}
-				list_data.sort((a, b) => {
-					/** @param {any[]} x */
-					function g(x) { return x[1][0] + (x[1][1] * 100) + (x[1][2] * 10000) + (x[1][3] * 10000) }
-					if (g(a) < g(b)) {
-						return -1;
-					}
-					if (g(a) > g(b)) {
-						return 1;
-					}
-					// a must be equal to b
-					return 0;
-				})
-				list_data.reverse()
-				return list_data
-			}
-			function getTotalBadgeCounts() {
-				var badges = [0, 0, 0, 0]
-				// 1. Loop over the different events
-				var eventnames = Object.keys(info.data)
-				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event = 	info.data[eventnames[eventno]].entries
-					var e_values = 	info.data[eventnames[eventno]].badges
-					if (e_values.length == 0) continue; // Specialty leaderboard
-					// 2. Loop over the different entries
-					for (var i = 0; i < event.length; i++) {
-						var entry_info = event[i]
-						var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
-						if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
-						if (f(entry_info[1], e_values[0])) badges[0] += 1
-						if (f(entry_info[1], e_values[1])) badges[0] += 1
-						if (f(entry_info[1], e_values[2])) badges[0] += 1
-						if (f(entry_info[1], e_values[3])) badges[1] += 1
-						if (f(entry_info[1], e_values[4])) badges[1] += 1
-						if (f(entry_info[1], e_values[5])) badges[2] += 1
-						if (f(entry_info[1], e_values[6])) badges[2] += 1
-						if (f(entry_info[1], e_values[7])) badges[3] += 1
-					}
-				}
-				return badges
-			}
-			/**
-			 * @param {any} user
-			 * @param {string} event
-			 */
-			function getScore(user, event) {
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					if (entry_info[0] == user) return entry_info[1]
-				}
-			}
-			/**
-			 * @param {any} user
-			 * @param {any} event
-			 */
-			function getTimeForEntry(user, event) {
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					if (entry_info[0] == user) return new Date(entry_info[2])
-				}
-			}
-			/**
-			 * @param {any} user
-			 * @param {any} event
-			 */
-			function getDesc(user, event) {
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					if (entry_info[0] == user) return entry_info[3]
-				}
-			}
-			/**
-			 * @param {string} event
-			 * @param {any} score
-			 */
-			function getDuplicates(event, score) {
-				var users = []
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					if (entry_info[1] == score) users.push(entry_info[0])
-				}
-				return users
-			}
-			/**
-			 * @param {any} user
-			 * @param {any} event
-			 */
-			function getBadgeCount(user, event) {
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					if (entry_info[0] == user) {
-						// Get badges
-						var e_values = info.data[event].badges
-						if (e_values.length == 0) return 0; // Specialty leaderboard
-						var n_badges = 0
-						var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
-						if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
-						if (f(entry_info[1], e_values[0])) n_badges += 1
-						if (f(entry_info[1], e_values[1])) n_badges += 1
-						if (f(entry_info[1], e_values[2])) n_badges += 1
-						if (f(entry_info[1], e_values[3])) n_badges += 1
-						if (f(entry_info[1], e_values[4])) n_badges += 1
-						if (f(entry_info[1], e_values[5])) n_badges += 1
-						if (f(entry_info[1], e_values[6])) n_badges += 1
-						if (f(entry_info[1], e_values[7])) n_badges += 1
-						return n_badges
-					}
-				}
-			}
-			/**
-			 * @param {string} event
-			 * @param {any} level
-			 */
-			function getBadgeOwners(event, level) {
-				var users = []
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					// Get badges
-					var e_values = info.data[event].badges
-					var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
-					if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
-					if (f(entry_info[1], e_values[level])) users.push(entry_info[0])
-				}
-				users.sort((a, b) => {
-					return getScore(b, event) - getScore(a, event)
-				})
-				return users
-			}
-			/**
-			 * @param {any} user
-			 */
-			function getEventList(user) {
-				var events = []
-				var eventnames = Object.keys(info.data)
-				for (var eventno = 0; eventno < eventnames.length; eventno++) {
-					var event_info = info.data[eventnames[eventno]].entries
-					for (var i = 0; i < event_info.length; i++) {
-						var entry_info = event_info[i]
-						if (entry_info[0] == user) events.push(eventnames[eventno])
-					}
-				}
-				return events
-			}
-			/**
-			 * @param {string} event
-			 */
-			function getLeaderboardRanks(event) {
-				/** @type {Object<any, any>} */
-				var users = {}
-				var event_info = info.data[event].entries
-				for (var i = 0; i < event_info.length; i++) {
-					var entry_info = event_info[i]
-					// Get score
-					users[entry_info[0]] = entry_info[1]
-				}
-				// Format & sort the data
-				var list_data = []
-				var keys = Object.keys(users)
-				for (var i = 0; i < keys.length; i++) {
-					var thisBadges = users[keys[i]]
-					list_data.push([keys[i], thisBadges])
-				}
-				list_data.reverse()
-				list_data.sort((a, b) => {
-					/**
-					 * @param {any[]} x
-					 */
-					function g(x) { return x[1] }
-					if (g(a) < g(b)) {
-						return -1;
-					}
-					if (g(a) > g(b)) {
-						return 1;
-					}
-					// a must be equal to b
-					return 0;
-				})
-				if (!info.data[event].reverseOrder) list_data.reverse()
-				var ret_data = []
-				for (var i = 0; i < list_data.length; i++) {
-					ret_data.push(list_data[i][0])
-				}
-				return ret_data
-			}
-			/**
-			 * @param {any} user
-			 */
-			function getUserObject(user) {
-				for (var i = 0; i < info.users.length; i++) {
-					var thisname = info.users[i].name
-					if (thisname == user) return info.users[i]
-				}
-			}
-			/**
-			 * @param {any} user
-			 */
-			function getMetaPoints(user) {
-				var users = getUserList()
-				var points = 0
-				var eventlist = Object.keys(info.data)
-				for (var n = 0; n < eventlist.length; n++) {
-					var event = eventlist[n]
-					var ranks = getLeaderboardRanks(event)
-					var rank = ranks.indexOf(user)
-					var score = getScore(user, event)
-					if (rank == -1) points += users.length
-					else {
-						// Find real score
-						var duplicates = getDuplicates(eventlist[n], score)
-						var pcscore = rank + 0
-						for (var xn = rank - 1; xn >= 0; xn--) {
-							if (duplicates.includes(ranks[xn])) {
-								pcscore -= 1
-							}
-						}
-						// Give points
-						points += pcscore + 1
-					}
-				}
-				return points
-			}
-			/**
-			 * @param {any} user
-			 */
-			function getActivityPoints(user) {
-				var firsts = 0
-				var eventlist = Object.keys(info.data)
-				for (var n = 0; n < eventlist.length; n++) {
-					var event = eventlist[n]
-					var score = getScore(user, event)
-					if (score == undefined) continue;
-					var vassal = info.data[event].badges
-					if (vassal.length > 0) vassal = vassal[1]
-					else continue;
-					firsts += Math.round(score / (vassal / 25))
-				}
-				return firsts
-			}
-			resolve({
-				getUserList,
-				getBadgeTypeCounts,
-				getTotalBadgeCounts,
-				getScore,
-				getTimeForEntry,
-				getDesc,
-				getDuplicates,
-				getBadgeCount,
-				getBadgeOwners,
-				getEventList,
-				getLeaderboardRanks,
-				getUserObject,
-				getMetaPoints,
-				getActivityPoints,
-				data: info.data,
-				users: info.users,
-				profile: info.profile
-			})
+		this.requests = []
+		/** @type {Object<string, null | string>} */
+		this.results = {}
+		/** @type {((results: Object<string, string>) => void)[]} */
+		this.promises = []
+	}
+	sendRequests() {
+		var _bd = this
+		for (var i = 0; i < this.urls.length; i++) {
+			this.results[this.urls[i]] = null
+			var x = new XMLHttpRequest()
+			x.open("GET", this.urls[i]);
+			((url, x) => {
+				x.addEventListener("loadend", () => _bd.saveData(url, x.responseText))
+			})(this.urls[i], x);
+			x.send()
+			this.requests.push(x)
 		}
+	}
+	/**
+	 * @param {string} url
+	 * @param {string} response
+	 */
+	saveData(url, response) {
+		this.results[url] = response
+		this.checkForFinish()
+	}
+	checkForFinish() {
+		/** @type {Object<string, string>} */
+		var finishedResults = {}
+		var finished = true
+		for (var i = 0; i < this.urls.length; i++) {
+			var url = this.urls[i]
+			var result = this.results[url]
+			if (result == null) {
+				finished = false;
+			} else {
+				finishedResults[url] = result
+			}
+		}
+		if (!finished) return
+		// Finished, trigger promises
+		for (var i = 0; i < this.promises.length; i++) {
+			this.promises[i](finishedResults)
+		}
+		this.promises = [];
+	}
+	getPromise() {
+		var _bd = this
+		/** @type {Promise<Object<string, string>>} */
+		var promise = new Promise((resolve) => {
+			_bd.promises.push(resolve)
+		})
+		this.checkForFinish()
+		return promise
+	}
+}
+
+
+class User {
+	/**
+	 * @param {string} name
+	 * @param {Date} date
+	 * @param {string} email
+	 * @param {boolean} admin
+	 * @param {string} desc
+	 */
+	constructor(name, date, email, admin, desc) {
+		this.name = name
+		this.date = date
+		this.email = email
+		this.admin = admin
+		this.desc = desc
+	}
+}
+class Entry {
+	/**
+	 * @param {User} user
+	 * @param {number} score
+	 * @param {Date} date
+	 * @param {string} note
+	 */
+	constructor(user, score, date, note) {
+		this.user = user
+		this.score = score
+		this.date = date
+		this.note = note
+	}
+}
+class Leaderboard {
+	/**
+	 * @param {string} name
+	 * @param {string} description
+	 * @param {{ values: number[], description: string } | null} badges
+	 * @param {Entry[]} entries
+	 * @param {boolean} reverseOrder
+	 * @param {boolean} isTime
+	 */
+	constructor(name, description, badges, entries, reverseOrder, isTime) {
+		this.name = name
+		this.description = description
+		this.badges = badges
+		this.entries = entries
+		this.reverseOrder = reverseOrder
+		this.isTime = isTime
+	}
+}
+
+async function getData() {
+	var downloader = new BulkDownloader([
+		"/users.json",
+		"/data.json",
+		"/usercheck" + location.search
+	])
+	downloader.sendRequests()
+	var results = await downloader.getPromise()
+	var info = {
+		data: results["/data.json"],
+		users: results["/users.json"],
+		profile: results["/usercheck" + location.search]
+	}
+	return parseData(info)
+}
+/**
+ * @param {{ data: string; users: string; profile: string; }} info
+ */
+function parseData(info) {
+	// Parse users
+	/** @type {User[]} */
+	var users = []
+	for (var data of JSON.parse(info.users)) {
+		var user = new User(data.name, data.date, data.email, data.admin, data.desc)
+		users.push(user)
+	}
+	// Parse leaderboards
+	var leaderboards = []
+	var events = JSON.parse(info.data)
+	for (var eventname of Object.keys(events)) {
+		var eventData = events[eventname]
+		/** @type {any[][]} */
+		var encodedEntries = eventData.entries
+		var entries = encodedEntries.map((v) => {
+			var user = users.find((d) => d.name == v[0])
+			if (user == undefined) throw new Error("Entry in event " + eventname + " refers to unknown user: " + v.toString())
+			var entry = new Entry(user, v[1], v[2], v[3])
+			return entry
+		})
+		var leaderboard = new Leaderboard(eventname, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
+			description: eventData.badge_desc,
+			values: eventData.badges
+		}, entries, eventData.reverseOrder, eventData.isTime)
+		leaderboards.push(leaderboard)
+	}
+}
+/**
+ * @param {any} info
+ */
+function generateObject(info) {
+	function getUserList() {
+		var userlist = []
+		for (var i = info.users.length - 1; i >= 0; i--) {
+			userlist.push(info.users[i].name)
+		}
+		return userlist
+	}
+	function getBadgeTypeCounts() {
+		var userlist = getUserList()
+		/** @type {Object<any, number[]>} */
+		var names = {}
+		for (var i = 0; i < userlist.length; i++) {
+			names[userlist[i]] = [0, 0, 0, 0]
+		}
+		// 1. Loop over the different events
+		var eventnames = Object.keys(info.data)
+		for (var eventno = 0; eventno < eventnames.length; eventno++) {
+			var event = 	info.data[eventnames[eventno]].entries
+			var e_values = 	info.data[eventnames[eventno]].badges
+			if (e_values.length == 0) continue; // Specialty leaderboard
+			// 2. Loop over the different entries
+			for (var i = 0; i < event.length; i++) {
+				var entry_info = event[i]
+				var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
+				if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
+				if (f(entry_info[1], e_values[0])) names[entry_info[0]][0] += 1
+				if (f(entry_info[1], e_values[1])) names[entry_info[0]][0] += 1
+				if (f(entry_info[1], e_values[2])) names[entry_info[0]][0] += 1
+				if (f(entry_info[1], e_values[3])) names[entry_info[0]][1] += 1
+				if (f(entry_info[1], e_values[4])) names[entry_info[0]][1] += 1
+				if (f(entry_info[1], e_values[5])) names[entry_info[0]][2] += 1
+				if (f(entry_info[1], e_values[6])) names[entry_info[0]][2] += 1
+				if (f(entry_info[1], e_values[7])) names[entry_info[0]][3] += 1
+			}
+		}
+		// 3. Format & sort the data
+		var list_data = []
+		var keys = Object.keys(names)
+		for (var i = 0; i < keys.length; i++) {
+			var thisBadges = names[keys[i]]
+			list_data.push([keys[i], thisBadges])
+		}
+		list_data.sort((a, b) => {
+			/** @param {any[]} x */
+			function g(x) { return x[1][0] + (x[1][1] * 100) + (x[1][2] * 10000) + (x[1][3] * 10000) }
+			if (g(a) < g(b)) {
+				return -1;
+			}
+			if (g(a) > g(b)) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		})
+		list_data.reverse()
+		return list_data
+	}
+	function getTotalBadgeCounts() {
+		var badges = [0, 0, 0, 0]
+		// 1. Loop over the different events
+		var eventnames = Object.keys(info.data)
+		for (var eventno = 0; eventno < eventnames.length; eventno++) {
+			var event = 	info.data[eventnames[eventno]].entries
+			var e_values = 	info.data[eventnames[eventno]].badges
+			if (e_values.length == 0) continue; // Specialty leaderboard
+			// 2. Loop over the different entries
+			for (var i = 0; i < event.length; i++) {
+				var entry_info = event[i]
+				var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
+				if (info.data[eventnames[eventno]].reverseOrder) f = (entry, badge) => (entry <= badge)
+				if (f(entry_info[1], e_values[0])) badges[0] += 1
+				if (f(entry_info[1], e_values[1])) badges[0] += 1
+				if (f(entry_info[1], e_values[2])) badges[0] += 1
+				if (f(entry_info[1], e_values[3])) badges[1] += 1
+				if (f(entry_info[1], e_values[4])) badges[1] += 1
+				if (f(entry_info[1], e_values[5])) badges[2] += 1
+				if (f(entry_info[1], e_values[6])) badges[2] += 1
+				if (f(entry_info[1], e_values[7])) badges[3] += 1
+			}
+		}
+		return badges
+	}
+	/**
+	 * @param {any} user
+	 * @param {string} event
+	 */
+	function getScore(user, event) {
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			if (entry_info[0] == user) return entry_info[1]
+		}
+	}
+	/**
+	 * @param {any} user
+	 * @param {any} event
+	 */
+	function getTimeForEntry(user, event) {
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			if (entry_info[0] == user) return new Date(entry_info[2])
+		}
+	}
+	/**
+	 * @param {any} user
+	 * @param {any} event
+	 */
+	function getDesc(user, event) {
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			if (entry_info[0] == user) return entry_info[3]
+		}
+	}
+	/**
+	 * @param {string} event
+	 * @param {any} score
+	 */
+	function getDuplicates(event, score) {
+		var users = []
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			if (entry_info[1] == score) users.push(entry_info[0])
+		}
+		return users
+	}
+	/**
+	 * @param {any} user
+	 * @param {any} event
+	 */
+	function getBadgeCount(user, event) {
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			if (entry_info[0] == user) {
+				// Get badges
+				var e_values = info.data[event].badges
+				if (e_values.length == 0) return 0; // Specialty leaderboard
+				var n_badges = 0
+				var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
+				if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
+				if (f(entry_info[1], e_values[0])) n_badges += 1
+				if (f(entry_info[1], e_values[1])) n_badges += 1
+				if (f(entry_info[1], e_values[2])) n_badges += 1
+				if (f(entry_info[1], e_values[3])) n_badges += 1
+				if (f(entry_info[1], e_values[4])) n_badges += 1
+				if (f(entry_info[1], e_values[5])) n_badges += 1
+				if (f(entry_info[1], e_values[6])) n_badges += 1
+				if (f(entry_info[1], e_values[7])) n_badges += 1
+				return n_badges
+			}
+		}
+	}
+	/**
+	 * @param {string} event
+	 * @param {any} level
+	 */
+	function getBadgeOwners(event, level) {
+		var users = []
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			// Get badges
+			var e_values = info.data[event].badges
+			var f = (/** @type {number} */ entry, /** @type {number} */ badge) => (entry >= badge)
+			if (info.data[event].reverseOrder) f = (entry, badge) => (entry <= badge)
+			if (f(entry_info[1], e_values[level])) users.push(entry_info[0])
+		}
+		users.sort((a, b) => {
+			return getScore(b, event) - getScore(a, event)
+		})
+		return users
+	}
+	/**
+	 * @param {any} user
+	 */
+	function getEventList(user) {
+		var events = []
+		var eventnames = Object.keys(info.data)
+		for (var eventno = 0; eventno < eventnames.length; eventno++) {
+			var event_info = info.data[eventnames[eventno]].entries
+			for (var i = 0; i < event_info.length; i++) {
+				var entry_info = event_info[i]
+				if (entry_info[0] == user) events.push(eventnames[eventno])
+			}
+		}
+		return events
+	}
+	/**
+	 * @param {string} event
+	 */
+	function getLeaderboardRanks(event) {
+		/** @type {Object<any, any>} */
+		var users = {}
+		var event_info = info.data[event].entries
+		for (var i = 0; i < event_info.length; i++) {
+			var entry_info = event_info[i]
+			// Get score
+			users[entry_info[0]] = entry_info[1]
+		}
+		// Format & sort the data
+		var list_data = []
+		var keys = Object.keys(users)
+		for (var i = 0; i < keys.length; i++) {
+			var thisBadges = users[keys[i]]
+			list_data.push([keys[i], thisBadges])
+		}
+		list_data.reverse()
+		list_data.sort((a, b) => {
+			/**
+			 * @param {any[]} x
+			 */
+			function g(x) { return x[1] }
+			if (g(a) < g(b)) {
+				return -1;
+			}
+			if (g(a) > g(b)) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		})
+		if (!info.data[event].reverseOrder) list_data.reverse()
+		var ret_data = []
+		for (var i = 0; i < list_data.length; i++) {
+			ret_data.push(list_data[i][0])
+		}
+		return ret_data
+	}
+	/**
+	 * @param {any} user
+	 */
+	function getUserObject(user) {
+		for (var i = 0; i < info.users.length; i++) {
+			var thisname = info.users[i].name
+			if (thisname == user) return info.users[i]
+		}
+	}
+	/**
+	 * @param {any} user
+	 */
+	function getMetaPoints(user) {
+		var users = getUserList()
+		var points = 0
+		var eventlist = Object.keys(info.data)
+		for (var n = 0; n < eventlist.length; n++) {
+			var event = eventlist[n]
+			var ranks = getLeaderboardRanks(event)
+			var rank = ranks.indexOf(user)
+			var score = getScore(user, event)
+			if (rank == -1) points += users.length
+			else {
+				// Find real score
+				var duplicates = getDuplicates(eventlist[n], score)
+				var pcscore = rank + 0
+				for (var xn = rank - 1; xn >= 0; xn--) {
+					if (duplicates.includes(ranks[xn])) {
+						pcscore -= 1
+					}
+				}
+				// Give points
+				points += pcscore + 1
+			}
+		}
+		return points
+	}
+	/**
+	 * @param {any} user
+	 */
+	function getActivityPoints(user) {
+		var firsts = 0
+		var eventlist = Object.keys(info.data)
+		for (var n = 0; n < eventlist.length; n++) {
+			var event = eventlist[n]
+			var score = getScore(user, event)
+			if (score == undefined) continue;
+			var vassal = info.data[event].badges
+			if (vassal.length > 0) vassal = vassal[1]
+			else continue;
+			firsts += Math.round(score / (vassal / 25))
+		}
+		return firsts
+	}
+	return({
+		getUserList,
+		getBadgeTypeCounts,
+		getTotalBadgeCounts,
+		getScore,
+		getTimeForEntry,
+		getDesc,
+		getDuplicates,
+		getBadgeCount,
+		getBadgeOwners,
+		getEventList,
+		getLeaderboardRanks,
+		getUserObject,
+		getMetaPoints,
+		getActivityPoints,
+		data: info.data,
+		users: info.users,
+		profile: info.profile
 	})
 }
