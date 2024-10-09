@@ -20,6 +20,15 @@ function expect(selector) {
 	if (! (e instanceof HTMLElement)) throw new Error("Document is of the wrong type?!?!")
 	return e
 }
+/**
+ * @param {string} selector
+ * @returns {HTMLInputElement}
+ */
+function expectInput(selector) {
+	var e = expect(selector)
+	if (! (e instanceof HTMLInputElement)) throw new Error("Element is not an input: " + selector)
+	return e
+}
 Object.prototype.toString = function () {
 	var r = [];
 	var keys = Object.keys(this);
@@ -109,7 +118,7 @@ function describe(key, obj) {
 /**
  * @param {number} i
  */
-function scrollToEntry(i) { // i = Number(document.querySelector("#e").value)
+function scrollToEntry(i) {
 	var _elm = document.querySelector(`table tr:nth-child(${i + 1})`)
 	if (_elm == null) throw new Error("table is missing, cannot scroll")
 	var elm = _elm
@@ -247,6 +256,18 @@ class Leaderboard {
 		this.isTime = isTime
 	}
 	/**
+	 * @param {User} user
+	 * @returns {Entry | undefined}
+	 */
+	getEntryForUser(user) {
+		for (var i = 0; i < this.entries.length; i++) {
+			if (this.entries[i].user == user) {
+				return this.entries[i]
+			}
+		}
+		return undefined
+	}
+	/**
 	 * Get a list of all the entries in the leaderboard, sorted according to score.
 	 * The entries have some extra data indicating their place value.
 	 */
@@ -288,6 +309,22 @@ class Leaderboard {
 		}
 		return this.badges.values.length
 	}
+	/**
+	 * @param {number} score
+	 */
+	getNumberOfBadgesInEachCategory(score) {
+		var n = this.getNumberOfBadges(score)
+		return [
+			[1, 0, 0, 0],
+			[1, 0, 0, 0],
+			[1, 0, 0, 0],
+			[0, 1, 0, 0],
+			[0, 1, 0, 0],
+			[0, 0, 1, 0],
+			[0, 0, 1, 0],
+			[0, 0, 0, 1]
+		].slice(0, n).reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
+	}
 }
 class SGData {
 	/**
@@ -310,6 +347,22 @@ class SGData {
 			}
 		}
 		throw new Error("There is no leaderboard with the name: " + name)
+	}
+	/**
+	 * @param {User} user
+	 */
+	getNumberOfBadgesInEachCategory(user) {
+		/** @type {number[][]} */
+		var total = []
+		for (var i = 0; i < this.leaderboards.length; i++) {
+			var leaderboard = this.leaderboards[i]
+			if (leaderboard.badges == null) continue
+			var entry = leaderboard.getEntryForUser(user)
+			if (entry == undefined) continue
+			var badges = leaderboard.getNumberOfBadgesInEachCategory(entry.score)
+			total.push(badges)
+		}
+		return total.reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
 	}
 }
 

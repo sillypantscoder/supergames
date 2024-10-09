@@ -1,49 +1,25 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="/theme.css" />
-		<script src="/background.js"></script>
-		<link rel="stylesheet" type="text/css" href="/badges.css" />
-		<style>
-.badge {
-	margin-left: 0.8em;
-}
-		</style>
-	</head>
-	<body>
-		<div class="tabs"></div>
-		<h1>Badge Leaderboard</h1>
-		<p><button onclick="scrollToEntrySpecial()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
-		<!--<div>
-			<ol id="badges"></ol>
-		</div>
-		<h3>Testing...</h3>-->
-		<div>
-			<table id="badges2">
-				<tbody></tbody>
-			</table>
-		</div>
-		<h2>Totals</h2>
-		<div id="stats"></div>
-		<script src="/data.js"></script>
-		<script src="/tabs.js"></script>
-		<script>
-tabs();
-getData().then((info) => {
-	tabs.userfix(info.profile);
-	var list_data = info.getBadgeTypeCounts()
-	for (var i = 0; i < list_data.length; i++) {
-		var username = list_data[i][0]
-		var counts = list_data[i][1]
+sgtabs();
+getData().then((info) => { try {
+	sgtabs.userfix(info);
+	/** @type {Map<User, number[]>} */
+	var user_data = new Map()
+	for (var i = 0; i < info.users.length; i++) {
+		var user = info.users[i]
+		var badges = info.getNumberOfBadgesInEachCategory(user)
+		user_data.set(user, badges)
+	}
+	for (var i = 0; i < info.users.length; i++) {
+		var username = info.users[i].name
+		var counts = user_data.get(info.users[i])
+		if (counts == undefined) throw new Error("The user is not registered")
 		// Create the element
 		var e = document.createElement("tr")
 		e.appendChild(document.createElement("td"))
 			e.children[0].setAttribute("style", "text-align: right;")
 			e.children[0].appendChild(document.createElement("a"))
-				e.children[0].children[0].href = "/profile/" + username + location.search
+				e.children[0].children[0].setAttribute("href", "/profile/" + username + location.search)
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
-				e.children[0].children[0].innerText = username
+				e.children[0].children[0].textContent = username
 		e.appendChild(document.createElement("td"))
 			e.children[1].innerHTML = "<div class='badge badge-bronze'></div>" + counts[0]
 		e.appendChild(document.createElement("td"))
@@ -52,14 +28,14 @@ getData().then((info) => {
 			e.children[3].innerHTML = "<div class='badge badge-gold'></div>" + counts[2]
 		e.appendChild(document.createElement("td"))
 			e.children[4].innerHTML = "<div class='badge badge-platinum'></div>" + counts[3]
-		document.querySelector("#badges2 tbody").appendChild(e)
+		expect("#badges2 tbody").appendChild(e)
 	}
-	document.querySelector("#e").setAttribute("max", i)
+	expect("#e").setAttribute("max", i.toString())
 	// Statistics
-	var total_badges = info.getTotalBadgeCounts()
-	var total_users = info.getUserList().length
-	var total_events = (() => { var n = 0; var k = Object.keys(info.data); for (var i = 0; i < k.length; i++) { if (info.data[k[i]].badges.length > 0) n += 1; } return n; })();
-	document.querySelector("#stats").innerHTML =
+	var total_badges = [...user_data.values()].reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
+	var total_users = info.users.length
+	var total_events = (() => { var n = 0; for (var i = 0; i < info.leaderboards.length; i++) { if (info.leaderboards[i].badges != null) n += 1; } return n; })();
+	expect("#stats").innerHTML =
 		`<div class="physics">Total awarded badges of each type:</div>` +
 		`<span class="physics"><div class='badge badge-bronze'></div>${total_badges[0]}</span> <span class="physics"><div class='badge badge-silver'></div>${total_badges[1]}</span> <span class="physics"><div class='badge badge-gold'></div>${total_badges[2]}</span> <span class="physics"><div class='badge badge-platinum'></div>${total_badges[3]}</span><br>` +
 		`<div class="physics">Total number of awarded badges: <b>${total_badges[0] + total_badges[1] + total_badges[2] + total_badges[3]}</b></div>` +
@@ -69,14 +45,8 @@ getData().then((info) => {
 		`<span class="physics"><div class='badge badge-bronze'></div>${Math.round((total_badges[0] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-silver'></div>${Math.round((total_badges[1] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-gold'></div>${Math.round((total_badges[2] / total_users) * 100) / 100}</span> <span class="physics"><div class='badge badge-platinum'></div>${Math.round((total_badges[3] / total_users) * 100) / 100}</span>` +
 		`<div class="physics">Total badges available to earn:</div>` +
 		`<span class="physics"><div class='badge badge-bronze'></div>${total_events * 3}</span> <span class="physics"><div class='badge badge-silver'></div>${total_events * 2}</span> <span class="physics"><div class='badge badge-gold'></div>${total_events * 2}</span> <span class="physics"><div class='badge badge-platinum'></div>${total_events * 1}</span>`
+} catch (e) { alert(e) }
 })
 function scrollToEntrySpecial() {
-	document.querySelector("#e").valueAsNumber -= 1
-	scrollToEntry()
-	document.querySelector("#e").valueAsNumber += 1
+	scrollToEntry(Number(expectInput("#e").valueAsNumber - 1))
 }
-		</script>
-		<script src="https://brm.io/matter-js/build/matter.js"></script>
-		<script src="/matter2.js"></script>
-	</body>
-</html>
