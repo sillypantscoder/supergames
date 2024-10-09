@@ -28,21 +28,8 @@
 		<div id="buttons">Loading leaderboard list...</div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
-		<script>
-tabs();
-getData().then((info) => {
-	tabs.userfix(info.profile);
-	document.querySelector("#buttons").innerText = ""
-	var keys = Object.keys(info.data)
-	for (var i = 0; i < keys.length; i++) {
-		var e = document.createElement("a")
-		e.innerText = keys[i]
-		e.href = "/leaderboard/" + keys[i] + location.search
-		document.querySelector("#buttons").appendChild(e)
-	}
-})
-		</script>
-		<script src="https://raw.githubusercontent.com/liabru/matter-js/master/build/matter.min.js"></script>
+		<script src="list.js"></script>
+		<script src="https://brm.io/matter-js/build/matter.js"></script>
 		<script src="/matter2.js"></script>
 	</body>
 </html>

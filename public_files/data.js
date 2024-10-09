@@ -5,11 +5,21 @@
  */
 function _choice(items) { return items[Math.floor(Math.random()*items.length)]; }
 window.addEventListener("error", (e) => {
-	alert(`${e.message} @${e.filename}:${e.lineno}`)
+	alert(`ERROR: ${e.message} @${e.filename}:${e.lineno}`)
 	var x = new XMLHttpRequest()
 	x.open("POST", "/error")
 	x.send(`user: ${location.search}; message: ${e.message} @${e.filename}:${e.lineno}`)
 })
+/**
+ * @param {string} selector
+ * @returns {HTMLElement}
+ */
+function expect(selector) {
+	var e = document.querySelector(selector)
+	if (e == null) throw new Error("Element is missing: " + selector)
+	if (! (e instanceof HTMLElement)) throw new Error("Document is of the wrong type?!?!")
+	return e
+}
 Object.prototype.toString = function () {
 	var r = [];
 	var keys = Object.keys(this);
@@ -196,14 +206,12 @@ class User {
 	 * @param {string} name
 	 * @param {Date} date
 	 * @param {string} email
-	 * @param {boolean} admin
 	 * @param {string} desc
 	 */
-	constructor(name, date, email, admin, desc) {
+	constructor(name, date, email, desc) {
 		this.name = name
 		this.date = date
 		this.email = email
-		this.admin = admin
 		this.desc = desc
 	}
 }
@@ -238,6 +246,71 @@ class Leaderboard {
 		this.reverseOrder = reverseOrder
 		this.isTime = isTime
 	}
+	/**
+	 * Get a list of all the entries in the leaderboard, sorted according to score.
+	 * The entries have some extra data indicating their place value.
+	 */
+	getRanked() {
+		/** @type {{ entry: Entry }[]} */
+		var data = []
+		for (var i = 0; i < this.entries.length; i++) {
+			var entry = this.entries[i]
+			// Get score
+			data.push({ entry })
+		}
+		data.reverse()
+		data.sort((a, b) => {
+			/**
+			 * @param {{ entry: Entry }} x
+			 * @return {number}
+			 */
+			function g(x) { return x.entry.score }
+			if (g(a) < g(b)) {
+				return -1;
+			}
+			if (g(a) > g(b)) {
+				return 1;
+			}
+			// a must be equal to b
+			return 0;
+		})
+		if (!this.reverseOrder) data.reverse()
+		return data
+	}
+	/**
+	 * @param {number} score
+	 */
+	getNumberOfBadges(score) {
+		if (this.badges == null) throw new Error("There are no badges on a specialty leaderboard")
+		for (var i = 0; i < this.badges.values.length; i++) {
+			var value = this.badges.values[i]
+			if (score <= value) return i
+		}
+		return this.badges.values.length
+	}
+}
+class SGData {
+	/**
+	 * @param {User[]} users
+	 * @param {Leaderboard[]} leaderboards
+	 * @param {{ name: string, admin: boolean } | null} profile
+	 */
+	constructor(users, leaderboards, profile) {
+		this.users = users
+		this.leaderboards = leaderboards
+		this.profile = profile
+	}
+	/**
+	 * @param {string} name
+	 */
+	getLeaderboard(name) {
+		for (var i = 0; i < this.leaderboards.length; i++) {
+			if (this.leaderboards[i].name == name) {
+				return this.leaderboards[i]
+			}
+		}
+		throw new Error("There is no leaderboard with the name: " + name)
+	}
 }
 
 async function getData() {
@@ -263,7 +336,7 @@ function parseData(info) {
 	/** @type {User[]} */
 	var users = []
 	for (var data of JSON.parse(info.users)) {
-		var user = new User(data.name, data.date, data.email, data.admin, data.desc)
+		var user = new User(data.name, new Date(data.date), data.email, data.desc)
 		users.push(user)
 	}
 	// Parse leaderboards
@@ -276,7 +349,7 @@ function parseData(info) {
 		var entries = encodedEntries.map((v) => {
 			var user = users.find((d) => d.name == v[0])
 			if (user == undefined) throw new Error("Entry in event " + eventname + " refers to unknown user: " + v.toString())
-			var entry = new Entry(user, v[1], v[2], v[3])
+			var entry = new Entry(user, v[1], new Date(v[2]), v[3])
 			return entry
 		})
 		var leaderboard = new Leaderboard(eventname, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
@@ -285,6 +358,18 @@ function parseData(info) {
 		}, entries, eventData.reverseOrder, eventData.isTime)
 		leaderboards.push(leaderboard)
 	}
+	// Parse profile
+	/** @type {{ name: string, admin: boolean } | null} */
+	var profile = null
+	var encodedProfile = JSON.parse(info.profile)
+	if (encodedProfile.length > 0) {
+		profile = {
+			name: encodedProfile[0].name,
+			admin: encodedProfile[0].admin
+		}
+	}
+	// Return objects
+	return new SGData(users, leaderboards, profile)
 }
 /**
  * @param {any} info

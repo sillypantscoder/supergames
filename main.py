@@ -5,6 +5,7 @@ import datetime
 import traceback
 import subprocess
 from urllib.parse import unquote
+import random
 
 vandalize = False
 
@@ -166,10 +167,10 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": "<!DOCTYPE html><html><head></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
+			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
 		}
-	elif path.startswith("/leaderboard/"):
-		name = path.split("?")[0][13:]
+	elif path.startswith("/leaderboards/"):
+		name = path.split("?")[0][14:]
 		return {
 			"status": 200,
 			"headers": {
