@@ -364,6 +364,35 @@ class SGData {
 		}
 		return total.reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
 	}
+	/**
+	 * @param {User} user
+	 */
+	getMetaPoints(user) {
+		var points = 0
+		for (var n = 0; n < this.leaderboards.length; n++) {
+			var leaderboard = this.leaderboards[n]
+			var ranks = leaderboard.getRanked()
+			var rank = ranks.findIndex((v) => v.entry.user == user)
+			if (rank == -1) points += this.users.length
+			else points += n + 1
+		}
+		return points
+	}
+	/**
+	 * @param {User} user
+	 */
+	getActivityPoints(user) {
+		var totalScore = 0
+		for (var n = 0; n < this.leaderboards.length; n++) {
+			var leaderboard = this.leaderboards[n]
+			var score = leaderboard.getEntryForUser(user)?.score
+			if (score == undefined) continue;
+			var vassal = leaderboard.badges?.values[1]
+			if (vassal == undefined) continue;
+			totalScore += Math.round(score / (vassal / 25))
+		}
+		return totalScore
+	}
 }
 
 async function getData() {
