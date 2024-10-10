@@ -3,7 +3,14 @@ import time
 import sys
 
 codespace = input("Enter the codespace name\n")
-server = subprocess.Popen(["python3", "main.py"])
+
+def start_server():
+	server = subprocess.Popen(["python3", "main.py"])
+	time.sleep(1)
+	subprocess.run(["gh", "codespace", "ports", "visibility", "12344:public", "--codespace", codespace])
+	return server
+
+server = start_server()
 
 while True:
 	p = subprocess.Popen(["curl", f"https://{codespace}-12344.app.github.dev/home.html"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -14,9 +21,7 @@ while True:
 		server.kill()
 		print("Killed the server!")
 		time.sleep(3)
-		server = subprocess.Popen(["python3", "main.py"])
-		time.sleep(1)
-		subprocess.run(["gh", "codespace", "ports", "visibility", "12344:public", "--codespace", codespace])
+		start_server()
 		print("Restarted the server.")
 	else:
 		print("fine...", end="")

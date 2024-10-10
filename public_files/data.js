@@ -21,12 +21,11 @@ function expect(selector) {
 	return e
 }
 /**
- * @param {string} selector
+ * @param {Node} e
  * @returns {HTMLInputElement}
  */
-function expectInput(selector) {
-	var e = expect(selector)
-	if (! (e instanceof HTMLInputElement)) throw new Error("Element is not an input: " + selector)
+function expectInput(e) {
+	if (! (e instanceof HTMLInputElement)) throw new Error("Element is not an input: " + e)
 	return e
 }
 Object.prototype.toString = function () {
@@ -392,6 +391,20 @@ class SGData {
 			totalScore += Math.round(score / (vassal / 25))
 		}
 		return totalScore
+	}
+	getBadgeLeaderboardRanked() {
+		var user_data = this.users.map((v) => ({ user: v, badges: this.getNumberOfBadgesInEachCategory(v) })).sort((a, b) => {
+			if (a.badges[3] > b.badges[3]) return -1;
+			if (a.badges[3] < b.badges[3]) return 1;
+			if (a.badges[2] > b.badges[2]) return -1;
+			if (a.badges[2] < b.badges[2]) return 1;
+			if (a.badges[1] > b.badges[1]) return -1;
+			if (a.badges[1] < b.badges[1]) return 1;
+			if (a.badges[0] > b.badges[0]) return -1;
+			if (a.badges[0] < b.badges[0]) return 1;
+			return 0;
+		})
+		return user_data
 	}
 }
 

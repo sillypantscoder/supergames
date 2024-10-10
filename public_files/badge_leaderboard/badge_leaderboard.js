@@ -1,16 +1,10 @@
 sgtabs();
 getData().then((info) => { try {
 	sgtabs.userfix(info);
-	/** @type {Map<User, number[]>} */
-	var user_data = new Map()
-	for (var i = 0; i < info.users.length; i++) {
-		var user = info.users[i]
-		var badges = info.getNumberOfBadgesInEachCategory(user)
-		user_data.set(user, badges)
-	}
-	for (var i = 0; i < info.users.length; i++) {
-		var username = info.users[i].name
-		var counts = user_data.get(info.users[i])
+	var user_data = info.getBadgeLeaderboardRanked()
+	for (var i = 0; i < user_data.length; i++) {
+		var username = user_data[i].user.name
+		var counts = user_data[i]
 		if (counts == undefined) throw new Error("The user is not registered")
 		// Create the element
 		var e = document.createElement("tr")
@@ -21,18 +15,18 @@ getData().then((info) => { try {
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].textContent = username
 		e.appendChild(document.createElement("td"))
-			e.children[1].innerHTML = "<div class='badge badge-bronze'></div>" + counts[0]
+			e.children[1].innerHTML = "<div class='badge badge-bronze'></div>" + counts.badges[0]
 		e.appendChild(document.createElement("td"))
-			e.children[2].innerHTML = "<div class='badge badge-silver'></div>" + counts[1]
+			e.children[2].innerHTML = "<div class='badge badge-silver'></div>" + counts.badges[1]
 		e.appendChild(document.createElement("td"))
-			e.children[3].innerHTML = "<div class='badge badge-gold'></div>" + counts[2]
+			e.children[3].innerHTML = "<div class='badge badge-gold'></div>" + counts.badges[2]
 		e.appendChild(document.createElement("td"))
-			e.children[4].innerHTML = "<div class='badge badge-platinum'></div>" + counts[3]
+			e.children[4].innerHTML = "<div class='badge badge-platinum'></div>" + counts.badges[3]
 		expect("#badges2 tbody").appendChild(e)
 	}
 	expect("#e").setAttribute("max", i.toString())
 	// Statistics
-	var total_badges = [...user_data.values()].reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
+	var total_badges = [...user_data.values()].reduce((a, b) => a.map((v, i) => v + b.badges[i]), [0, 0, 0, 0])
 	var total_users = info.users.length
 	var total_events = (() => { var n = 0; for (var i = 0; i < info.leaderboards.length; i++) { if (info.leaderboards[i].badges != null) n += 1; } return n; })();
 	expect("#stats").innerHTML =
@@ -48,5 +42,5 @@ getData().then((info) => { try {
 } catch (e) { alert(e) }
 })
 function scrollToEntrySpecial() {
-	scrollToEntry(Number(expectInput("#e").valueAsNumber - 1))
+	scrollToEntry(Number(expectInput(expect("#e")).valueAsNumber - 1))
 }

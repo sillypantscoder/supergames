@@ -64,8 +64,6 @@ const sgtabs = (() => {
 		if (location.pathname == "/profile/" + encodeURIComponent(profile.name)) {
 			expect("#login-tab").remove()
 			// We are on our own profile page!
-			// @ts-ignore
-			window.isOwnProfile = true
 		}
 	}
 	return tabs

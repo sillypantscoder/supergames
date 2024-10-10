@@ -63,7 +63,7 @@ getData().then((info) => { try {
 		// 2nd column: User name
 		e.appendChild(document.createElement("td"))
 			e.children[1].appendChild(document.createElement("a"))
-				e.children[1].children[0].setAttribute("href", "/profile/" + ranks[i] + leaderboard.name)
+				e.children[1].children[0].setAttribute("href", "/profile/" + ranks[i].entry.user.name)
 				e.children[1].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[1].children[0].textContent = ranks[i].entry.user.name
 		// 3rd column: Score

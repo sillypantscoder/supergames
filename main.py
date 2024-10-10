@@ -195,15 +195,7 @@ def get(path: str):
 	elif path.startswith("/profile/"):
 		name = path.split("?")[0].split("/")[2]
 		userlist: list[str] = [x["name"] for x in json.loads(read_file("users.json"))]
-		if name in userlist:
-			return {
-				"status": 200,
-				"headers": {
-					"Content-Type": "text/html"
-				},
-				"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
-			}
-		elif name.isdigit() and int(name) - 1 < len(userlist):
+		if name.isdigit() and int(name) - 1 < len(userlist):
 			name = userlist[int(name) - 1]
 			return {
 				"status": 200,
@@ -213,7 +205,7 @@ def get(path: str):
 				"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 			}
 		return {
-			"status": 404,
+			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
@@ -412,7 +404,7 @@ def post(path, body):
 		# Update user list
 		c = read_file("users.json").decode("UTF-8")
 		now = datetime.datetime.now()
-		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}"
+		date = f"{now.year}-{str(now.month).rjust(2, '0')}-{str(now.day).rjust(2, '0')}T{str(now.hour).rjust(2, '0')}:{str(now.minute).rjust(2, '0')}:{str(now.second).rjust(2, '0')}.{str(now.microsecond // 1000).rjust(3, '0')}"
 		c = c[:-2] + f''',
 	{{
 		"name": {json.dumps(bodydata[0])},
