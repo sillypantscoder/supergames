@@ -8,7 +8,7 @@ window.addEventListener("error", (e) => {
 	alert(`ERROR: ${e.message} @${e.filename}:${e.lineno}`)
 	var x = new XMLHttpRequest()
 	x.open("POST", "/error")
-	x.send(`user: ${location.search}; message: ${e.message} @${e.filename}:${e.lineno}`)
+	x.send(`url: ${location.href}; message: ${e.message} @${e.filename}:${e.lineno}`)
 })
 /**
  * @param {string} selector
@@ -323,6 +323,18 @@ class Leaderboard {
 			[0, 0, 1, 0],
 			[0, 0, 0, 1]
 		].slice(0, n).reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
+	}
+}
+class Form {
+	/**
+	 * @param {string} name
+	 * @param {any[]} questions
+	 * @param {any[]} responses
+	 */
+	constructor(name, questions, responses) {
+		this.name = name
+		this.questions = questions
+		this.responses = responses
 	}
 }
 class SGData {

@@ -38,35 +38,7 @@
 		<div id="buttons">Loading form list...</div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
-		<script>
-tabs();
-getData().then((info) => {
-	tabs.userfix(info.profile);
-	var x = new XMLHttpRequest()
-	x.open("GET", "/forms.json")
-	x.addEventListener("loadend", (e) => {
-		var forms = JSON.parse(e.target.responseText)
-		document.querySelector("#buttons").innerText = ""
-		for (var i = 0; i < forms.length; i++) {
-			var e = document.createElement("a")
-			e.appendChild(document.createElement("span"))
-			e.children[0].innerText = forms[i].name
-			e.href = `/form/${i}${location.search}`
-			if (info.profile[0] && info.profile[0].admin) {
-				var n_responses = forms[i].responses.length
-				if (n_responses > 0) {
-					var s = document.createElement("span")
-					s.classList.add("responses")
-					s.innerText = n_responses
-					e.appendChild(s)
-				}
-			}
-			document.querySelector("#buttons").appendChild(e)
-		}
-	})
-	x.send()
-})
-		</script>
+		<script src="list.js"></script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
 		<script src="/matter2.js"></script>
 	</body>

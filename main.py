@@ -211,7 +211,7 @@ def get(path: str):
 			},
 			"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
-	elif path.startswith("/form/"):
+	elif path.startswith("/forms/"):
 		formid = path.split("?")[0].split("/")[2]
 		formlist: list[str] = [x["name"] for x in json.loads(read_file("public_files/forms.json"))]
 		if formid.isdigit() and int(formid) < len(formlist):
