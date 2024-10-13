@@ -35,7 +35,7 @@ if (location.search == "?physics") {
 		Matter.Composite.add(engine.world, box.body);
 	}
 	setTimeout(() => {
-		document.querySelectorAll("h1, h2, li, .tabs > *, #buttons > a, td, th, .physics").forEach(addElement)
+		document.querySelectorAll("h1, h2, li, .tabs > * > *, #buttons > a, td, th, .physics").forEach(addElement)
 		boxes.forEach((e) => e.elem.setAttribute("style", e.elem.getAttribute("style") + " ; margin: 0; pointer-events: none; position: absolute; display: inline-block;"))
 		;(() => {
 			var e = document.createElement("style")

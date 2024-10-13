@@ -8,7 +8,6 @@ var formName = expect("script[data-formname]").dataset.formname ?? "[Invalid]"
  * @typedef {{ "type": "multiplechoice", "title": string, "options": string[] }} MultipleChoiceQuestion
  * @typedef {{ "type": "text", "title": string }} TextQuestion
  * @typedef {MultipleChoiceQuestion | TextQuestion} Question
- * @typedef {{ question: Question, element: HTMLElement, getResult: () => Promise<any>, fillResponse: (data: any) => void }} QuestionData
  * @typedef {{ user: string, results: any[] }} FormResponse
  */
 
@@ -34,7 +33,7 @@ getData().then((info) => {
 	})
 	x.send()
 })
-/** @type {QuestionData[]} */
+/** @type {FormInput[]} */
 var pageQuestions = []
 /**
  * @param {Question[]} questions
@@ -42,88 +41,21 @@ var pageQuestions = []
 function addQuestions(questions) {
 	for (var i = 0; i < questions.length; i++) {
 		// Add the question element
-		/** @type {QuestionData | null} */
+		/** @type {FormInput | null} */
 		var data = null
 		var q = questions[i]
-		if (q.type == "multiplechoice") data = createMultipleChoiceQuestionElement(q)
-		if (q.type == "text") data = createTextQuestionElement(q)
+		if (q.type == "multiplechoice") data = new MultipleChoiceFormInput(q)
+		if (q.type == "text") data = new TextFormInput(q)
 		if (data == null) throw new Error("Could not generate question data for type: " + q.type)
-		expect("#questions").appendChild(data.element)
+		expect("#questions").appendChild(data.elm)
 		pageQuestions.push(data)
 	}
 }
-/**
- * @param {TextQuestion} question
- * @returns {QuestionData}
- */
-function createTextQuestionElement(question) {
-	var e = document.createElement("div")
-	e.classList.add("card")
-	e.appendChild(document.createElement("div"))
-	e.children[0].classList.add("title")
-	e.children[0].textContent = question.title
-	e.appendChild(document.createElement("div"))
-	var textarea = e.children[1].appendChild(document.createElement("textarea"))
-	textarea.setAttribute("style", "width: 60em; height: 30em;")
-	return {
-		question,
-		element: e,
-		getResult: async function () {
-			return textarea.value
-		},
-		fillResponse: (data) => {
-			textarea.value = data
-		}
-	}
-}
-/**
- * @param {MultipleChoiceQuestion} question
- * @returns {QuestionData}
- */
-function createMultipleChoiceQuestionElement(question) {
-	var e = document.createElement("div")
-	e.classList.add("card")
-	e.appendChild(document.createElement("div"))
-	e.children[0].classList.add("title")
-	e.children[0].textContent = question.title
-	e.appendChild(document.createElement("div"))
-	var radioname = question.title.replaceAll(" ", "_").replaceAll(/[^A-Za-z_]/ig, "")
-	for (var i = 0; i < question.options.length; i++) {
-		var rw = document.createElement("div")
-		e.children[1].append(rw)
-		var r = document.createElement("input")
-		r.setAttribute("type", "radio")
-		r.setAttribute("name", radioname)
-		r.setAttribute("value", i.toString())
-		r.setAttribute("id", `multiplechoice_${radioname}_${i}`)
-		rw.appendChild(r)
-		var label = document.createElement("label")
-		label.setAttribute("for", `multiplechoice_${radioname}_${i}`)
-		label.innerText = question.options[i]
-		rw.appendChild(label)
-	}
-	return {
-		question,
-		element: e,
-		getResult: async function () {
-			var elm = e.children[1].querySelector("div:has( > input:checked)")
-			if (elm == null) throw new Error("You need to select a radio button")
-			var i = [...e.children[1].children].indexOf(elm)
-			return i
-		},
-		fillResponse: (data) => {
-			if (data != -1) {
-				var rw = e.children[1].children[data]
-				rw.children[0].setAttribute("checked", "")
-			}
-		}
-	}
-}
-async function submit() {
+function submit() {
 	var results = []
 	for (var i = 0; i < pageQuestions.length; i++) {
 		var func = pageQuestions[i].getResult;
-		var result = await func();
+		var result = func();
 		results.push(result)
 	}
 	var x = new XMLHttpRequest()

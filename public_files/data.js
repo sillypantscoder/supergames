@@ -28,6 +28,14 @@ function expectInput(e) {
 	if (! (e instanceof HTMLInputElement)) throw new Error("Element is not an input: " + e)
 	return e
 }
+/**
+ * @param {Node} e
+ * @returns {HTMLSelectElement}
+ */
+function expectSelect(e) {
+	if (! (e instanceof HTMLSelectElement)) throw new Error("Element is not a select: " + e)
+	return e
+}
 Object.prototype.toString = function () {
 	var r = [];
 	var keys = Object.keys(this);
@@ -358,6 +366,17 @@ class SGData {
 			}
 		}
 		throw new Error("There is no leaderboard with the name: " + name)
+	}
+	/**
+	 * @param {string} name
+	 */
+	getUserForName(name) {
+		for (var i = 0; i < this.users.length; i++) {
+			if (this.users[i].name == name) {
+				return this.users[i]
+			}
+		}
+		throw new Error("There is no user with the name: " + name)
 	}
 	/**
 	 * @param {User} user

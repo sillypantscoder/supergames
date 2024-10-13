@@ -8,11 +8,6 @@
 		<link rel="stylesheet" type="text/css" href="/badges.css" />
 		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
 		<style>
-/* div {
-	border: 1px solid black;
-	padding: 0.5em;
-	margin: 0.5em;
-} */
 .card {
 	background: #03fccf;
 	border: 1px solid black;
@@ -45,19 +40,47 @@ iframe {
 	width: 100%;
 	height: 50vh;
 }
+body:not(.h_a) .admin {
+	display: none;
+}
 		</style>
 	</head>
 	<body>
 		<div class="tabs"></div>
-		<h1>Form: {{NAME}}</h1>
-		<div id="cancelbtn" style="display: none;"><button onclick="location.reload()">Back</button></div>
+		<h1>Entry Submit</h1>
 		<div id="responses"></div>
-		<div id="questions"></div>
+		<div id="questions">
+			<div class="card">
+				<div class="title">Select the event:</div>
+				<div><select class="events" id="eventselect"></select></div>
+			</div>
+			<div class="card admin">
+				<div class="title">Select the user:</div>
+				<div><select class="users" id="username"></select></div>
+				<div><button onclick="document.querySelector('#newscore').value = getScore()" style="margin-top: 1em;">Get score</button></div>
+			</div>
+			<div class="card">
+				<div class="title">Enter the new score:</div>
+				<div><input type="number" id="newscore"></div>
+			</div>
+			<div class="card">
+				<div class="title">Enter the score combination mode:</div>
+				<div><select id="modeselect">
+					<option value="add">Add</option>
+					<option value="replace">Replace</option>
+					<option value="max">Max</option>
+				</select></div>
+			</div>
+			<div class="card">
+				<div class="title">Enter a note for your entry:</div>
+				<div>Note: This could be a link to a video.</div>
+				<div><input type="text" id="note"></div>
+			</div>
+		</div>
 		<div><button onclick="submit()" id="endbtn">Submit!</button></div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
-		<script src="form_inputs.js"></script>
-		<script src="form.js" data-formid="{{FORMID}}" data-formname="{{NAME}}"></script>
+		<script src="entrysubmit.js"></script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
 		<script src="/matter2.js"></script>
 	</body>

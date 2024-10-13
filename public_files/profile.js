@@ -29,7 +29,7 @@ getData().then((info) => {
 		// 1st column: Leaderboard name
 		e.appendChild(document.createElement("td"))
 			e.children[0].appendChild(document.createElement("a"))
-				e.children[0].children[0].setAttribute("href", "/leaderboard/" + event.name + location.search)
+				e.children[0].children[0].setAttribute("href", "/leaderboards/" + event.name + location.search)
 				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
 				e.children[0].children[0].textContent = event.name
 		// 2nd column: Score
