@@ -275,8 +275,7 @@ class Leaderboard {
 		return undefined
 	}
 	/**
-	 * Get a list of all the entries in the leaderboard, sorted according to score.
-	 * The entries have some extra data indicating their place value.
+	 * Get a list of all the entries in the leaderboard, sorted according to score from best to worst.
 	 */
 	getRanked() {
 		/** @type {{ entry: Entry }[]} */
@@ -393,49 +392,6 @@ class SGData {
 			total.push(badges)
 		}
 		return total.reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
-	}
-	/**
-	 * @param {User} user
-	 */
-	getMetaPoints(user) {
-		var points = 0
-		for (var n = 0; n < this.leaderboards.length; n++) {
-			var leaderboard = this.leaderboards[n]
-			var ranks = leaderboard.getRanked()
-			var rank = ranks.findIndex((v) => v.entry.user == user)
-			if (rank == -1) points += this.users.length
-			else points += n + 1
-		}
-		return points
-	}
-	/**
-	 * @param {User} user
-	 */
-	getActivityPoints(user) {
-		var totalScore = 0
-		for (var n = 0; n < this.leaderboards.length; n++) {
-			var leaderboard = this.leaderboards[n]
-			var score = leaderboard.getEntryForUser(user)?.score
-			if (score == undefined) continue;
-			var vassal = leaderboard.badges?.values[1]
-			if (vassal == undefined) continue;
-			totalScore += Math.round(score / (vassal / 25))
-		}
-		return totalScore
-	}
-	getBadgeLeaderboardRanked() {
-		var user_data = this.users.map((v) => ({ user: v, badges: this.getNumberOfBadgesInEachCategory(v) })).sort((a, b) => {
-			if (a.badges[3] > b.badges[3]) return -1;
-			if (a.badges[3] < b.badges[3]) return 1;
-			if (a.badges[2] > b.badges[2]) return -1;
-			if (a.badges[2] < b.badges[2]) return 1;
-			if (a.badges[1] > b.badges[1]) return -1;
-			if (a.badges[1] < b.badges[1]) return 1;
-			if (a.badges[0] > b.badges[0]) return -1;
-			if (a.badges[0] < b.badges[0]) return 1;
-			return 0;
-		})
-		return user_data
 	}
 }
 

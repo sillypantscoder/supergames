@@ -93,34 +93,20 @@ getData().then((info) => {
 	}
 	// badge leaderboard
 	(() => {
-		var badgeranks = info.getBadgeLeaderboardRanked()
-		var rank = badgeranks.findIndex((v) => v.user == this_user_obj)
-		if (rank == undefined) throw new Error("User is not on the badge leaderboard! (Somehow.)")
-			var e = document.createElement("tr")
+		var badge_leaderboard = new BadgeLeaderboard(info)
+		var badge_rank = badge_leaderboard.getRankForUser(this_user_obj)
+		var e = document.createElement("tr")
 			e.appendChild(document.createElement("td"))
 				e.children[0].setAttribute("colspan", "3")
 				e.children[0].textContent = "Badge Leaderboard"
 			e.appendChild(document.createElement("td"))
-				e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(rank)};">${rank + 1}${getSuffix(rank + 1)} place</b>`
+				e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(badge_rank)};">${badge_rank + 1}${getSuffix(badge_rank + 1)} place</b>`
 			expect("table tbody").appendChild(e)
 	})();
 	// meta
 	(() => {
-		var users = [...info.users]
-		users.reverse()
-		users.sort((a, b) => {
-			var ascore = info.getMetaPoints(a)
-			var bscore = info.getMetaPoints(b)
-			if (ascore < bscore) {
-				return -1;
-			}
-			if (ascore > bscore) {
-				return 1;
-			}
-			// a must be equal to b
-			return 0;
-		})
-		var meta_rank = users.indexOf(this_user_obj)
+		var meta_leaderboard = new MetaLeaderboard(info)
+		var meta_rank = meta_leaderboard.getRankForUser(this_user_obj)
 		var e = document.createElement("tr")
 			e.appendChild(document.createElement("td"))
 				e.children[0].setAttribute("colspan", "3")
@@ -131,27 +117,14 @@ getData().then((info) => {
 	})();
 	// activity leaderboard
 	(() => {
-		var users = [...info.users]
-		users.sort((a, b) => {
-			var ascore = info.getActivityPoints(a)
-			var bscore = info.getActivityPoints(b)
-			if (ascore < bscore) {
-				return -1;
-			}
-			if (ascore > bscore) {
-				return 1;
-			}
-			// a must be equal to b
-			return 0;
-		})
-		users.reverse()
-		var active_rank = users.indexOf(this_user_obj)
+		var activity_leaderboard = new ActivityLeaderboard(info)
+		var active_rank = activity_leaderboard.getRankForUser(this_user_obj)
 		var e = document.createElement("tr")
 			e.appendChild(document.createElement("td"))
 				e.children[0].setAttribute("colspan", "3")
 				e.children[0].textContent = "Activity Leaderboard"
 			e.appendChild(document.createElement("td"))
-				e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(active_rank)};">${active_rank + 1}${getSuffix(active_rank + 1)} place</b>`
+				e.children[1].innerHTML = `<b class="outline" style="color: ${getColor(active_rank - 1)};">${active_rank}${getSuffix(active_rank)} place</b>`
 			expect("table tbody").appendChild(e)
 	})();
 	// Are we on our own profile page?
