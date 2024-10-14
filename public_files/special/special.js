@@ -1,26 +1,39 @@
 sgtabs();
 
 var scrollToEntryOffset = 0
+const specialLeaderboardName = (() => {
+	var a = location.pathname.split(".")[0].split("/")
+	return a[a.length - 1]
+})();
 
 getData().then((info) => {
 	sgtabs.userfix(info);
-	var leaderboard = new BadgeLeaderboard(info);
+	// get leaderboard ranks
+	/** @type {SpecialLeaderboard<any> | undefined} */
+	const leaderboard = {
+		"badges": new BadgeLeaderboard(info),
+		"meta": new MetaLeaderboard(info),
+		"activity": new ActivityLeaderboard(info)
+	}[specialLeaderboardName]
+	if (leaderboard == undefined) throw new Error("Invalid special leaderboard name")
 	var ranked = leaderboard.getRanked();
+	// display elements
 	for (var i = 0; i < info.users.length; i++) {
 		var entry = ranked[i]
 		// Create the element
 		var e = leaderboard.createTableRow(i + 1, entry)
-		expect("#badges2 tbody").appendChild(e)
+		expect("#maintable tbody").appendChild(e)
 	}
 	expect("#e").setAttribute("max", i.toString())
 	// Badge Leaderboard-specific code:
-	if (location.pathname.endsWith("badge_leaderboard.html")) {
+	if (leaderboard instanceof BadgeLeaderboard) {
 		scrollToEntryOffset -= 1;
 		// Statistics
-		var total_badges = [...ranked].map((v) => v.score).reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
+		document.body.appendChild(document.createElement("h2")).innerText = "Totals"
+		var total_badges = [...leaderboard.getRanked()].map((v) => v.score).reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
 		var total_users = info.users.length
 		var total_events = (() => { var n = 0; for (var i = 0; i < info.leaderboards.length; i++) { if (info.leaderboards[i].badges != null) n += 1; } return n; })();
-		expect("#stats").innerHTML =
+		document.body.appendChild(document.createElement("div")).innerHTML =
 			`<div class="physics">Total awarded badges of each type:</div>` +
 			`<span class="physics"><div class='badge badge-bronze'></div>${total_badges[0]}</span> <span class="physics"><div class='badge badge-silver'></div>${total_badges[1]}</span> <span class="physics"><div class='badge badge-gold'></div>${total_badges[2]}</span> <span class="physics"><div class='badge badge-platinum'></div>${total_badges[3]}</span><br>` +
 			`<div class="physics">Total number of awarded badges: <b>${total_badges[0] + total_badges[1] + total_badges[2] + total_badges[3]}</b></div>` +
