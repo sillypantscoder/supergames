@@ -324,6 +324,14 @@ def get(path: str):
 			},
 			"content": json.dumps(ou)
 		}
+	elif path.split("?")[0] in ["/special/badges", "/special/meta", "/special/activity"]:
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": read_file("special.html")
+		}
 	elif path.startswith("/graph/"):
 		event = path.split("/")[2]
 		graph_type = path.split("/")[3]

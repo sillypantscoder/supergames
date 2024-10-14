@@ -8,6 +8,12 @@ class SpecialLeaderboard {
 	constructor(info) {
 		this.info = info
 	}
+	getName() {
+		return "Error"
+	}
+	getTooltip() {
+		return "Error"
+	}
 	/**
 	 * @param {User} a
 	 * @param {User} b
@@ -82,6 +88,12 @@ class SpecialLeaderboard {
 
 /** @extends {SpecialLeaderboard<number[]>} */
 class BadgeLeaderboard extends SpecialLeaderboard {
+	getName() {
+		return "Badge Leaderboard"
+	}
+	getTooltip() {
+		return "The number of badges of each type each user has."
+	}
 	/**
 	 * @param {number[]} a
 	 * @param {number[]} b
@@ -128,6 +140,12 @@ class BadgeLeaderboard extends SpecialLeaderboard {
 }
 /** @extends {SpecialLeaderboard<number>} */
 class MetaLeaderboard extends SpecialLeaderboard {
+	getName() {
+		return "Meta Leaderboard"
+	}
+	getTooltip() {
+		return "The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. The winner is the person with the least number of points."
+	}
 	/**
 	 * @param {number} a
 	 * @param {number} b
@@ -156,6 +174,12 @@ class MetaLeaderboard extends SpecialLeaderboard {
 }
 /** @extends {SpecialLeaderboard<number>} */
 class ActivityLeaderboard extends SpecialLeaderboard {
+	getName() {
+		return "Activity Leaderboard"
+	}
+	getTooltip() {
+		return "You get a point each time you get 1/25 of Vassal for each leaderboard."
+	}
 	/**
 	 * @param {number} a
 	 * @param {number} b

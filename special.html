@@ -4,13 +4,19 @@
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="/theme.css" />
 		<script src="/background.js"></script>
-		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<link rel="stylesheet" type="text/css" href="/table.css" class="not-for-badges" />
 		<link rel="stylesheet" type="text/css" href="/tooltip.css" />
+		<style>
+.badge {
+	margin-left: 0.8em;
+}
+		</style>
 	</head>
 	<body>
 		<div class="tabs"></div>
-		<h1 class="no-outline"><span class="outline">Activity Leaderboard</span> <span class="tooltip" style="--tooltip-text: 'You get a point each time you get 1/25 of Vassal for each leaderboard.';" tabindex="0"></span></h1>
-		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
+		<h1 class="no-outline"><span class="outline" id="title">Special Leaderboard</span> <span class="tooltip" tabindex="0"></span></h1>
+		<p><button onclick="scrollToEntrySpecial()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
 		<div>
 			<table id="maintable">
 				<tbody>
@@ -23,7 +29,7 @@
 			</table>
 		</div>
 		<script src="/data.js"></script>
-		<script src="/special_leaderboards.js"></script>
+		<script src="leaderboards.js"></script>
 		<script src="/tabs.js"></script>
 		<script src="special.js"></script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>

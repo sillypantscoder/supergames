@@ -17,6 +17,9 @@ getData().then((info) => {
 	}[specialLeaderboardName]
 	if (leaderboard == undefined) throw new Error("Invalid special leaderboard name")
 	var ranked = leaderboard.getRanked();
+	// Title and tooltip
+	expect("#title").innerText = leaderboard.getName()
+	expect(".tooltip").setAttribute("style", "--tooltip-text: '" + leaderboard.getTooltip() + "';");
 	// display elements
 	for (var i = 0; i < info.users.length; i++) {
 		var entry = ranked[i]
@@ -28,6 +31,8 @@ getData().then((info) => {
 	// Badge Leaderboard-specific code:
 	if (leaderboard instanceof BadgeLeaderboard) {
 		scrollToEntryOffset -= 1;
+		expect("#maintable tbody :first-child").remove();
+		[...document.querySelectorAll(".not-for-badges")].forEach((v) => v.remove())
 		// Statistics
 		document.body.appendChild(document.createElement("h2")).innerText = "Totals"
 		var total_badges = [...leaderboard.getRanked()].map((v) => v.score).reduce((a, b) => a.map((v, i) => v + b[i]), [0, 0, 0, 0])
