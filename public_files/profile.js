@@ -171,7 +171,7 @@ getData().then((info) => {
 		}
 		// Admin tools
 		if (info.profile.admin) {
-			expect("#self").innerHTML += ` <a style='color: rgb(0, 0, 200);' href='/admin.html${location.search}'>Admin Board</a>`
+			expect("#self").innerHTML += ` <a style='color: rgb(0, 0, 200);' href='/admin/admin.html${location.search}'>Admin Board</a>`
 		}
 	} else if (info.profile?.admin) {
 		var switchbtn = expect("#self").appendChild(document.createElement("button"))
