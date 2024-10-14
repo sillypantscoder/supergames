@@ -56,6 +56,28 @@ class SpecialLeaderboard {
 		var index = ranked.findIndex((v) => v.user == user)
 		return index
 	}
+	/**
+	 * @param {number} rank
+	 * @param {{ user: User, score: T }} entry
+	 */
+	createTableRow(rank, entry) {
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].classList.add("outline")
+			e.children[0].setAttribute("style", `text-align: right; color: ${getColor(rank - 1)};`)
+			e.children[0].innerHTML = addCommas(String(rank)) + getSuffix(rank)
+		e.appendChild(document.createElement("td"))
+			e.children[1].setAttribute("style", "text-align: right;")
+			e.children[1].appendChild(document.createElement("a"))
+				e.children[1].children[0].setAttribute("href", "/profile/" + entry.user.name + location.search)
+				e.children[1].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[1].children[0].textContent = entry.user.name
+		e.appendChild(document.createElement("td"))
+			e.children[2].setAttribute("class", "outline")
+			e.children[2].setAttribute("style", `color: ${getColor(rank - 1)};`)
+			e.children[2].innerHTML = addCommas(String(entry.score))
+		return e
+	}
 }
 
 /** @extends {SpecialLeaderboard<number[]>} */
@@ -80,6 +102,28 @@ class BadgeLeaderboard extends SpecialLeaderboard {
 	 */
 	getScore(user) {
 		return this.info.getNumberOfBadgesInEachCategory(user)
+	}
+	/**
+	 * @param {number} rank
+	 * @param {{ user: User, score: number[] }} entry
+	 */
+	createTableRow(rank, entry) {
+		var e = document.createElement("tr")
+		e.appendChild(document.createElement("td"))
+			e.children[0].setAttribute("style", "text-align: right;")
+			e.children[0].appendChild(document.createElement("a"))
+				e.children[0].children[0].setAttribute("href", "/profile/" + entry.user.name + location.search)
+				e.children[0].children[0].setAttribute("style", "color: rgb(0, 0, 200);")
+				e.children[0].children[0].textContent = entry.user.name
+		e.appendChild(document.createElement("td"))
+			e.children[1].innerHTML = "<div class='badge badge-bronze'></div>" + entry.score[0]
+		e.appendChild(document.createElement("td"))
+			e.children[2].innerHTML = "<div class='badge badge-silver'></div>" + entry.score[1]
+		e.appendChild(document.createElement("td"))
+			e.children[3].innerHTML = "<div class='badge badge-gold'></div>" + entry.score[2]
+		e.appendChild(document.createElement("td"))
+			e.children[4].innerHTML = "<div class='badge badge-platinum'></div>" + entry.score[3]
+		return e
 	}
 }
 /** @extends {SpecialLeaderboard<number>} */
