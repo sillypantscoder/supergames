@@ -213,7 +213,7 @@ def get(path: str):
 		}
 	elif path.startswith("/forms/"):
 		formid = path.split("?")[0].split("/")[2]
-		formlist: list[str] = [x["name"] for x in json.loads(read_file("public_files/forms.json"))]
+		formlist: list[str] = [x["name"] for x in json.loads(read_file("forms.json"))]
 		if formid.isdigit() and int(formid) < len(formlist):
 			name = formlist[int(formid)]
 			return {
@@ -305,6 +305,25 @@ def get(path: str):
 				"headers": {},
 				"content": ""
 			}
+	elif path.split("?")[0] == "/forms.json":
+		if "?" not in path: return {
+			"status": 404,
+			"headers": {},
+			"content": ""
+		}
+		u = path.split("?")[1]
+		user = getUserFromID(u)
+		ou = json.loads(read_file("forms.json"))
+		if not (user and user["admin"]):
+			for form in ou:
+				del form["responses"]
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/json"
+			},
+			"content": json.dumps(ou)
+		}
 	elif path.startswith("/graph/"):
 		event = path.split("/")[2]
 		graph_type = path.split("/")[3]
@@ -475,14 +494,14 @@ def post(path, body):
 		}
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
-		forms = json.loads(read_file("public_files/forms.json"))
+		forms = json.loads(read_file("forms.json"))
 		name = getUserFromID(bodydata["user"])["name"] # type: ignore
 		forms[bodydata["id"]]["responses"].append({
 			"user": name,
 			"results": bodydata["results"]
 		})
 		log(f"{name} submit form {forms[bodydata['id']]['name']}: " + json.dumps(bodydata["results"], indent='\t'))
-		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
+		write_file("forms.json", json.dumps(forms, indent='\t'))
 		return {
 			"status": 200,
 			"headers": {},
@@ -495,9 +514,9 @@ def post(path, body):
 			"headers": {},
 			"content": ""
 		}
-		forms = json.loads(read_file("public_files/forms.json"))
+		forms = json.loads(read_file("forms.json"))
 		del forms[int(bodydata[1])]["responses"][int(bodydata[2])]
-		write_file("public_files/forms.json", json.dumps(forms, indent='\t'))
+		write_file("forms.json", json.dumps(forms, indent='\t'))
 		return {
 			"status": 200,
 			"headers": {},

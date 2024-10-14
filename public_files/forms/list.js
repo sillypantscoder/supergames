@@ -4,7 +4,7 @@ getData().then((info) => {
 	sgtabs.userfix(info);
 	// Request form list
 	var x = new XMLHttpRequest()
-	x.open("GET", "/forms.json")
+	x.open("GET", "/forms.json" + location.search)
 	x.addEventListener("loadend", () => {
 		var forms = JSON.parse(x.responseText)
 		expect("#buttons").innerText = ""

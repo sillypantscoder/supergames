@@ -17,7 +17,7 @@ getData().then((info) => {
 	sgtabs.userfix(info);
 	// Download Forms
 	var x = new XMLHttpRequest()
-	x.open("GET", "/forms.json")
+	x.open("GET", "/forms.json" + location.search)
 	x.addEventListener("loadend", () => {
 		var formList = JSON.parse(x.responseText)
 		var form = formList[formID]
@@ -54,8 +54,7 @@ function addQuestions(questions) {
 function submit() {
 	var results = []
 	for (var i = 0; i < pageQuestions.length; i++) {
-		var func = pageQuestions[i].getResult;
-		var result = func();
+		var result = pageQuestions[i].getResult();
 		results.push(result)
 	}
 	var x = new XMLHttpRequest()
