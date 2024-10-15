@@ -20,6 +20,15 @@
 				"title": "Please describe the bug, including facts like what page the bug is on, etc."
 			}
 		],
-		"responses": []
+		"responses": [
+			{
+				"user": "test user",
+				"results": [
+					1,
+					"anything",
+					"ahsuigfwhaluwerfsuia ld"
+				]
+			}
+		]
 	}
 ]

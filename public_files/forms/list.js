@@ -2,6 +2,10 @@ sgtabs();
 
 getData().then((info) => {
 	sgtabs.userfix(info);
+	if (info.profile == null) {
+		location.replace("/login.html")
+		return;
+	}
 	// Request form list
 	var x = new XMLHttpRequest()
 	x.open("GET", "/forms.json" + location.search)

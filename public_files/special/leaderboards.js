@@ -167,7 +167,7 @@ class MetaLeaderboard extends SpecialLeaderboard {
 			var rank = ranks.findIndex((v) => v.entry.user == user)
 			// assign points
 			if (rank == -1) points += this.info.users.length
-			else points += n + 1
+			else points += rank + 1
 		}
 		return points
 	}
