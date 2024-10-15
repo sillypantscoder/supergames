@@ -43,10 +43,9 @@ if (location.search == "?physics") {
 		 */
 		function addElement(elm) {
 			var prevStyle = elm.getAttribute("style")
-			console.log(prevStyle)
-			elm.setAttribute("style", prevStyle + " ; display: inline-block; margin: 0;")
+			elm.setAttribute("style", prevStyle + " ; display: inline-block;")
 			var rect = elm.getBoundingClientRect();
-			elm.setAttribute("style", prevStyle + " ; pointer-events: none;")
+			elm.setAttribute("style", prevStyle + "")
 			const box = {
 				body: addRect(rect.left, rect.top, rect.width, rect.height, true),
 				elem: elm,
@@ -71,7 +70,11 @@ if (location.search == "?physics") {
 				.map((v) => (v instanceof HTMLElement) ? v : console.log("not an htmlelement", v))
 				.filter((v) => v != undefined)
 				.forEach(addElement)
-			boxes.forEach((e) => e.elem.setAttribute("style", e.elem.getAttribute("style") + " ; margin: 0; pointer-events: none; position: absolute; display: inline-block;"))
+			boxes.forEach((e) => {
+				// prepare boxes for movement
+				e.elem.setAttribute("style", e.elem.getAttribute("style") + " ; margin: 0; /*pointer-events: none;*/ position: absolute; display: inline-block;")
+				e.elem.setAttribute("draggable", "false")
+			})
 			;(() => {
 				var e = document.createElement("style")
 				e.innerText = "body { margin: 0; overflow: hidden; touch-action: none; } .tabs > a.tab { height: 2em; } * { user-select: none; white-space: nowrap; } .tabs { border: none; }"
@@ -80,7 +83,7 @@ if (location.search == "?physics") {
 		}, 1000)
 
 		const ground = addRect(
-			0, window.innerHeight, window.innerWidth * 2, 100, false
+			0, window.innerHeight, window.innerWidth, 100, false
 		);
 		const leftWall = addRect(
 			-100, 0, 100, window.innerHeight, false

@@ -1,7 +1,7 @@
 var tabs_default = [
 	`<a class="tab" href="/login.html${location.search}" id="login-tab"><b>Login</b></a>`,
 	`<a class="tab" href="/leaderboards/list.html${location.search}">Leaderboard List</a>`,
-	`<a class="tab" href="/badges.html${location.search}">Badges</a>`,
+	`<a class="tab" href="/badges/list.html${location.search}">Badges</a>`,
 	`<a class="tab" href="/special/badges${location.search}">Badge Leaderboard</a>`,
 	`<a class="tab" href="/special/meta${location.search}">Meta</a>`,
 	`<a class="tab" href="/special/activity${location.search}">Activity Leaderboard</a>`,

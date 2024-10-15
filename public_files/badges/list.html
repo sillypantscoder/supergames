@@ -37,43 +37,7 @@
 		</div>
 		<script src="/data.js"></script>
 		<script src="/tabs.js"></script>
-		<script>
-tabs();
-getData().then((info) => {
-	tabs.userfix(info.profile);
-	var names = Object.keys(info.data)
-	for (var i = 0; i < names.length; i++) {
-		var badge_set = info.data[names[i]].badges
-		if (badge_set.length == 0) continue;
-		var e = document.createElement("tr")
-		var n = document.createElement("td")
-		n.innerHTML = `<a href="/leaderboard/${names[i]}${location.search}" style="color: rgb(0, 0, 200);">${names[i]}</a>`
-		e.appendChild(n)
-		for (var x = 0; x < badge_set.length; x++) {
-			var n = document.createElement("td")
-			n.innerText = info.data[names[i]].isTime ? formatTime(badge_set[x]) : addCommas(badge_set[x])
-			var bl = document.createElement("a")
-			bl.href = "/badges/" + names[i] + "/" + x + location.search
-			n.appendChild(bl)
-			var b = document.createElement("div")
-			b.classList.add("badge")
-			b.classList.add("badge-" + ["bronze", "bronze", "bronze", "silver", "silver", "gold", "gold", "platinum"][x])
-			b.innerText = "NVAPREMU"[x]
-			bl.appendChild(b)
-			e.appendChild(n)
-		}
-		if (badge_set.length == 0) {
-			// Specialty leaderboard!
-			var n = document.createElement("td")
-			n.setAttribute("colspan", "8")
-			n.setAttribute("style", "opacity: 0.5; font-style: italic; text-align: center;")
-			n.innerText = `This is a specialty leaderboard; there are no badges`
-			e.appendChild(n)
-		}
-		document.querySelector("table tbody").appendChild(e)
-	}
-})
-		</script>
+		<script src="list.js"></script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
 		<script src="/matter2.js"></script>
 	</body>

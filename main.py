@@ -190,7 +190,6 @@ def get(path: str):
 				.replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 				.replace(b"{{RANK}}", rank.encode("UTF-8"))
 				.replace(b"{{SRANK}}", ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][int(rank)].encode("UTF-8"))
-				.replace(b"{{SNAME}}", (name[0].upper() + name[1:].replace("%20", " ")).encode("UTF-8"))
 		}
 	elif path.startswith("/profile/"):
 		name = path.split("?")[0].split("/")[2]

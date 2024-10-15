@@ -39,8 +39,8 @@
 	<body>
 		<div class="tabs"></div>
 		<h1 class="no-outline"><span class="outline">Leaderboard for <b>{{NAME}}</b></span> <span class="tooltip" style="--tooltip-text: 'Entries marked with a T are tied. The rank shown is the maximum rank of all the tied entries.';" tabindex="0"></span></h1>
-		<p><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
-		<p>Time range: <select oninput="filter(Number(this.value))">
+		<p class="physics"><button onclick="scrollToEntry()">Scroll</button> to place value: <input type="number" id="e" min="1" value="1"></p>
+		<p class="physics">Time range: <select oninput="filter(Number(this.value))">
 			<option value="10000">All time</option>
 			<option value="365">Yearly</option>
 			<option value="30">Monthly</option>
@@ -50,7 +50,7 @@
 		<p class="admin-buttons">
 			<button>Remove Leaderboard</button>
 		</p>
-		<p id="desc"></p>
+		<p id="desc" class="physics"></p>
 		<table>
 			<tr>
 				<th>Rank</th>

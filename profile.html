@@ -62,7 +62,7 @@
 		<div class="rm physics">This is profile number <span id="profilen"></span>.</div>
 		<div class="rm physics">Joined on <span id="joindate"></span></div>
 		<div class="physics" id="self"></div>
-		<div id="desc"></div>
+		<div id="desc" class="physics"></div>
 		<h2 id="header">Stats</h2>
 		<table class="rm">
 			<tbody>
@@ -74,14 +74,14 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="rm physics" id="hint" style="display: none;">
+		<div class="rm" id="hint" style="display: none;">
 			<h2>Hey!</h2>
 			<p>It looks like you haven't done anything yet. To get badges, you need to submit your scores from various games. Use the link below to submit scores!</p>
 			<p style="padding: 1em;"><a id="submitscoresbtn">Submit your scores!</a></p>
 			<p>Once your submission is accepted, this message will go away. You can find this button on the home page (second-to-right button).</p>
 		</div>
 		<script src="/data.js"></script>
-		<script src="/special_leaderboards.js"></script>
+		<script src="/special/leaderboards.js"></script>
 		<script src="/tabs.js"></script>
 		<script src="/profile.js" data-profile="{{NAME}}"></script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
