@@ -82,12 +82,12 @@ getData().then((info) => { try {
 			// Badges
 			var badgeno = leaderboard.getNumberOfBadges(ranks[i].entry.score)
 			for (var x = 0; x < badgeno; x++) {
-				e.children[3].innerHTML += `<a href="/badges/{{NAME}}/${x}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
+				e.children[3].innerHTML += `<a href="/badges/${leaderboardName}/${x}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][x]}">${'NVAPREMU'[x]}</div></a>`
 			}
 			// // Progress bar: Distance to next badge
 			// if (badgeno < 8) {
 			// 	var bar = document.createElement("a")
-			// 	bar.setAttribute("href", `/badges/{{NAME}}/${badgeno}${location.search}`)
+			// 	bar.setAttribute("href", `/badges/${leaderboardName}/${badgeno}${location.search}`)
 			// 	bar.classList.add("bar")
 			// 	bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
 			// 	var nextValue = info.data[leaderboardName].badges[badgeno]
@@ -109,8 +109,8 @@ getData().then((info) => { try {
 				var x = new XMLHttpRequest()
 				x.open("POST", "/remove_entry")
 				x.addEventListener("loadend", () => location.reload())
-				x.send(location.search.substring(1) + "\n{{NAME}}\n" + name)
-			}))(ranks[i]);
+				x.send(location.search.substring(1) + "\n" + leaderboardName + "\n" + name)
+			}))(ranks[i].entry.user.name);
 			e.appendChild(admin)
 		}
 		// Add the row to the table
@@ -118,14 +118,14 @@ getData().then((info) => { try {
 	}
 	if (leaderboard.badges != null) {
 		var badge_container = expect("#badges") // NVAPREMU
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/0${location.search}" class="physics"><div class="badge badge-bronze">N</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/1${location.search}" class="physics"><div class="badge badge-bronze">V</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/2${location.search}" class="physics"><div class="badge badge-bronze">A</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/3${location.search}" class="physics"><div class="badge badge-silver">P</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/4${location.search}" class="physics"><div class="badge badge-silver">R</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/5${location.search}" class="physics"><div class="badge badge-gold">E</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/6${location.search}" class="physics"><div class="badge badge-gold">M</div></a>`
-		badge_container.innerHTML += `<a href="/badges/{{NAME}}/7${location.search}" class="physics"><div class="badge badge-platinum">U</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/0${location.search}" class="physics"><div class="badge badge-bronze">N</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/1${location.search}" class="physics"><div class="badge badge-bronze">V</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/2${location.search}" class="physics"><div class="badge badge-bronze">A</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/3${location.search}" class="physics"><div class="badge badge-silver">P</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/4${location.search}" class="physics"><div class="badge badge-silver">R</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/5${location.search}" class="physics"><div class="badge badge-gold">E</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/6${location.search}" class="physics"><div class="badge badge-gold">M</div></a>`
+		badge_container.innerHTML += `<a href="/badges/${leaderboardName}/7${location.search}" class="physics"><div class="badge badge-platinum">U</div></a>`
 	} else {
 		document.querySelectorAll("#badges, :has( + #badges)").forEach((e) => e.remove())
 	}

@@ -268,7 +268,7 @@ def get(path: str) -> HTTPResponse:
 		user = getUserFromID(u)
 		if user == None: return {"status": 404, "headers": {}, "content": b""}
 		if user["admin"]:
-			newID = getIDFromUser(newname, user["password"])
+			newID = getIDFromUser(newname, getPwdFromUser(newname)) # type: ignore
 			log("User " + repr(user["name"]) + " switch to " + repr(newname))
 			return {
 				"status": 200,
@@ -651,6 +651,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			for i in range(len(entries)):
 				if entries[i][0] == bodydata[2]:
 					entries.remove(entries[i])
+					break
 			write_file("public_files/data.json", json.dumps(data, indent='\t').encode("UTF-8"))
 			# return
 			return {
