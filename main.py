@@ -517,18 +517,18 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		newName = bodydata[2]
 		log(f"Changing the name of a user. From: {repr(oldName)} To: {repr(newName)}")
 		# Change entry in users.json
-		f = open("../public_files/users.json", "r")
+		f = open("users.json", "r")
 		d = json.loads(f.read())
 		f.close()
 		for e in d:
 			if e["name"] == oldName:
 				e["name"] = newName
-				log("\tChanged username un users.json")
-		f = open("../public_files/users.json", "w")
+				log("\tChanged username in users.json")
+		f = open("users.json", "w")
 		f.write(json.dumps(d, indent='\t'))
 		f.close()
 		# Find entries in data.json and switch the user
-		f = open("../public_files/data.json", "r")
+		f = open("public_files/data.json", "r")
 		d = json.loads(f.read())
 		f.close()
 		for eventname in d.keys():
@@ -536,8 +536,8 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			for itemno in range(len(entries)):
 				if entries[itemno][0] == oldName:
 					entries[itemno][0] = newName
-					log("\tChanged entry for event: " + eventname + " item#: " + str(itemno))
-		f = open("../public_files/data.json", "w")
+					log("\tChanged entry for event: " + eventname + " item #: " + str(itemno))
+		f = open("public_files/data.json", "w")
 		f.write(json.dumps(d, indent='\t'))
 		f.close()
 		# Return result
@@ -691,6 +691,8 @@ class MyServer(BaseHTTPRequestHandler):
 			self.send_header(h, res["headers"][h])
 		self.end_headers()
 		self.wfile.write(res["content"])
+	def log_message(self, format: str, *args: typing.Any) -> None:
+		return
 
 if __name__ == "__main__":
 	running = True

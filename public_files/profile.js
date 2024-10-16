@@ -75,7 +75,7 @@ getData().then((info) => {
 			// if (duplicates.length > 1) s += "<i>T</i> "
 			e.children[3].innerHTML = `${s}${i + 1}${getSuffix(i + 1)} place</span>`
 		// Progress bar: Distance to next place
-		if (i > 0 && (! event.reverseOrder)) {
+		if (i > 0 && (! event.reverseOrder) && ranks[i + 1] != undefined) {
 			var ranks = event.getRanked()
 			var bar = document.createElement("a")
 			bar.classList.add("bar")
