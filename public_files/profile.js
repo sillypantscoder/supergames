@@ -147,11 +147,27 @@ getData().then((info) => {
 			expect("#self").innerHTML += ` <a style='color: rgb(0, 0, 200);' href='/admin/admin.html${location.search}'>Admin Board</a>`
 		}
 	} else if (info.profile?.admin) {
+		// Admin and on someone else's profile page
 		var switchbtn = expect("#self").appendChild(document.createElement("button"))
 		switchbtn.innerText = "Switch User"
 		switchbtn.addEventListener("click", () => {
 			var newUser = location.pathname.split("/")[2]
 			location.replace("/user_id_create/sudo?" + location.search.substring(1) + "&" + newUser)
+		})
+	}
+	if (info.profile?.admin) {
+		// Admin and on any profile page
+		var renamebtn = expect("#self").appendChild(document.createElement("button"))
+		renamebtn.innerText = "Rename This User"
+		renamebtn.addEventListener("click", () => {
+			var oldName = this_user_obj.name
+			var newName = prompt("Enter the new name:")
+			var x = new XMLHttpRequest()
+			x.open("POST", "/setting/change_name")
+			x.addEventListener("loadend", () => {
+				location.replace("/profile/" + newName + location.search)
+			})
+			x.send(location.search.substring(1) + "\n" + oldName + "\n" + newName)
 		})
 	}
 })

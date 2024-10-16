@@ -499,6 +499,50 @@ def post(path, body):
 			"headers": {},
 			"content": ""
 		}
+	elif path == "/setting/change_name":
+		bodydata = body.decode("UTF-8").split("\n")
+		# Check permissions
+		user = getUserFromID(int(bodydata[0]))
+		if user == None or user["admin"] == False:
+			return {
+				"status": 404,
+				"headers": {},
+				"content": ""
+			}
+		# Get names
+		oldName = bodydata[1]
+		newName = bodydata[2]
+		log(f"Changing the name of a user. From: {repr(oldName)} To: {repr(newName)}")
+		# Change entry in users.json
+		f = open("../public_files/users.json", "r")
+		d = json.loads(f.read())
+		f.close()
+		for e in d:
+			if e["name"] == oldName:
+				e["name"] = newName
+				log("\tChanged username un users.json")
+		f = open("../public_files/users.json", "w")
+		f.write(json.dumps(d, indent='\t'))
+		f.close()
+		# Find entries in data.json and switch the user
+		f = open("../public_files/data.json", "r")
+		d = json.loads(f.read())
+		f.close()
+		for eventname in d.keys():
+			entries = d[eventname]["entries"]
+			for itemno in range(len(entries)):
+				if entries[itemno][0] == oldName:
+					entries[itemno][0] = newName
+					log("\tChanged entry for event: " + eventname + " item#: " + str(itemno))
+		f = open("../public_files/data.json", "w")
+		f.write(json.dumps(d, indent='\t'))
+		f.close()
+		# Return result
+		return {
+			"status": 200,
+			"headers": {},
+			"content": ""
+		}
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
 		forms = json.loads(read_file("forms.json"))
