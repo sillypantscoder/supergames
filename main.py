@@ -6,8 +6,7 @@ import traceback
 import subprocess
 from urllib.parse import unquote
 import random
-
-vandalize = False
+import typing
 
 hostName = "0.0.0.0"
 serverPort = 12344
@@ -18,8 +17,8 @@ def read_file(filename: str) -> bytes:
 	f.close()
 	return t
 
-def write_file(filename: str, content: str):
-	f = open(filename, "w")
+def write_file(filename: str, content: bytes):
+	f = open(filename, "wb")
 	f.write(content)
 	f.close()
 
@@ -54,7 +53,15 @@ def multiply(s1: str, s2: str) -> int:
 			if xpos >= len(f): xpos -= len(f)
 	return (f[0] * 16) * (f[1] * 8) * (f[2] * 4) * (f[3] * 2) * (f[4] * 1)
 
-def getUserFromID(userid: str) -> dict | None:
+class User(typing.TypedDict):
+	name: str
+	date: str
+	email: str
+	password: str
+	admin: bool
+	desc: str
+
+def getUserFromID(userid: str) -> User | None:
 	ou = json.loads(read_file("users.json"))
 	for n in ou:
 		uid = multiply(n["name"], n["password"])
@@ -86,7 +93,7 @@ def generateDataFileFromCSV(csv: str):
 	f.close()
 	# Go through the CSV file and register the events
 	newData = {}
-	newentries = []
+	newentries: list[str] = []
 	for line in d:
 		if line[0] == "DONTREGISTER": continue
 		newentries.append(line[0])
@@ -119,16 +126,13 @@ def generateDataFileFromCSV(csv: str):
 	# Finish
 	log("[csv-loader] Finished!")
 
-def get(path: str):
+class HTTPResponse(typing.TypedDict):
+	status: int
+	headers: dict[str, str]
+	content: bytes
+
+def get(path: str) -> HTTPResponse:
 	log_existence_check()
-	if vandalize:
-		return {
-			"status": 200,
-			"headers": {
-				"Content-Type": "text/html"
-			},
-			"content": "<!DOCTYPE html><html><head></head><body>Hahaha! The website is gone!!!</body></html>"
-		}
 	user = getUserFromID(''.join(path.split("?")[1:]))
 	if path == "/users.json":
 		ou = json.loads(read_file("users.json"))
@@ -140,7 +144,7 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "application.json"
 			},
-			"content": json.dumps(ou)
+			"content": json.dumps(ou).encode("UTF-8")
 		}
 	elif os.path.isfile("public_files" + path.split("?")[0]):
 		return {
@@ -167,7 +171,7 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>"
+			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>".encode("UTF-8")
 		}
 	elif path.startswith("/leaderboards/"):
 		name = path.split("?")[0][14:]
@@ -227,7 +231,7 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": "<script>location.replace('/form_list.html')</script>"
+			"content": b"<script>location.replace('/form_list.html')</script><body>That is not a valid form name, you will be redirected to the form list.</body>"
 		}
 	elif path.split("?")[0] == "/usercheck":
 		return {
@@ -235,7 +239,7 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "application/json"
 			},
-			"content": json.dumps([{"name": user["name"], "admin": user["admin"]}]) if user != None else "[]"
+			"content": (json.dumps([{"name": user["name"], "admin": user["admin"]}]) if user != None else "[]").encode("UTF-8")
 		}
 	elif path.split("?")[0] == "/user_id_create":
 		u = path.split("?")[1].split("&")[0]
@@ -248,7 +252,7 @@ def get(path: str):
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": "<script>location.replace('/login.html#invalid')</script>"
+				"content": b"<script>location.replace('/login.html#invalid')</script>"
 			}
 		log("User " + u + " logged in!")
 		return {
@@ -256,36 +260,35 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?{userid}')</script>"
+			"content": f"<script>location.replace('/?{userid}')</script>".encode("UTF-8")
 		}
 	elif path.split("?")[0] == "/user_id_create/sudo":
 		u = path.split("?")[1].split("&")[0]
-		p = unquote(path.split("?")[1].split("&")[1])
+		newname = unquote(path.split("?")[1].split("&")[1])
 		user = getUserFromID(u)
-		if user == None: return {"status": 404, "headers": {}, "content": ""}
+		if user == None: return {"status": 404, "headers": {}, "content": b""}
 		if user["admin"]:
-			newID = getIDFromUser(p, getPwdFromUser(p)) # type: ignore
-			newname = getUserFromID(newID)['name'] # type: ignore
+			newID = getIDFromUser(newname, user["password"])
 			log("User " + repr(user["name"]) + " switch to " + repr(newname))
 			return {
 				"status": 200,
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": f"<script>location.replace('/profile/{newname}?{newID}')</script>"
+				"content": f"<script>location.replace('/profile/{newname}?{newID}')</script>".encode("UTF-8")
 			}
 		return {
 			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?{u}')</script>"
+			"content": f"<script>location.replace('/?{u}')</script>".encode("UTF-8")
 		}
 	elif path.split("?")[0] == "/applications.txt":
 		if "?" not in path: return {
 			"status": 404,
 			"headers": {},
-			"content": ""
+			"content": b"You must be signed in to access the applications list"
 		}
 		u = path.split("?")[1]
 		user = getUserFromID(u)
@@ -302,13 +305,13 @@ def get(path: str):
 			return {
 				"status": 404,
 				"headers": {},
-				"content": ""
+				"content": b"You must be an admin to access the applications list"
 			}
 	elif path.split("?")[0] == "/forms.json":
 		if "?" not in path: return {
 			"status": 404,
 			"headers": {},
-			"content": ""
+			"content": b"You must be signed in to access the applications list"
 		}
 		u = path.split("?")[1]
 		user = getUserFromID(u)
@@ -321,7 +324,7 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/json"
 			},
-			"content": json.dumps(ou)
+			"content": json.dumps(ou).encode("UTF-8")
 		}
 	elif path.split("?")[0] in ["/special/badges", "/special/meta", "/special/activity"]:
 		return {
@@ -338,7 +341,7 @@ def get(path: str):
 		entries = {}
 		for d in event_data:
 			entries[d[0]] = d[1]
-		data = {
+		data: dict[str, typing.Any] = {
 			"type": graph_type,
 			"data": entries
 		}
@@ -358,10 +361,10 @@ def get(path: str):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": ""
+			"content": b"404 Page Not Found"
 		}
 
-def post(path, body):
+def post(path: str, body: bytes) -> HTTPResponse:
 	if path == "/addentry":
 		update = "There was an error and no entries were updated."
 		try:
@@ -391,7 +394,7 @@ def post(path, body):
 					data[eventname]["entries"].append([username, float(score), datetime.datetime.now().isoformat(), note])
 			else:
 				update += f"\n\nERROR: Unknown event: {eventname}\nRequest data:\n\tuser: {username}\n\tscore: {score}\n\tmode: {mode}\n\tnote: {note}"
-			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+			write_file("public_files/data.json", json.dumps(data, indent='\t').encode("UTF-8"))
 		except Exception as e:
 			update += "\nError was:\n\n"
 			update += ''.join(traceback.format_exception(type(e), e, e.__traceback__))
@@ -401,29 +404,29 @@ def post(path, body):
 			"headers": {
 				"Content-Type": "text/plain"
 			},
-			"content": update
+			"content": update.encode("UTF-8")
 		}
 	elif path == "/tryaddentry":
 		bodydata = json.loads(body.decode("UTF-8"))
 		forms = json.loads(read_file("public_files/entries.json"))
 		forms.append(bodydata)
-		write_file("public_files/entries.json", json.dumps(forms, indent='\t'))
+		write_file("public_files/entries.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		# log("Tried to add an entry...\n\t" + repr(bodydata))
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Entry was updated"
 		}
 	elif path == "/add_application":
 		bodydata = body.decode("UTF-8").split("\n")
 		c = read_file("applications.txt")
-		c = f"""\n==========\nUsername: {bodydata[0]}\nEmail address: {bodydata[1]}\n==========\n\n\n{c}"""
+		c = f"""\n==========\nUsername: {bodydata[0]}\nEmail address: {bodydata[1]}\n==========\n\n\n""".encode("UTF-8") + c
 		log(f"create application (username={bodydata[0]}, email={bodydata[1]})")
 		write_file("applications.txt", c)
 		return {
 			"status": 301,
 			"headers": {},
-			"content": ""
+			"content": b"Application was created"
 		}
 	elif path == "/createuser":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -442,16 +445,16 @@ def post(path, body):
 	}}
 ]'''
 		log("accept application for " + bodydata[0])
-		write_file("users.json", c)
+		write_file("users.json", c.encode("UTF-8"))
 		# Update applications
 		c = read_file("applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Accepted]")
-		write_file("applications.txt", c)
+		write_file("applications.txt", c.encode("UTF-8"))
 		# Finish
 		return {
 			"status": 301,
 			"headers": {},
-			"content": ""
+			"content": b"Application was created"
 		}
 	elif path == "/rejectprofile":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -459,12 +462,12 @@ def post(path, body):
 		c = read_file("applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Rejected]")
 		log("reject application for " + bodydata[0])
-		write_file("applications.txt", c)
+		write_file("applications.txt", c.encode("UTF-8"))
 		# Finish
 		return {
 			"status": 301,
 			"headers": {},
-			"content": ""
+			"content": b"Rejected successfully"
 		}
 	elif path == "/setting/pwd":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -475,11 +478,11 @@ def post(path, body):
 				n["password"] = bodydata[1]
 				name = n["name"]
 		log(f"{name} update pwd")
-		write_file("users.json", json.dumps(ou, indent='\t'))
+		write_file("users.json", json.dumps(ou, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Password updated successfully"
 		}
 	elif path == "/setting/desc":
 		bodydata = body.decode("UTF-8").split("\n")
@@ -493,21 +496,21 @@ def post(path, body):
 				n["desc"] = newdesc
 				name = n["name"]
 		log(f"{name} update desc\n\tfrom: {repr(desc_from)}\n\tto: {repr(newdesc)}")
-		write_file("users.json", json.dumps(ou, indent='\t'))
+		write_file("users.json", json.dumps(ou, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Description updated successfully"
 		}
 	elif path == "/setting/change_name":
 		bodydata = body.decode("UTF-8").split("\n")
 		# Check permissions
-		user = getUserFromID(int(bodydata[0]))
+		user = getUserFromID(bodydata[0])
 		if user == None or user["admin"] == False:
 			return {
 				"status": 404,
 				"headers": {},
-				"content": ""
+				"content": b"The user is not correct (need to have admin permissions)"
 			}
 		# Get names
 		oldName = bodydata[1]
@@ -541,7 +544,7 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Name was changed successfully"
 		}
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
@@ -552,38 +555,38 @@ def post(path, body):
 			"results": bodydata["results"]
 		})
 		log(f"{name} submit form {forms[bodydata['id']]['name']}: " + json.dumps(bodydata["results"], indent='\t'))
-		write_file("forms.json", json.dumps(forms, indent='\t'))
+		write_file("forms.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"The submission has been recieved"
 		}
 	elif path == "/delete_submission":
 		bodydata = body.decode("UTF-8").split("\n")
 		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
 			"status": 404,
 			"headers": {},
-			"content": ""
+			"content": b"You need admin permissions"
 		}
 		forms = json.loads(read_file("forms.json"))
 		del forms[int(bodydata[1])]["responses"][int(bodydata[2])]
-		write_file("forms.json", json.dumps(forms, indent='\t'))
+		write_file("forms.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Deleted successfully"
 		}
 	elif path == "/handle_entry":
 		bodydata = body.decode("UTF-8").split("\n")
 		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
 			"status": 404,
 			"headers": {},
-			"content": ""
+			"content": b"You need admin permissions"
 		}
 		forms = json.loads(read_file("public_files/entries.json"))
 		i = forms[int(bodydata[2])]
 		del forms[int(bodydata[2])]
-		write_file("public_files/entries.json", json.dumps(forms, indent='\t'))
+		write_file("public_files/entries.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		if bodydata[1] == "1":
 			# Accepted the entry!
 			log("entry submissions: accepted an entry\n\t" + repr(i))
@@ -599,21 +602,21 @@ def post(path, body):
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Success"
 		}
 	elif path == "/upload_csv":
 		bodydata = body.decode("UTF-8").split("\n")
 		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
 			"status": 404,
 			"headers": {},
-			"content": ""
+			"content": b"You need admin permissions"
 		}
 		csv = "\n".join(bodydata[1:])
 		generateDataFileFromCSV(csv)
 		return {
 			"status": 200,
 			"headers": {},
-			"content": ""
+			"content": b"Successfully generated data file"
 		}
 	elif path == "/add_event":
 		bodydata = json.loads(body.decode("UTF-8"))
@@ -621,25 +624,25 @@ def post(path, body):
 		if bodydata["name"] not in data.keys():
 			data[bodydata["name"]] = bodydata["data"]
 			log("Created new event with name " + repr(bodydata["name"]) + "!")
-			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+			write_file("public_files/data.json", json.dumps(data, indent='\t').encode("UTF-8"))
 		else:
 			log("Failed to create new event with name " + repr(bodydata["name"]))
 		return {
 			"status": 302,
 			"headers": {},
-			"content": ""
+			"content": b"Success"
 		}
 	elif path == "/error":
 		log("User encountered error: " + body.decode("UTF-8"))
 		return {
 			"status": 302,
 			"headers": {},
-			"content": ""
+			"content": b"Recorded successfully"
 		}
 	elif path == "/remove_entry":
 		bodydata = body.decode("UTF-8").split("\n")
 		user = getUserFromID(bodydata[0])
-		if user == None: return {"status": 404, "headers": {}, "content": ""}
+		if user == None: return {"status": 404, "headers": {}, "content": b"You need to be signed in"}
 		if user["admin"]:
 			log("Removing an entry with user " + repr(bodydata[2]) + " from leaderboard " + repr(bodydata[1]))
 			# remove the entry
@@ -648,19 +651,19 @@ def post(path, body):
 			for i in range(len(entries)):
 				if entries[i][0] == bodydata[2]:
 					entries.remove(entries[i])
-			write_file("public_files/data.json", json.dumps(data, indent='\t'))
+			write_file("public_files/data.json", json.dumps(data, indent='\t').encode("UTF-8"))
 			# return
 			return {
 				"status": 302,
 				"headers": {},
-				"content": ""
+				"content": b"Removed successfully"
 			}
 		return {
 			"status": 404,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": ""
+			"content": b"You need to be an admin"
 		}
 	else:
 		log("404 POST encountered: " + path)
@@ -669,7 +672,7 @@ def post(path, body):
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": ""
+			"content": b"404 POST"
 		}
 
 class MyServer(BaseHTTPRequestHandler):
@@ -680,7 +683,6 @@ class MyServer(BaseHTTPRequestHandler):
 			self.send_header(h, res["headers"][h])
 		self.end_headers()
 		c = res["content"]
-		if isinstance(c, str): c = c.encode("utf-8")
 		self.wfile.write(c)
 	def do_POST(self):
 		res = post(self.path, self.rfile.read(int(self.headers["Content-Length"])))
@@ -688,15 +690,7 @@ class MyServer(BaseHTTPRequestHandler):
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])
 		self.end_headers()
-		self.wfile.write(res["content"].encode("utf-8"))
-	def log_message(self, _: str, *args) -> None:
-		return
-		# if 400 <= int(args[1]) < 500:
-		# 	# Errored request!
-		# 	print(u"\u001b[31m", end="")
-		# print(args[0].split(" ")[0], "request to", args[0].split(" ")[1], "(status code:", args[1] + ")")
-		# print(u"\u001b[0m", end="")
-		# # don't output requests
+		self.wfile.write(res["content"])
 
 if __name__ == "__main__":
 	running = True
