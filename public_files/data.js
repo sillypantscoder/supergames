@@ -309,9 +309,10 @@ class Leaderboard {
 	 */
 	getNumberOfBadges(score) {
 		if (this.badges == null) throw new Error("There are no badges on a specialty leaderboard")
+		if (score < this.badges.values[0]) return 0
 		for (var i = 0; i < this.badges.values.length; i++) {
 			var value = this.badges.values[i]
-			if (score <= value) return i
+			if (score <= value) return i + 1
 		}
 		return this.badges.values.length
 	}

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="/theme.css" />
-		<script src="/background.js"></script>
-		<link rel="stylesheet" type="text/css" href="/table.css" />
-		<link rel="stylesheet" type="text/css" href="/badges.css" />
+		<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
+		<script src="/assets/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/assets/table.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/badges.css" />
 		<style>
 #invalid {
 	background: #FAA;
@@ -26,7 +26,7 @@
 		<p><b>Note:</b> If you have not yet changed your password, your password is the same as your username. Please change your password soon!</p>
 		<p><button onclick="finish()">Log In</button></p>
 		<script src="/data.js"></script>
-		<script src="/tabs.js"></script>
+		<script src="/assets/tabs.js"></script>
 		<script>
 sgtabs();
 function finish() {
@@ -37,6 +37,6 @@ function finish() {
 if (location.hash == "#invalid") document.querySelector("#invalid").removeAttribute("style")
 		</script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
-		<script src="/matter2.js"></script>
+		<script src="/assets/matter2.js"></script>
 	</body>
 </html>

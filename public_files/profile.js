@@ -52,7 +52,7 @@ getData().then((info) => {
 				// Progress bar: Distance to next badge
 				if (badgeno < 8) {
 					var bar = document.createElement("a")
-					bar.setAttribute("href", `/badges/${event}/${badgeno}${location.search}`)
+					bar.setAttribute("href", `/badges/${event.name}/${badgeno}${location.search}`)
 					bar.classList.add("bar")
 					bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
 					var nextBadgeValue = event.badges.values[badgeno]

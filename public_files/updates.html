@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="/theme.css" />
-		<script src="/background.js"></script>
+		<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
+		<script src="/assets/background.js"></script>
 		<style>
 p {
 	margin: 1em;
@@ -18,7 +18,7 @@ p {
 		<h2 class="physics">April 12, 2023 - Version 2.0 - <b>Code Redo</b></h2>
 		<p class="physics">I completely redid the code for getting statistics from the files. Now you'll see all sorts of statistics popping up in all kinds of places!</p>
 		<script>window.addEventListener("error", (e) => alert(`${e.message} :${e.lineno}`))</script>
-		<script src="/tabs.js"></script>
+		<script src="/assets/tabs.js"></script>
 		<script>
 Object.prototype.toString = function () { var r = []; var keys = Object.keys(this); for (var i = 0; i < keys.length; i++) { r.push(`${keys[i]}: ${this[keys[i]]}`) } return "{" + r.join(", ") + "}" }
 Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
@@ -26,6 +26,6 @@ Array.prototype.toString = function () { return "[" + this.join(", ") + "]" }
 tabs.extra(4, "Updates")
 		</script>
 		<script src="https://brm.io/matter-js/build/matter.js"></script>
-		<script src="/matter2.js"></script>
+		<script src="/assets/matter2.js"></script>
 	</body>
 </html>

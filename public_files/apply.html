@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
 		<style>
 body {
 	min-height: 50vh;
@@ -39,13 +39,13 @@ button {
 		</style>
 	</head>
 	<body>
-		<img src="/logo.png">
+		<img src="/assets/logo.png">
 		<h1>SUPERGAMES</h1>
 		<h2>Apply now!</h2>
 		<div><b class="outline">Username: </b><input type="text" id="username"></div>
 		<div><b class="outline">Email address: </b><input type="email" id="email"></div>
 		<div><button class="outline" onclick="submit()">SUBMIT</button></div>
-		<script src="/background.js"></script>
+		<script src="/assets/background.js"></script>
 		<script>
 if (location.search.startsWith("?u=")) {
 	document.querySelector("h2").innerText = "Thank you for your application!"
