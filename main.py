@@ -83,15 +83,15 @@ def getIDFromUser(name: str, pwd: str) -> str | None:
 			return str(multiply(n["name"], n["password"]))
 	return None
 
-def generateDataFileFromCSV(csv: str):
-	log("[csv-loader] Starting!")
-	# Load the CSV data
-	d = [x.split(",") for x in csv.split("\n")[1:]]
+def generateDataFileFromTSV(tsv: str):
+	log("[tsv-loader] Starting!")
+	# Load the TSV data
+	d = [x.split("\t") for x in tsv.split("\n")[1:]]
 	# Load the old data
 	f = open("public_files/data.json", "r")
 	data = json.loads(f.read())
 	f.close()
-	# Go through the CSV file and register the events
+	# Go through the TSV file and register the events
 	newData = {}
 	newentries: list[str] = []
 	for line in d:
@@ -106,25 +106,25 @@ def generateDataFileFromCSV(csv: str):
 			"reverseOrder": line[-3] == "Lowest"
 		}
 	# Go through the old data and see if there are any
-	# leaderboards missing from the CSV file
+	# leaderboards missing from the TSV file
 	for name in data:
 		if name not in newData.keys():
-			log(f"[csv-loader] Warning: {name} is not in the CSV file!")
-			log(f"[csv-loader] \tThere are {len(data[name]['entries'])} entries")
-			log("[csv-loader] \tThe leaderboard is not being deleted")
+			log(f"[tsv-loader] Warning: Not in the TSV file: {name}")
+			log(f"[tsv-loader] \tThere are {len(data[name]['entries'])} entries")
+			log("[tsv-loader] \tThe leaderboard is not being deleted")
 			newData[name] = data[name]
 		else:
 			newData[name]["entries"] = data[name]["entries"]
 			newentries.remove(name)
 	# List of new leaderboards
-	log("[csv-loader] New leaderboards:")
-	for x in newentries: log("[csv-loader]\t" + x)
+	log("[tsv-loader] New leaderboards:")
+	for x in newentries: log("[tsv-loader]\t" + x)
 	# Save the data!
 	f = open("public_files/data.json", "w")
 	f.write(json.dumps(newData, indent='\t'))
 	f.close()
 	# Finish
-	log("[csv-loader] Finished!")
+	log("[tsv-loader] Finished!")
 
 class HTTPResponse(typing.TypedDict):
 	status: int
@@ -353,6 +353,14 @@ def get(path: str) -> HTTPResponse:
 				"Content-Type": "image/svg+xml"
 			},
 			"content": chart
+		}
+	elif path == "/apple-touch-icon.png":
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "image/png"
+			},
+			"content": read_file("public_files/assetes/apple-touch-icon.png")
 		}
 	else: # 404 page
 		log("404 encountered: " + path)
@@ -612,7 +620,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"content": b"You need admin permissions"
 		}
 		csv = "\n".join(bodydata[1:])
-		generateDataFileFromCSV(csv)
+		generateDataFileFromTSV(csv)
 		return {
 			"status": 200,
 			"headers": {},

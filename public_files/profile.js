@@ -47,7 +47,7 @@ getData().then((info) => {
 			} else {
 				var badgeno = event.getNumberOfBadges(entry.score)
 				for (var i = 0; i < badgeno; i++) {
-					e.children[2].innerHTML += `<a href="/badges/${event}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
+					e.children[2].innerHTML += `<a href="/badges/${event.name}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
 				}
 				// Progress bar: Distance to next badge
 				if (badgeno < 8) {

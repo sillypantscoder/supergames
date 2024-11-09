@@ -312,7 +312,7 @@ class Leaderboard {
 		if (score < this.badges.values[0]) return 0
 		for (var i = 0; i < this.badges.values.length; i++) {
 			var value = this.badges.values[i]
-			if (score <= value) return i + 1
+			if (score < value) return i
 		}
 		return this.badges.values.length
 	}
@@ -324,7 +324,7 @@ class Leaderboard {
 		var score = this.getEntryForUser(user)?.score
 		if (score == undefined) return false
 		var n = this.getNumberOfBadges(score)
-		return n >= badge_rank
+		return n >= badge_rank + 1
 	}
 	/**
 	 * @param {User[]} userList

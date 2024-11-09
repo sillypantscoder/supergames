@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
-		<script src="/assets/background.js"></script>
-		<link rel="stylesheet" type="text/css" href="/assets/table.css" />
-		<link rel="stylesheet" type="text/css" href="/assets/badges.css" />
+		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/theme.css" />
+		<script src="/background.js"></script>
+		<link rel="stylesheet" type="text/css" href="/table.css" />
+		<link rel="stylesheet" type="text/css" href="/badges.css" />
 		<style>
 .disabled {
 	opacity: 0.75;
@@ -25,6 +25,7 @@
 		<h2>Applications</h2>
 		<div id="applications"></div>
 		<h2>Update Event List</h2>
+		<p><b>Warning: this is a potentially destructive action!</b></p>
 		<p>To get the file, go to the Google Sheets event list, then click on File > Export > Comma Separated Values. Then upload the file here.</p>
 		<p><input type="file" id="eventList"><button onclick="this.previousElementSibling.files[0].text().then((e) => uploadCSV(e))">Upload</button></p>
 		<h2>Add New Event</h2>
@@ -46,7 +47,7 @@
 		<div><input type="checkbox" id="istime"> Is time leaderboard</div>
 		<div><button onclick="addLeaderboard()">Add Leaderboard</button></div>
 		<script src="/data.js"></script>
-		<script src="/assets/tabs.js"></script>
+		<script src="/tabs.js"></script>
 		<script src="admin.js"></script>
 		<!--<script src="https://brm.io/matter-js/build/matter.js"></script>-->
 		<!--<script src="/matter2.js"></script>-->
