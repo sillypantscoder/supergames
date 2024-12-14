@@ -45,7 +45,7 @@ body {
 
 @font-face {
 	font-family: 'Jellee';
-	src: url('/Jellee-Roman.otf') format('opentype');
+	src: url('/assets/Jellee-Roman.otf') format('opentype');
 }
 h1:not(.no-outline), h2, .outline {
 	color: white;

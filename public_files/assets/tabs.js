@@ -25,7 +25,7 @@ const sgtabs = (() => {
 	var tabs = () => {
 		for (var i = 0; i < tabs_default.length; i++) {
 			if (i == 0) {
-				addTab(`<a href="/${location.search}"><img src="/logo.png"></a>`)
+				addTab(`<a href="/${location.search}"><img src="/assets/logo.png"></a>`)
 			}
 			var elm = addTab(tabs_default[i])
 			var currentTabCheck = tabs_default[i].match(/href="([\/a-z_\.]+)(\?[0-9]*)?"/)
@@ -38,7 +38,7 @@ const sgtabs = (() => {
 	tabs.extra = (/** @type {number} */ tabi, /** @type {string} */ tabname) => {
 		for (var i = 0; i < tabs_default.length; i++) {
 			if (i == 0) {
-				addTab(`<a href="/${location.search}"><img src="/logo.png"></a>`)
+				addTab(`<a href="/${location.search}"><img src="/assets/logo.png"></a>`)
 			}
 			if (i == tabi) {
 				addTab('<a class="tab selected">' + tabname + '</a>')
