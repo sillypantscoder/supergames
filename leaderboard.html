@@ -34,6 +34,15 @@
 .admin-buttons {
 	display: none;
 }
+.note-btn + :not(.note-visible) {
+	display: none;
+}
+.note-btn:has( + :not(.note-visible))::before {
+	content: "show";
+}
+.note-btn:not(:has( + :not(.note-visible)))::before {
+	content: "hide";
+}
 		</style>
 	</head>
 	<body>

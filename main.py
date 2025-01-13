@@ -126,12 +126,37 @@ def generateDataFileFromTSV(tsv: str):
 	# Finish
 	log("[tsv-loader] Finished!")
 
+class SafeDict:
+	def __init__(self, fields: dict[str, str]):
+		self.fields: dict[str, str] = fields
+	def get(self, key: str, default: str = ''):
+		if key in self.fields:
+			return self.fields[key]
+		else:
+			return default
+	@staticmethod
+	def from_list(fields: list[tuple[str, str]]):
+		f: dict[str, str] = {}
+		for i in fields:
+			f[i[0]] = i[1]
+		return SafeDict(f)
+
+class URLQuery(SafeDict):
+	def __init__(self, q: str):
+		fields: dict[str, str] = {}
+		for f in q.split("&"):
+			s = f.split("=")
+			if len(s) >= 2:
+				fields[s[0]] = s[1]
+		super().__init__(fields)
+		self.orig = q
+
 class HTTPResponse(typing.TypedDict):
 	status: int
 	headers: dict[str, str]
 	content: bytes
 
-def get(path: str) -> HTTPResponse:
+def get(path: str, headers: SafeDict) -> HTTPResponse:
 	log_existence_check()
 	user = getUserFromID(''.join(path.split("?")[1:]))
 	if path == "/users.json":
@@ -363,7 +388,7 @@ def get(path: str) -> HTTPResponse:
 			"content": read_file("public_files/assetes/apple-touch-icon.png")
 		}
 	else: # 404 page
-		log("404 encountered: " + path)
+		log("404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
 		return {
 			"status": 404,
 			"headers": {
@@ -436,7 +461,17 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"headers": {},
 			"content": b"Application was created"
 		}
-	elif path == "/createuser":
+	elif path.startswith("/createuser/"):
+		# Authenticate
+		auth = path.split("/")[2]
+		user = getUserFromID(auth)
+		if user == None or user["admin"] == False:
+			return {
+				"status": 404,
+				"headers": {},
+				"content": b"The user is not correct (need to have admin permissions)"
+			}
+		# get data
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update user list
 		c = read_file("users.json").decode("UTF-8")
@@ -464,7 +499,17 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"headers": {},
 			"content": b"Application was created"
 		}
-	elif path == "/rejectprofile":
+	elif path.startswith("/rejectprofile/"):
+		# Authenticate
+		auth = path.split("/")[2]
+		user = getUserFromID(auth)
+		if user == None or user["admin"] == False:
+			return {
+				"status": 404,
+				"headers": {},
+				"content": b"The user is not correct (need to have admin permissions)"
+			}
+		# data
 		bodydata = body.decode("UTF-8").split("\n")
 		# Update applications
 		c = read_file("applications.txt").decode("UTF-8")
@@ -686,7 +731,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_GET(self):
-		res = get(self.path)
+		res = get(self.path, SafeDict.from_list(self.headers.items()))
 		self.send_response(res["status"])
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])

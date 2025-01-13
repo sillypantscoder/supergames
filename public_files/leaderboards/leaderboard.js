@@ -98,7 +98,12 @@ getData().then((info) => { try {
 		}
 		// // 5th column: Description
 		var newE = document.createElement("td")
-		newE.innerText = ranks[i].entry.note
+			if (ranks[i].entry.note.length > 0) {
+				var btn = newE.appendChild(document.createElement("button"))
+				btn.classList.add("note-btn")
+				btn.setAttribute("onclick", "this.nextElementSibling.classList.toggle('note-visible')")
+				newE.appendChild(document.createElement("span")).innerText = ranks[i].entry.note
+			}
 		e.appendChild(newE)
 		// 6th column (if needed): Admin buttons
 		if (info.profile != null && info.profile.admin) {
