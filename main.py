@@ -22,9 +22,11 @@ def write_file(filename: str, content: bytes):
 	f.write(content)
 	f.close()
 
-def log(msg: str):
+def log(importance: str, msg: str):
 	f = open("log.txt", "a")
 	f.write(datetime.datetime.now().isoformat())
+	f.write(" - ")
+	f.write(importance.center(5))
 	f.write(" - ")
 	f.write(msg)
 	f.write("\n")
@@ -84,7 +86,7 @@ def getIDFromUser(name: str, pwd: str) -> str | None:
 	return None
 
 def generateDataFileFromTSV(tsv: str):
-	log("[tsv-loader] Starting!")
+	log("TSV", "Starting!")
 	# Load the TSV data
 	d = [x.split("\t") for x in tsv.split("\n")[1:]]
 	# Load the old data
@@ -109,22 +111,22 @@ def generateDataFileFromTSV(tsv: str):
 	# leaderboards missing from the TSV file
 	for name in data:
 		if name not in newData.keys():
-			log(f"[tsv-loader] Warning: Not in the TSV file: {name}")
-			log(f"[tsv-loader] \tThere are {len(data[name]['entries'])} entries")
-			log("[tsv-loader] \tThe leaderboard is not being deleted")
+			log("TSV", f"Warning: Not in the TSV file: {name}")
+			log("TSV", f"\tThere are {len(data[name]['entries'])} entries")
+			log("TSV", "\tThe leaderboard is not being deleted")
 			newData[name] = data[name]
 		else:
 			newData[name]["entries"] = data[name]["entries"]
 			newentries.remove(name)
 	# List of new leaderboards
-	log("[tsv-loader] New leaderboards:")
-	for x in newentries: log("[tsv-loader]\t" + x)
+	log("TSV", "New leaderboards:")
+	for x in newentries: log("TSV", "\t" + x)
 	# Save the data!
 	f = open("public_files/data.json", "w")
 	f.write(json.dumps(newData, indent='\t'))
 	f.close()
 	# Finish
-	log("[tsv-loader] Finished!")
+	log("TSV", "Finished!")
 
 class SafeDict:
 	def __init__(self, fields: dict[str, str]):
@@ -156,7 +158,7 @@ class HTTPResponse(typing.TypedDict):
 	headers: dict[str, str]
 	content: bytes
 
-def get(path: str, headers: SafeDict) -> HTTPResponse:
+def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 	log_existence_check()
 	user = getUserFromID(''.join(path.split("?")[1:]))
 	if path == "/users.json":
@@ -279,7 +281,7 @@ def get(path: str, headers: SafeDict) -> HTTPResponse:
 				},
 				"content": b"<script>location.replace('/login.html#invalid')</script>"
 			}
-		log("User " + u + " logged in!")
+		log("#", "User " + u + " logged in!")
 		return {
 			"status": 200,
 			"headers": {
@@ -294,7 +296,7 @@ def get(path: str, headers: SafeDict) -> HTTPResponse:
 		if user == None: return {"status": 404, "headers": {}, "content": b""}
 		if user["admin"]:
 			newID = getIDFromUser(newname, getPwdFromUser(newname)) # type: ignore
-			log("User " + repr(user["name"]) + " switch to " + repr(newname))
+			log("SECUR", "User " + repr(user["name"]) + " switch to " + repr(newname))
 			return {
 				"status": 200,
 				"headers": {
@@ -388,7 +390,7 @@ def get(path: str, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("public_files/assetes/apple-touch-icon.png")
 		}
 	else: # 404 page
-		log("404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
+		log("", "404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
 		return {
 			"status": 404,
 			"headers": {
@@ -431,7 +433,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		except Exception as e:
 			update += "\nError was:\n\n"
 			update += ''.join(traceback.format_exception(type(e), e, e.__traceback__))
-		log("entryeditor: " + update)
+		log("E", "entryeditor: " + update)
 		return {
 			"status": 200,
 			"headers": {
@@ -454,7 +456,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		bodydata = body.decode("UTF-8").split("\n")
 		c = read_file("applications.txt")
 		c = f"""\n==========\nUsername: {bodydata[0]}\nEmail address: {bodydata[1]}\n==========\n\n\n""".encode("UTF-8") + c
-		log(f"create application (username={bodydata[0]}, email={bodydata[1]})")
+		log("APPLC", f"create application (username={bodydata[0]}, email={bodydata[1]})")
 		write_file("applications.txt", c)
 		return {
 			"status": 301,
@@ -487,7 +489,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		"desc": ""
 	}}
 ]'''
-		log("accept application for " + bodydata[0])
+		log("APPLC", "accept application for " + bodydata[0])
 		write_file("users.json", c.encode("UTF-8"))
 		# Update applications
 		c = read_file("applications.txt").decode("UTF-8")
@@ -514,7 +516,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		# Update applications
 		c = read_file("applications.txt").decode("UTF-8")
 		c = c.replace(f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}", f"Username: {bodydata[0]}\nEmail address: {bodydata[1]}\n[Rejected]")
-		log("reject application for " + bodydata[0])
+		log("APPLC", "reject application for " + bodydata[0])
 		write_file("applications.txt", c.encode("UTF-8"))
 		# Finish
 		return {
@@ -530,7 +532,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
 				n["password"] = bodydata[1]
 				name = n["name"]
-		log(f"{name} update pwd")
+		log("SECUR", f"{name} update pwd")
 		write_file("users.json", json.dumps(ou, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
@@ -548,7 +550,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 				desc_from = n["desc"]
 				n["desc"] = newdesc
 				name = n["name"]
-		log(f"{name} update desc\n\tfrom: {repr(desc_from)}\n\tto: {repr(newdesc)}")
+		log("SECUR", f"{name} update desc\n\tfrom: {repr(desc_from)}\n\tto: {repr(newdesc)}")
 		write_file("users.json", json.dumps(ou, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
@@ -568,7 +570,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		# Get names
 		oldName = bodydata[1]
 		newName = bodydata[2]
-		log(f"Changing the name of a user. From: {repr(oldName)} To: {repr(newName)}")
+		log("SECUR", f"Changing the name of a user. From: {repr(oldName)} To: {repr(newName)}")
 		# Change entry in users.json
 		f = open("users.json", "r")
 		d = json.loads(f.read())
@@ -576,7 +578,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		for e in d:
 			if e["name"] == oldName:
 				e["name"] = newName
-				log("\tChanged username in users.json")
+				log("SECUR", "\tChanged username in users.json")
 		f = open("users.json", "w")
 		f.write(json.dumps(d, indent='\t'))
 		f.close()
@@ -589,7 +591,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			for itemno in range(len(entries)):
 				if entries[itemno][0] == oldName:
 					entries[itemno][0] = newName
-					log("\tChanged entry for event: " + eventname + " item #: " + str(itemno))
+					log("E", "\tChanged entry for event: " + eventname + " item #: " + str(itemno))
 		f = open("public_files/data.json", "w")
 		f.write(json.dumps(d, indent='\t'))
 		f.close()
@@ -607,7 +609,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"user": name,
 			"results": bodydata["results"]
 		})
-		log(f"{name} submit form {forms[bodydata['id']]['name']}: " + json.dumps(bodydata["results"], indent='\t'))
+		log("FORMS", f"{name} submit form {forms[bodydata['id']]['name']}: " + json.dumps(bodydata["results"], indent='\t'))
 		write_file("forms.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
@@ -642,7 +644,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		write_file("public_files/entries.json", json.dumps(forms, indent='\t').encode("UTF-8"))
 		if bodydata[1] == "1":
 			# Accepted the entry!
-			log("entry submissions: accepted an entry\n\t" + repr(i))
+			log("E", "entry submissions: accepted an entry\n\t" + repr(i))
 			post("/addentry", '\n'.join([
 				i["event"],
 				i["user"],
@@ -651,7 +653,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 				i["note"]
 			]).encode("UTF-8"))
 		else:
-			log("entry submissions: rejected an entry\n\t" + repr(i))
+			log("E", "entry submissions: rejected an entry\n\t" + repr(i))
 		return {
 			"status": 200,
 			"headers": {},
@@ -676,17 +678,17 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		data = json.loads(read_file("public_files/data.json"))
 		if bodydata["name"] not in data.keys():
 			data[bodydata["name"]] = bodydata["data"]
-			log("Created new event with name " + repr(bodydata["name"]) + "!")
+			log("ADMIN", "Created new event with name " + repr(bodydata["name"]) + "!")
 			write_file("public_files/data.json", json.dumps(data, indent='\t').encode("UTF-8"))
 		else:
-			log("Failed to create new event with name " + repr(bodydata["name"]))
+			log("ADMIN", "Failed to create new event with name " + repr(bodydata["name"]))
 		return {
 			"status": 302,
 			"headers": {},
 			"content": b"Success"
 		}
 	elif path == "/error":
-		log("User encountered error: " + body.decode("UTF-8"))
+		log("", "User encountered error: " + body.decode("UTF-8"))
 		return {
 			"status": 302,
 			"headers": {},
@@ -697,7 +699,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		user = getUserFromID(bodydata[0])
 		if user == None: return {"status": 404, "headers": {}, "content": b"You need to be signed in"}
 		if user["admin"]:
-			log("Removing an entry with user " + repr(bodydata[2]) + " from leaderboard " + repr(bodydata[1]))
+			log("ADMIN", "Removing an entry with user " + repr(bodydata[2]) + " from leaderboard " + repr(bodydata[1]))
 			# remove the entry
 			data = json.loads(read_file("public_files/data.json"))
 			entries = data[bodydata[1]]["entries"]
@@ -720,7 +722,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"content": b"You need to be an admin"
 		}
 	else:
-		log("404 POST encountered: " + path)
+		log("", "404 POST encountered: " + path)
 		return {
 			"status": 404,
 			"headers": {
