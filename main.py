@@ -160,7 +160,7 @@ class HTTPResponse(typing.TypedDict):
 
 def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 	log_existence_check()
-	user = getUserFromID(''.join(path.split("?")[1:]))
+	user = getUserFromID(query.get("user"))
 	if path == "/users.json":
 		ou = json.loads(read_file("users.json"))
 		for n in ou:
@@ -173,7 +173,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			},
 			"content": json.dumps(ou).encode("UTF-8")
 		}
-	elif os.path.isfile("public_files" + path.split("?")[0]):
+	elif os.path.isfile("public_files" + path):
 		return {
 			"status": 200,
 			"headers": {
@@ -188,11 +188,11 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 					"js": "application/javascript",
 					"txt": "text/plain",
 					"xml": "image/svg+xml"
-				}[path.split("?")[0].split(".")[-1]]
+				}[path.split(".")[-1]]
 			},
-			"content": read_file("public_files" + path.split("?")[0])
+			"content": read_file("public_files" + path)
 		}
-	elif path.split("?")[0] == "/":
+	elif path == "/":
 		return {
 			"status": 200,
 			"headers": {
@@ -201,7 +201,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>".encode("UTF-8")
 		}
 	elif path.startswith("/leaderboards/"):
-		name = path.split("?")[0][14:]
+		name = path[14:]
 		return {
 			"status": 200,
 			"headers": {
@@ -210,8 +210,8 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("leaderboard.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/badges/"):
-		name = path.split("?")[0].split("/")[2]
-		rank = path.split("?")[0].split("/")[3]
+		name = path.split("/")[2]
+		rank = path.split("/")[3]
 		return {
 			"status": 200,
 			"headers": {
@@ -223,7 +223,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				.replace(b"{{SRANK}}", ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][int(rank)].encode("UTF-8"))
 		}
 	elif path.startswith("/profile/"):
-		name = path.split("?")[0].split("/")[2]
+		name = path.split("/")[2]
 		userlist: list[str] = [x["name"] for x in json.loads(read_file("users.json"))]
 		if name.isdigit() and int(name) - 1 < len(userlist):
 			name = userlist[int(name) - 1]
@@ -242,7 +242,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/forms/"):
-		formid = path.split("?")[0].split("/")[2]
+		formid = path.split("/")[2]
 		formlist: list[str] = [x["name"] for x in json.loads(read_file("forms.json"))]
 		if formid.isdigit() and int(formid) < len(formlist):
 			name = formlist[int(formid)]
@@ -260,7 +260,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			},
 			"content": b"<script>location.replace('/form_list.html')</script><body>That is not a valid form name, you will be redirected to the form list.</body>"
 		}
-	elif path.split("?")[0] == "/usercheck":
+	elif path == "/usercheck":
 		return {
 			"status": 200,
 			"headers": {
@@ -268,12 +268,12 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			},
 			"content": (json.dumps([{"name": user["name"], "admin": user["admin"]}]) if user != None else "[]").encode("UTF-8")
 		}
-	elif path.split("?")[0] == "/user_id_create":
-		u = path.split("?")[1].split("&")[0]
-		p = path.split("?")[1].split("&")[1]
+	elif path == "/user_id_create":
+		u = query.get("username")
+		p = query.get("pwd")
 		userid = getIDFromUser(unquote(u), unquote(p))
-		# print(repr(u), repr(p), repr(id))
 		if userid == None:
+			log("-", "Failed to sign in for user: " + u + " and password: " + p)
 			return {
 				"status": 200,
 				"headers": {
@@ -281,18 +281,20 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				},
 				"content": b"<script>location.replace('/login.html#invalid')</script>"
 			}
-		log("#", "User " + u + " logged in!")
+		admin = False
+		userData = getUserFromID(userid)
+		if userData != None:
+			admin = userData["admin"]
+		log("#", "User '" + unquote(u) + ("' (admin)" if admin else "'") + " logged in!")
 		return {
 			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?{userid}')</script>".encode("UTF-8")
+			"content": f"<script>location.replace('/?user={userid}')</script>".encode("UTF-8")
 		}
-	elif path.split("?")[0] == "/user_id_create/sudo":
-		u = path.split("?")[1].split("&")[0]
-		newname = unquote(path.split("?")[1].split("&")[1])
-		user = getUserFromID(u)
+	elif path == "/user_id_create/sudo":
+		newname = unquote(query.get("newUser"))
 		if user == None: return {"status": 404, "headers": {}, "content": b""}
 		if user["admin"]:
 			newID = getIDFromUser(newname, getPwdFromUser(newname)) # type: ignore
@@ -302,16 +304,16 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": f"<script>location.replace('/profile/{newname}?{newID}')</script>".encode("UTF-8")
+				"content": f"<script>location.replace('/profile/{newname}?user={newID}')</script>".encode("UTF-8")
 			}
 		return {
 			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?{u}')</script>".encode("UTF-8")
+			"content": f"[Invalid admin credentials.]".encode("UTF-8")
 		}
-	elif path.split("?")[0] == "/applications.txt":
+	elif path == "/applications.txt":
 		if "?" not in path: return {
 			"status": 404,
 			"headers": {},
@@ -334,13 +336,8 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"headers": {},
 				"content": b"You must be an admin to access the applications list"
 			}
-	elif path.split("?")[0] == "/forms.json":
-		if "?" not in path: return {
-			"status": 404,
-			"headers": {},
-			"content": b"You must be signed in to access the applications list"
-		}
-		u = path.split("?")[1]
+	elif path == "/forms.json":
+		u = query.get("user")
 		user = getUserFromID(u)
 		ou = json.loads(read_file("forms.json"))
 		if not (user and user["admin"]):
@@ -353,7 +350,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			},
 			"content": json.dumps(ou).encode("UTF-8")
 		}
-	elif path.split("?")[0] in ["/special/badges", "/special/meta", "/special/activity"]:
+	elif path in ["/special/badges", "/special/meta", "/special/activity"]:
 		return {
 			"status": 200,
 			"headers": {
@@ -390,7 +387,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("public_files/assetes/apple-touch-icon.png")
 		}
 	else: # 404 page
-		log("", "404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
+		log("", "404 encountered: " + path + "\n\t\t\t\t\t\t\t\t\t\t(Referrer: " + headers.get("Referer") + ")")
 		return {
 			"status": 404,
 			"headers": {
@@ -633,11 +630,15 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		}
 	elif path == "/handle_entry":
 		bodydata = body.decode("UTF-8").split("\n")
-		if getUserFromID(bodydata[0])["admin"] == False: return { # type: ignore
-			"status": 404,
-			"headers": {},
-			"content": b"You need admin permissions"
-		}
+		user = getUserFromID(bodydata[0])
+		if user == None or user["admin"] == False:
+			log(repr(user), bodydata[0])
+			log("EnErr", "User tried to handle entry without sufficient permissions")
+			return {
+				"status": 404,
+				"headers": {},
+				"content": b"You need admin permissions"
+			}
 		forms = json.loads(read_file("public_files/entries.json"))
 		i = forms[int(bodydata[2])]
 		del forms[int(bodydata[2])]
@@ -722,7 +723,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 			"content": b"You need to be an admin"
 		}
 	else:
-		log("", "404 POST encountered: " + path)
+		log("#", "404 POST encountered: " + path)
 		return {
 			"status": 404,
 			"headers": {
@@ -733,7 +734,8 @@ def post(path: str, body: bytes) -> HTTPResponse:
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_GET(self):
-		res = get(self.path, SafeDict.from_list(self.headers.items()))
+		splitpath = self.path.split("?")
+		res = get(splitpath[0], URLQuery(''.join(splitpath[1:])), SafeDict.from_list(self.headers.items()))
 		self.send_response(res["status"])
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])

@@ -113,7 +113,7 @@ function fillResponse(response, responseIndex) {
 		x.addEventListener("loadend", (e) => {
 			location.reload()
 		})
-		x.send(location.search.substring(1) + "\n1\n" + responseIndex)
+		x.send(query.get("user", "") + "\n1\n" + responseIndex)
 	});
 	// Add Cancel Button
 	[...document.querySelectorAll("#responses button")].forEach((e) => e.remove())

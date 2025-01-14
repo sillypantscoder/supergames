@@ -1,3 +1,23 @@
+const query = (() => {
+	/** @type {Object<string, string>} */
+	var q = {}
+	var items = location.search.substring(1).split("&")
+	for (var item of items) {
+		var key = item.split("=")[0]
+		var val = item.split("=")[1]
+		if (val == undefined) val = "1"
+		// record the item
+		q[key] = val
+	}
+	return {
+		raw: q,
+		/** @type {(key: string, defaultValue: string) => string} */
+		get: (key, defaultValue) => {
+			if (Object.keys(q).includes(key)) return q[key]
+			else return defaultValue
+		}
+	}
+})();
 /**
  * @template {any} T
  * @param {T[]} items

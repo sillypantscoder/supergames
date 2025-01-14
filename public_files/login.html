@@ -32,7 +32,7 @@ sgtabs();
 function finish() {
 	var u = document.querySelector("#username").value
 	var p = document.querySelector("#password").value
-	location.replace("/user_id_create?" + u + "&" + p)
+	location.replace("/user_id_create?username=" + u + "&pwd=" + p)
 }
 if (location.hash == "#invalid") document.querySelector("#invalid").removeAttribute("style")
 		</script>

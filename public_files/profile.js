@@ -152,7 +152,7 @@ getData().then((info) => {
 		switchbtn.innerText = "Switch User"
 		switchbtn.addEventListener("click", () => {
 			var newUser = location.pathname.split("/")[2]
-			location.replace("/user_id_create/sudo?" + location.search.substring(1) + "&" + newUser)
+			location.replace("/user_id_create/sudo?user=" + query.get("user", "") + "&newUser=" + newUser)
 		})
 	}
 	if (info.profile?.admin) {

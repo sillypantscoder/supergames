@@ -63,7 +63,7 @@ function submit() {
 		location.replace("/forms/list.html" + location.search)
 	})
 	x.send(JSON.stringify({
-		user: location.search.substring(1),
+		user: query.get("user", ""),
 		id: formID,
 		results
 	}))
@@ -96,7 +96,7 @@ function fillResponse(response, responseIndex) {
 		x.addEventListener("loadend", (e) => {
 			location.reload()
 		})
-		x.send(location.search.substring(1) + "\n" + formID + "\n" + responseIndex)
+		x.send(query.get("user", "") + "\n" + formID + "\n" + responseIndex)
 	})
 	// Add Cancel Button
 	expect("#cancelbtn").removeAttribute("style")

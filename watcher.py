@@ -29,6 +29,8 @@ while True:
 		time.sleep(3)
 		start_server()
 		print("Restarted the server.")
+	elif p.stdout == None:
+		print("DANGER! Process is not reporting standard out!")
 	else:
 		out = int(p.stdout.read().decode("UTF-8"))
 		if out == 200:
