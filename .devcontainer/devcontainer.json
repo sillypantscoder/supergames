@@ -1,0 +1,8 @@
+{
+	"portsAttributes": {
+		"12344": {
+			"label": "server"
+		}
+	},
+	"postStartCommand": "python3 watcher.py silver-space-giggle-rx6r47499j535wqv"
+}

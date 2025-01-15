@@ -2,7 +2,23 @@ import subprocess
 import time
 import sys
 
-codespace = input("Enter the codespace name\n")
+f = open("watcher.txt", "a")
+f.write("\n\n\n\n\n\n\n\n")
+f.flush()
+f.close()
+
+if len(sys.argv) >= 2:
+	codespace = sys.argv[1]
+	def printf(*data: object, end: str = "\n"):
+		f = open("watcher.txt", "a")
+		f.write(" ".join([str(x) for x in data]))
+		f.write(end)
+		f.flush()
+		f.close()
+else:
+	codespace = input("Enter the codespace name\n")
+	def printf(*data: object, end: str = "\n"):
+		print(*data, end=end)
 
 def start_server():
 	global server
@@ -22,19 +38,19 @@ while True:
 	time.sleep(1)
 	if p.poll() == None or server.poll() != None:
 		p.kill()
-		print("\nServer is not responding!")
+		printf("\nServer is not responding!")
 		server.send_signal(2)
 		server.wait()
-		print("Killed the server!")
+		printf("Killed the server!")
 		time.sleep(3)
 		start_server()
-		print("Restarted the server.")
+		printf("Restarted the server.")
 	elif p.stdout == None:
-		print("DANGER! Process is not reporting standard out!")
+		printf("DANGER! Process is not reporting standard out!")
 	else:
 		out = int(p.stdout.read().decode("UTF-8"))
 		if out == 200:
-			print(f"[fine 200]", end="")
+			printf(f"[fine 200]", end="")
 		else:
-			print(f"\npossible problem! status code: {out}")
+			printf(f"\npossible problem! status code: {out}")
 		sys.stdout.flush()

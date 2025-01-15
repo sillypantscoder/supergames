@@ -160,6 +160,7 @@ class HTTPResponse(typing.TypedDict):
 
 def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 	log_existence_check()
+	log("", "req:" + path)
 	user = getUserFromID(query.get("user"))
 	if path == "/users.json":
 		ou = json.loads(read_file("users.json"))
