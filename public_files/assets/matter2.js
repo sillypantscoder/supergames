@@ -1,4 +1,4 @@
-if (location.search == "?physics") {
+if (query.get("physics", "") == "1") {
 	(() => {
 		/**
 		 * MatterJS class definitions.
