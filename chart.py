@@ -2,15 +2,15 @@ import math
 import sys
 import json
 
-def getColors():
-	patterns = [a+b+c for a in "08F" for b in "08F" for c in "08F"][1:]
-	patterns = [a for b in patterns for a in [
-		b[0] + b[1] + b[2],
-		b[1] + b[0] + b[2],
-		b[1] + b[2] + b[0]
-	]]
-	print(patterns)
-getColors()
+# def getColors():
+# 	patterns = [a+b+c for a in "08F" for b in "08F" for c in "08F"][1:]
+# 	patterns = [a for b in patterns for a in [
+# 		b[0] + b[1] + b[2],
+# 		b[1] + b[0] + b[2],
+# 		b[1] + b[2] + b[0]
+# 	]]
+# 	print(patterns)
+# getColors()
 
 def generateBarChart(data: dict[str, int]):
 	colors = [

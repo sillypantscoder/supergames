@@ -28,7 +28,7 @@ def log(importance: str, msg: str):
 	f.write(" - ")
 	f.write(importance.center(5))
 	f.write(" - ")
-	f.write(msg)
+	f.write(msg.replace("\t", "\t\t\t\t\t\t\t\t\t\t"))
 	f.write("\n")
 	f.close()
 
@@ -359,7 +359,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("special.html")
 		}
 	elif path.startswith("/graph/"):
-		event = path.split("/")[2]
+		event = unquote(path.split("/")[2])
 		graph_type = path.split("/")[3]
 		event_data = json.loads(read_file("public_files/data.json"))[event]["entries"]
 		entries = {}
@@ -387,7 +387,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": read_file("public_files/assetes/apple-touch-icon.png")
 		}
 	else: # 404 page
-		log("", "404 encountered: " + path + "\n\t\t\t\t\t\t\t\t\t\t(Referrer: " + headers.get("Referer") + ")")
+		log("", "404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
 		return {
 			"status": 404,
 			"headers": {
