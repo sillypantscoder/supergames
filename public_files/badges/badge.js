@@ -36,4 +36,4 @@ getData().then((info) => {
 		expect("#owners").appendChild(e)
 	}
 })
-expect("#leaderboard_link").setAttribute("href", expect("#leaderboard_link").getAttribute("href") + location.href)
+expect("#leaderboard_link").setAttribute("href", expect("#leaderboard_link").getAttribute("href") + location.search)
