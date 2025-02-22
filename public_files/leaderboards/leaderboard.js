@@ -114,7 +114,7 @@ getData().then((info) => { try {
 				var x = new XMLHttpRequest()
 				x.open("POST", "/remove_entry")
 				x.addEventListener("loadend", () => location.reload())
-				x.send(location.search.substring(1) + "\n" + leaderboardName + "\n" + name)
+				x.send(query.get("user", "") + "\n" + leaderboardName + "\n" + name)
 			}))(ranks[i].entry.user.name);
 			e.appendChild(admin)
 		}

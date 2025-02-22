@@ -209,6 +209,15 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			},
 			"content": read_file("leaderboard.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
+	elif path.startswith("/games/"):
+		name = path[7:]
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/html"
+			},
+			"content": read_file("game.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+		}
 	elif path.startswith("/badges/"):
 		name = path.split("/")[2]
 		rank = path.split("/")[3]

@@ -268,14 +268,16 @@ class Entry {
 class Leaderboard {
 	/**
 	 * @param {string} name
+	 * @param {string} game
 	 * @param {string} description
 	 * @param {{ values: number[], description: string } | null} badges
 	 * @param {Entry[]} entries
 	 * @param {boolean} reverseOrder
 	 * @param {boolean} isTime
 	 */
-	constructor(name, description, badges, entries, reverseOrder, isTime) {
+	constructor(name, game, description, badges, entries, reverseOrder, isTime) {
 		this.name = name
+		this.game = game ?? "undefined"
 		this.description = description
 		this.badges = badges
 		this.entries = entries
@@ -329,12 +331,23 @@ class Leaderboard {
 	 */
 	getNumberOfBadges(score) {
 		if (this.badges == null) throw new Error("There are no badges on a specialty leaderboard")
-		if (score < this.badges.values[0]) return 0
-		for (var i = 0; i < this.badges.values.length; i++) {
-			var value = this.badges.values[i]
-			if (score < value) return i
+		if (!this.reverseOrder) {
+			// Highest score is best. Return 0 if the score is less than the lowest badge.
+			if (score < this.badges.values[0]) return 0
+			// For each badge from left to right (lowest to highest), stop once we find a higher badge.
+			for (var i = 0; i < this.badges.values.length; i++) {
+				if (this.badges.values[i] > score) return i
+			}
+			return this.badges.values.length
+		} else {
+			// Lowest score is best. Return 0 if the score is higher than the highest badge.
+			if (score > this.badges.values[0]) return 0
+			// For each badge from right to left (lowest to highest), stop once we find a lower badge.
+			for (var i = this.badges.values.length - 1; i >= 0; i--) {
+				if (this.badges.values[i] >= score) return i + 1
+			}
+			return 0
 		}
-		return this.badges.values.length
 	}
 	/**
 	 * @param {User} user
@@ -472,7 +485,7 @@ function parseData(info) {
 			var entry = new Entry(user, v[1], new Date(v[2]), v[3])
 			return entry
 		})
-		var leaderboard = new Leaderboard(eventname, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
+		var leaderboard = new Leaderboard(eventname, eventData.game, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
 			description: eventData.badge_desc,
 			values: eventData.badges
 		}, entries, eventData.reverseOrder, eventData.isTime)

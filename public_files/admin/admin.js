@@ -60,7 +60,7 @@ function addLeaderboard() {
 			"badge_desc": isSpecialty ? "" : expectInput(expect("#desc-badge")).value,
 			"leaderboard_desc": expectInput(expect("#desc-event")).value,
 			"entries": [],
-			"reverseOrder": expectInput(expect("#bestscore")).value == "true",
+			"reverseOrder": expectSelect(expect("#bestscore")).value == "true",
 			"isTime": expectInput(expect("#istime")).checked
 		}
 	}

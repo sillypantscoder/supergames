@@ -101,7 +101,7 @@ function fillResponse(response, responseIndex) {
 		x.addEventListener("loadend", (e) => {
 			location.reload()
 		})
-		x.send(location.search.substring(1) + "\n0\n" + responseIndex)
+		x.send(query.get("user", "") + "\n0\n" + responseIndex)
 	})
 	// Add Accept Button
 	var e = document.createElement("button")

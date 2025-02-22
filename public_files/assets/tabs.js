@@ -28,7 +28,8 @@ const sgtabs = (() => {
 				addTab(`<a href="/${location.search}"><img src="/assets/logo.png"></a>`)
 			}
 			var elm = addTab(tabs_default[i])
-			var currentTabCheck = tabs_default[i].match(/href="([\/a-z_\.]+)(\?[0-9]*)?"/)
+			var currentTabCheck = tabs_default[i].match(/href="([\/a-z_\.]+)(\?[a-zA-Z=0-9]*)?"/)
+			console.log(currentTabCheck, location.pathname)
 			if (currentTabCheck && currentTabCheck[1] == location.pathname) {
 				elm.removeAttribute("href")
 				elm.classList.add("selected")
