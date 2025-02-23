@@ -144,7 +144,7 @@ class MetaLeaderboard extends SpecialLeaderboard {
 		return "Meta Leaderboard"
 	}
 	getTooltip() {
-		return "The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. The winner is the person with the least number of points."
+		return "The person in first place in each leaderboard gets 1 point. The person in second place gets 2 points, and so on. (Anyone not on the leaderboard gets a number of points equal to the number of users in existence.) The winner is the person with the least number of points."
 	}
 	/**
 	 * @param {number} a
@@ -164,10 +164,10 @@ class MetaLeaderboard extends SpecialLeaderboard {
 			var leaderboard = this.info.leaderboards[n]
 			// find this user's rank
 			var ranks = leaderboard.getRanked()
-			var rank = ranks.findIndex((v) => v.entry.user == user)
+			var rank = ranks.find((v) => v.entry.user == user)
 			// assign points
-			if (rank == -1) points += this.info.users.length
-			else points += rank + 1
+			if (rank == undefined) points += this.info.users.length
+			else points += rank.rank
 		}
 		return points
 	}

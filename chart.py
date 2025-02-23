@@ -88,6 +88,7 @@ def generatePieChart(data: dict[str, int]):
 	usernames.sort(key=lambda x: -data[x])
 	img_size = 100
 	total_points = sum([data[u] for u in usernames])
+	if total_points == 0: total_points = 1
 	r = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 {(img_size * 2) + 10} {img_size + 10}"><g>'
 	for i in range(len(usernames)):
 		pc = round((data[usernames[i]] / total_points) * 100 * 100) / 100
@@ -123,6 +124,7 @@ def generateStackedColumnChart(data: dict[str, int]):
 	usernames.sort(key=lambda x: -data[x])
 	img_size = 100
 	total_points = sum([data[u] for u in usernames])
+	if total_points == 0: total_points = 1
 	r = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 {(img_size * 2) + 10} {img_size + 10}"><g>'
 	for i in range(len(usernames)):
 		pc = round((data[usernames[i]] / total_points) * 100 * 100) / 100

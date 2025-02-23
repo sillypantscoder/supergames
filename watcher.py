@@ -2,7 +2,7 @@ import subprocess
 import time
 import sys
 
-f = open("watcher.txt", "a")
+f = open("watcher.txt", "w")
 f.write("\n\n\n\n\n\n\n\n")
 f.flush()
 f.close()

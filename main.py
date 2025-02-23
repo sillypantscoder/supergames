@@ -323,12 +323,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": f"[Invalid admin credentials.]".encode("UTF-8")
 		}
 	elif path == "/applications.txt":
-		if "?" not in path: return {
-			"status": 404,
-			"headers": {},
-			"content": b"You must be signed in to access the applications list"
-		}
-		u = path.split("?")[1]
+		u = query.get("user")
 		user = getUserFromID(u)
 		if user and user["admin"]:
 			ou = read_file("applications.txt")
@@ -405,7 +400,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": b"404 Page Not Found"
 		}
 
-def post(path: str, body: bytes) -> HTTPResponse:
+def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 	if path == "/addentry":
 		update = "There was an error and no entries were updated."
 		try:
@@ -471,7 +466,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		}
 	elif path.startswith("/createuser/"):
 		# Authenticate
-		auth = path.split("/")[2]
+		auth = query.get("user")
 		user = getUserFromID(auth)
 		if user == None or user["admin"] == False:
 			return {
@@ -534,11 +529,13 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		bodydata = body.decode("UTF-8").split("\n")
 		ou = json.loads(read_file("users.json"))
 		name = "<error>"
+		oldpwd = "<error>"
 		for n in ou:
 			if str(multiply(n["name"], n["password"])) == bodydata[0]:
+				oldpwd = n["password"]
 				n["password"] = bodydata[1]
 				name = n["name"]
-		log("SECUR", f"{name} update pwd")
+		log("SECUR", f"{name} update pwd (from: {oldpwd}; to: {bodydata[1]})")
 		write_file("users.json", json.dumps(ou, indent='\t').encode("UTF-8"))
 		return {
 			"status": 200,
@@ -655,7 +652,7 @@ def post(path: str, body: bytes) -> HTTPResponse:
 		if bodydata[1] == "1":
 			# Accepted the entry!
 			log("E", "entry submissions: accepted an entry\n\t" + repr(i))
-			post("/addentry", '\n'.join([
+			post("/addentry", query, '\n'.join([
 				i["event"],
 				i["user"],
 				str(i["newscore"]),
@@ -752,7 +749,8 @@ class MyServer(BaseHTTPRequestHandler):
 		c = res["content"]
 		self.wfile.write(c)
 	def do_POST(self):
-		res = post(self.path, self.rfile.read(int(self.headers["Content-Length"])))
+		splitpath = self.path.split("?")
+		res = post(splitpath[0], URLQuery(''.join(splitpath[1:])), self.rfile.read(int(self.headers["Content-Length"])))
 		self.send_response(res["status"])
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])

@@ -25,7 +25,7 @@ getData().then((info) => {
  */
 function createprofile(username, email) {
 	var x = new XMLHttpRequest()
-	x.open("POST", "/createuser/" + location.search.substring(1))
+	x.open("POST", "/createuser/?user=" + query.get("user", "error"))
 	x.addEventListener("loadend", () => location.reload())
 	x.send(`${username}\n${email}`)
 }

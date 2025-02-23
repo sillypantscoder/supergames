@@ -32,8 +32,8 @@ getData().then((info) => { try {
 		e.appendChild(document.createElement("td"))
 			e.children[0].appendChild(document.createElement("span"))
 				e.children[0].children[0].classList.add("outline")
-				e.children[0].children[0].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
-				e.children[0].children[0].innerHTML = String(i + 1) + getSuffix(i + 1)
+				e.children[0].children[0].setAttribute("style", `color: ${getColor(ranks[i].rank - 1)}; opacity: 0.7;${ranks[i].rank >= 4 ? " font-size: 0.8em;" : ""}`)
+				e.children[0].children[0].innerHTML = (ranks[i].tied ? "T " : "") + String(ranks[i].rank) + getSuffix(ranks[i].rank)
 		// // Progress bar: Distance to next place value
 		// if (i > 0) {
 		// 	if (! info.data[leaderboardName].reverseOrder) {
@@ -69,7 +69,7 @@ getData().then((info) => { try {
 		// 3rd column: Score
 		e.appendChild(document.createElement("td"))
 			e.children[2].classList.add("outline")
-			e.children[2].setAttribute("style", `color: ${getColor(i)}; opacity: 0.7;${i >= 3 ? " font-size: 0.8em;" : ""}`)
+			e.children[2].setAttribute("style", `color: ${getColor(ranks[i].rank - 1)}; opacity: 0.7;${ranks[i].rank >= 4 ? " font-size: 0.8em;" : ""}`)
 			var score = ranks[i].entry.score
 			if (leaderboard.isTime) {
 				e.children[2].textContent = formatTime(score)

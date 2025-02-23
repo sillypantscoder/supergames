@@ -14,5 +14,13 @@
 		"password": "ag ag ag ag ag",
 		"admin": false,
 		"desc": "This is another test user"
+	},
+	{
+		"name": "third test user",
+		"date": "2025-02-22T19:57:14.533",
+		"email": "",
+		"password": "third test user",
+		"admin": false,
+		"desc": ""
 	}
 ]

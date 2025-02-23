@@ -300,15 +300,33 @@ class Leaderboard {
 	 * Get a list of all the entries in the leaderboard, sorted according to score from best to worst.
 	 */
 	getRanked() {
-		/** @type {{ entry: Entry }[]} */
-		var data = []
+		// Organize the entries according to score
+		/** @type {Object<string, { entry: Entry, rank: number, tied: boolean }[]>} */
+		var scores = {}
 		for (var i = 0; i < this.entries.length; i++) {
 			var entry = this.entries[i]
 			// Get score
-			data.push({ entry })
+			if (! Object.keys(scores).includes(entry.score.toString())) {
+				scores[entry.score.toString()] = []
+			}
+			scores[entry.score.toString()].push({ entry, rank: i, tied: false })
 		}
-		data.reverse()
-		data.sort((a, b) => {
+		// Go through all the possible scores
+		var possibleScores = Object.keys(scores).map((v) => Number(v))
+		possibleScores.sort();
+		var cumRank = 1 // (Keep track of the rank)
+		for (var score of possibleScores) {
+			var entriesWithThisScore = scores[score]
+			entriesWithThisScore.forEach((v) => {
+				v.rank = cumRank;
+				v.tied = entriesWithThisScore.length > 1
+			})
+			cumRank += entriesWithThisScore.length // (Increase the rank)
+		}
+		// Collect all the entries now that we've set their `rank` and `tied` parameters
+		var collected = Object.values(scores).reduce((a, b) => [...a, ...b], [])
+		// Order the entries appropriately
+		collected.sort((a, b) => {
 			/**
 			 * @param {{ entry: Entry }} x
 			 * @return {number}
@@ -323,8 +341,9 @@ class Leaderboard {
 			// a must be equal to b
 			return 0;
 		})
-		if (!this.reverseOrder) data.reverse()
-		return data
+		if (!this.reverseOrder) collected.reverse()
+		// Finish
+		return collected
 	}
 	/**
 	 * @param {number} score

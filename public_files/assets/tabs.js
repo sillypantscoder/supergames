@@ -4,7 +4,7 @@ var tabs_default = [
 	`<a class="tab" href="/badges/list.html${location.search}">Badges</a>`,
 	`<a class="tab" href="/special/badges${location.search}">Badge Leaderboard</a>`,
 	`<a class="tab" href="/special/meta${location.search}">Meta</a>`,
-	`<a class="tab" href="/special/activity${location.search}">Activity Leaderboard</a>`,
+	// `<a class="tab" href="/special/activity${location.search}">Activity Leaderboard</a>`,
 	`<a class="tab" href="/forms/list.html${location.search}">Forms</a>`,
 	`<a class="tab" href="/entrysubmit/entrysubmit.html${location.search}">Submit entries</a>`
 ];
