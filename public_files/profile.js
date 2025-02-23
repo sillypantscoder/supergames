@@ -64,30 +64,30 @@ getData().then((info) => {
 		// 4th column: Rank
 		e.appendChild(document.createElement("td"))
 			var ranks = event.getRanked()
-			var i = ranks.findIndex((v) => v.entry.user == this_user_obj)
-			if (i == undefined) throw new Error("User is not listed in ranked")
+			var entrydata = ranks.find((v) => v.entry.user == this_user_obj)
+			if (entrydata == undefined) throw new Error("User is not listed in ranked")
 			// Create the element
 			var s = "<span class='outline'"
-			if (i < 3) s += " style='"
+			if (entrydata.rank <= 3) s += " style='"
 			else s += " style='font-size: 0.8em; opacity: 0.7; "
-			s += `color: ${getColor(i)};`
+			s += `color: ${getColor(entrydata.rank - 1)};`
 			s += "'>"
-			// if (duplicates.length > 1) s += "<i>T</i> "
-			e.children[3].innerHTML = `${s}${i + 1}${getSuffix(i + 1)} place</span>`
-		// Progress bar: Distance to next place
-		if (i > 0 && (! event.reverseOrder) && ranks[i + 1] != undefined) {
-			var ranks = event.getRanked()
-			var bar = document.createElement("a")
-			bar.classList.add("bar")
-			bar.innerText = String(i) + getSuffix(i)
-			var nextValue = ranks[i - 1].entry.score
-			var thisValue = ranks[i].entry.score
-			var prevValue = ranks[i + 1].entry.score
-			if (prevValue == undefined) prevValue = 0
-			// bar.innerText = `${prevValue} - ${thisValue} - ${nextValue}`
-			bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(i - 1)};`);
-			e.children[3].appendChild(bar)
-		}
+			if (entrydata.tied) s += "<i>T</i> "
+			e.children[3].innerHTML = `${s}${entrydata.rank}${getSuffix(entrydata.rank)} place</span>`
+		// // Progress bar: Distance to next place
+		// if (entrydata.rank > 1 && (! event.reverseOrder)) {
+		// 	var ranks = event.getRanked()
+		// 	var bar = document.createElement("a")
+		// 	bar.classList.add("bar")
+		// 	bar.innerText = String(entrydata.rank) + getSuffix(entrydata.rank)
+		// 	var nextValue = ranks[entrydata.rank - 1].entry.score
+		// 	var thisValue = ranks[entrydata.rank].entry.score
+		// 	var prevValue = ranks[entrydata.rank + 1].entry.score
+		// 	if (prevValue == undefined) prevValue = 0
+		// 	// bar.innerText = `${prevValue} - ${thisValue} - ${nextValue}`
+		// 	bar.setAttribute("style", `--amount: ${(thisValue - prevValue) / (nextValue - prevValue)}; background: ${getColor(i - 1)};`);
+		// 	e.children[3].appendChild(bar)
+		// }
 		// Add the row to the table
 		expect("table tbody").appendChild(e)
 	}
