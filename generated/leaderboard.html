@@ -43,6 +43,16 @@
 .note-btn:not(:has( + :not(.note-visible)))::before {
 	content: "hide";
 }
+
+.large-btn {
+	display: inline-block;
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 1em;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+}
 		</style>
 	</head>
 	<body>
@@ -60,6 +70,9 @@
 			<button>Remove Leaderboard</button>
 		</p>
 		<p id="desc" class="physics"></p>
+		<p>
+			<a class="large-btn" id="submit_entry_btn">Submit Entry</a>
+		</p>
 		<table>
 			<tr>
 				<th>Rank</th>

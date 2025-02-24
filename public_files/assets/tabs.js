@@ -1,12 +1,12 @@
 var tabs_default = [
-	`<a class="tab" href="/login.html${location.search}" id="login-tab"><b>Login</b></a>`,
-	`<a class="tab" href="/leaderboards/list.html${location.search}">Leaderboard List</a>`,
-	`<a class="tab" href="/badges/list.html${location.search}">Badges</a>`,
-	`<a class="tab" href="/special/badges${location.search}">Badge Leaderboard</a>`,
-	`<a class="tab" href="/special/meta${location.search}">Meta</a>`,
-	// `<a class="tab" href="/special/activity${location.search}">Activity Leaderboard</a>`,
-	`<a class="tab" href="/forms/list.html${location.search}">Forms</a>`,
-	`<a class="tab" href="/entrysubmit/entrysubmit.html${location.search}">Submit entries</a>`
+	`<a class="tab" href="/login.html${query.has("user") ? "?user="+query.get("user", "") : ""}" id="login-tab"><b>Login</b></a>`,
+	`<a class="tab" href="/leaderboards/list.html${query.has("user") ? "?user="+query.get("user", "") : ""}">Game List</a>`,
+	`<a class="tab" href="/badges/list.html${query.has("user") ? "?user="+query.get("user", "") : ""}">Badges</a>`,
+	`<a class="tab" href="/special/badges${query.has("user") ? "?user="+query.get("user", "") : ""}">Badge Leaderboard</a>`,
+	`<a class="tab" href="/special/meta${query.has("user") ? "?user="+query.get("user", "") : ""}">Meta</a>`,
+	// `<a class="tab" href="/special/activity${query.has("user") ? "?user="+query.get("user", "") : ""}">Activity Leaderboard</a>`,
+	`<a class="tab" href="/forms/list.html${query.has("user") ? "?user="+query.get("user", "") : ""}">Forms</a>`,
+	`<a class="tab" href="/entrysubmit/entrysubmit.html${query.has("user") ? "?user="+query.get("user", "") : ""}">Submit entries</a>`
 ];
 const sgtabs = (() => {
 	var container = document.createElement("div")
@@ -28,8 +28,8 @@ const sgtabs = (() => {
 				addTab(`<a href="/${location.search}"><img src="/assets/logo.png"></a>`)
 			}
 			var elm = addTab(tabs_default[i])
-			var currentTabCheck = tabs_default[i].match(/href="([\/a-z_\.]+)(\?[a-zA-Z=0-9]*)?"/)
-			console.log(currentTabCheck, location.pathname)
+			var currentTabCheck = tabs_default[i].match(/href="([\/a-z_\.]+)(\?[&a-zA-Z=0-9%]*)?"/)
+			// console.log(currentTabCheck, location.pathname)
 			if (currentTabCheck && currentTabCheck[1] == location.pathname) {
 				elm.removeAttribute("href")
 				elm.classList.add("selected")

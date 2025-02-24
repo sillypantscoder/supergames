@@ -1,6 +1,8 @@
 /** @type {string} */
 var leaderboardName = expect("script[data-leaderboard]").dataset.leaderboard ?? "[Invalid]"
 
+expect("#submit_entry_btn").setAttribute("href", '/entrysubmit/entrysubmit.html?user='+query.get('user', '')+'&leaderboard=' + encodeURIComponent(leaderboardName))
+
 sgtabs.extra(2, `Leaderboard for ${leaderboardName}`);
 getData().then((info) => { try {
 	sgtabs.userfix(info);

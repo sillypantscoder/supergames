@@ -17,12 +17,33 @@ getData().then((info) => {
 		}
 	})
 	x.send()
-	for (var i = 0; i < info.leaderboards.length; i++) {
+	// Leaderboard List
+	var sorted = [...info.leaderboards]
+	sorted.sort((a, b) => a.game.localeCompare(b.game))
+	/** @type {Object<string, HTMLOptGroupElement>} */
+	var game_groups = {}
+	for (var leaderboard of sorted) {
+		var game = leaderboard.game
+		// Get opt group
+		var group = document.createElement("optgroup")
+		if (Object.keys(game_groups).includes(game)) {
+			group = game_groups[game]
+		} else {
+			group.setAttribute("label", game)
+			expect(".events").appendChild(group)
+			game_groups[game] = group
+		}
+		// Create option element
 		var e = document.createElement("option")
-		e.innerText = info.leaderboards[i].name
-		e.setAttribute("value", info.leaderboards[i].name)
-		expect(".events").appendChild(e)
+		e.innerText = leaderboard.name
+		e.setAttribute("value", leaderboard.name)
+		group.appendChild(e)
+		// Select this option, if on a direct link
+		if (leaderboard.name == decodeURIComponent(query.get("leaderboard", ""))) {
+			e.setAttribute("selected", "true")
+		}
 	}
+	// User List
 	for (var i = 0; i < info.users.length; i++) {
 		var e = document.createElement("option")
 		e.innerText = info.users[i].name

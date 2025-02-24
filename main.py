@@ -207,7 +207,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("leaderboard.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+			"content": read_file("generated/leaderboard.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/games/"):
 		name = path[7:]
@@ -216,7 +216,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("game.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+			"content": read_file("generated/game.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/badges/"):
 		name = path.split("/")[2]
@@ -226,7 +226,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("badge.html")
+			"content": read_file("generated/badge.html")
 				.replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 				.replace(b"{{RANK}}", rank.encode("UTF-8"))
 				.replace(b"{{SRANK}}", ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][int(rank)].encode("UTF-8"))
@@ -241,14 +241,14 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+				"content": read_file("generated/profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 			}
 		return {
 			"status": 200,
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
+			"content": read_file("generated/profile.html").replace(b"{{NAME}}", name.replace("%20", " ").encode("UTF-8"))
 		}
 	elif path.startswith("/forms/"):
 		formid = path.split("/")[2]
@@ -260,7 +260,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"headers": {
 					"Content-Type": "text/html"
 				},
-				"content": read_file("form.html").replace(b"{{NAME}}", name.encode("UTF-8")).replace(b"{{FORMID}}", formid.encode("UTF-8"))
+				"content": read_file("generated/form.html").replace(b"{{NAME}}", name.encode("UTF-8")).replace(b"{{FORMID}}", formid.encode("UTF-8"))
 			}
 		return {
 			"status": 404,
@@ -360,7 +360,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": read_file("special.html")
+			"content": read_file("generated/special.html")
 		}
 	elif path.startswith("/graph/"):
 		event = unquote(path.split("/")[2])

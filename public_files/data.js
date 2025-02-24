@@ -15,6 +15,11 @@ const query = (() => {
 		get: (key, defaultValue) => {
 			if (Object.keys(q).includes(key)) return q[key]
 			else return defaultValue
+		},
+		/** @type {(key: string) => boolean} */
+		has: (key) => {
+			if (Object.keys(q).includes(key)) return true
+			else return false
 		}
 	}
 })();
