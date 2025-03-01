@@ -167,7 +167,7 @@ getData().then((info) => {
 			x.addEventListener("loadend", () => {
 				location.replace("/profile/" + newName + location.search)
 			})
-			x.send(location.search.substring(1) + "\n" + oldName + "\n" + newName)
+			x.send(query.get("user", "ERROR (user is not signed in --profile.js)") + "\n" + oldName + "\n" + newName)
 		})
 	}
 })

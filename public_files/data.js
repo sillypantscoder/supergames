@@ -332,6 +332,8 @@ class Leaderboard {
 		var collected = Object.values(scores).reduce((a, b) => [...a, ...b], [])
 		// Order the entries appropriately
 		collected.sort((a, b) => {
+			return b.entry.date.getTime() - a.entry.date.getTime()
+		}).sort((a, b) => {
 			/**
 			 * @param {{ entry: Entry }} x
 			 * @return {number}
@@ -508,6 +510,8 @@ function parseData(info) {
 			if (user == undefined) throw new Error("Entry in event " + eventname + " refers to unknown user: " + v.toString())
 			var entry = new Entry(user, v[1], new Date(v[2]), v[3])
 			return entry
+		}).sort((a, b) => {
+			return a.date.getTime() - b.date.getTime()
 		})
 		var leaderboard = new Leaderboard(eventname, eventData.game, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
 			description: eventData.badge_desc,

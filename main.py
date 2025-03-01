@@ -7,6 +7,7 @@ import subprocess
 from urllib.parse import unquote
 import random
 import typing
+import sys
 
 hostName = "0.0.0.0"
 serverPort = 12344
@@ -28,7 +29,7 @@ def log(importance: str, msg: str):
 	f.write(" - ")
 	f.write(importance.center(5))
 	f.write(" - ")
-	f.write(msg.replace("\t", "\t\t\t\t\t\t\t\t\t\t"))
+	f.write(msg.replace("\n\t", "\n\t\t\t\t\t\t\t\t\t\t"))
 	f.write("\n")
 	f.close()
 
@@ -174,22 +175,24 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": json.dumps(ou).encode("UTF-8")
 		}
 	elif os.path.isfile("public_files" + path):
+		returnheaders = {
+			"Content-Type": {
+				"html": "text/html",
+				"json": "application/json",
+				"css": "text/css",
+				"ico": "image/x-icon",
+				"otf": "application/x-font-opentype",
+				"jpeg": "image/jpeg",
+				"png": "image/png",
+				"js": "application/javascript",
+				"txt": "text/plain",
+				"xml": "image/svg+xml"
+			}[path.split(".")[-1]]
+		}
+		if path == "/data.json": returnheaders["Access-Control-Allow-Origin"] = headers.get("Origin", "null")
 		return {
 			"status": 200,
-			"headers": {
-				"Content-Type": {
-					"html": "text/html",
-					"json": "application/json",
-					"css": "text/css",
-					"ico": "image/x-icon",
-					"otf": "application/x-font-opentype",
-					"jpeg": "image/jpeg",
-					"png": "image/png",
-					"js": "application/javascript",
-					"txt": "text/plain",
-					"xml": "image/svg+xml"
-				}[path.split(".")[-1]]
-			},
+			"headers": returnheaders,
 			"content": read_file("public_files" + path)
 		}
 	elif path == "/":
@@ -199,6 +202,22 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"Content-Type": "text/html"
 			},
 			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>".encode("UTF-8")
+		}
+	elif path == "/data.csv":
+		csv = ["Leaderboard Name,Is Reversed,Username@Score..."]
+		data: dict[str, typing.Any] = json.loads(read_file("public_files/data.json"))
+		for name in data.keys():
+			l = f"{name},{data[name]['reverseOrder']}"
+			for entry in data[name]["entries"]:
+				l += f",{entry[0]}@{entry[1]}"
+			csv.append(l)
+		return {
+			"status": 200,
+			"headers": {
+				"Content-Type": "text/csv",
+				"Access-Control-Allow-Origin": headers.get("Origin", "null")
+			},
+			"content": "\n".join(csv).encode("UTF-8")
 		}
 	elif path.startswith("/leaderboards/"):
 		name = path[14:]
@@ -388,7 +407,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "image/png"
 			},
-			"content": read_file("public_files/assetes/apple-touch-icon.png")
+			"content": read_file("public_files/assets/apple-touch-icon.png")
 		}
 	else: # 404 page
 		log("", "404 encountered: " + path + "\n\t(Referrer: " + headers.get("Referer") + ")")
@@ -565,6 +584,7 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 		# Check permissions
 		user = getUserFromID(bodydata[0])
 		if user == None or user["admin"] == False:
+			log("SECUR", f"Failed to change the name of a user.\n\tUser Data: {repr(user)}\n\tBody Data: {repr(bodydata)}")
 			return {
 				"status": 404,
 				"headers": {},
@@ -740,8 +760,24 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 
 class MyServer(BaseHTTPRequestHandler):
 	def do_GET(self):
-		splitpath = self.path.split("?")
-		res = get(splitpath[0], URLQuery(''.join(splitpath[1:])), SafeDict.from_list(self.headers.items()))
+		try:
+			splitpath = self.path.split("?")
+			res = get(splitpath[0], URLQuery(''.join(splitpath[1:])), SafeDict.from_list(self.headers.items()))
+		except Exception as e:
+			tb = sys.exc_info()[2]
+			if tb != None: tb = tb.tb_next
+			frames: list[str] = []
+			while tb != None:
+				frames.append(str(tb.tb_frame))
+				tb = tb.tb_next
+			frames = [x[26:-1] for x in frames]
+			info = f"{e.__class__.__name__}: {str(e)}\n\t\t" + "\n\t\t".join(frames)
+			log("SERR!", f"[WARNING!] Server encountered error during handing of request:\n\tPath: {self.path}\n\tError details: {info}")
+			res: HTTPResponse = {
+				"status": 500,
+				"headers": {},
+				"content": b""
+			}
 		self.send_response(res["status"])
 		for h in res["headers"]:
 			self.send_header(h, res["headers"][h])
