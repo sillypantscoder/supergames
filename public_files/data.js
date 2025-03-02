@@ -29,12 +29,12 @@ const query = (() => {
  * @returns {T}
  */
 function _choice(items) { return items[Math.floor(Math.random()*items.length)]; }
-window.addEventListener("error", (e) => {
-	alert(`ERROR: ${e.message} @${e.filename}:${e.lineno}`)
+window.onerror = function(message, source, lineno, colno, error) {
+	alert('Error details:'+JSON.stringify({ message, source, lineno, colno, error }));
 	var x = new XMLHttpRequest()
 	x.open("POST", "/error")
-	x.send(`url: ${location.href}; message: ${e.message} @${e.filename}:${e.lineno}`)
-})
+	x.send(`url: ${location.href}; data: ${JSON.stringify({ message, source, lineno, colno, error })}`)
+};
 /**
  * @param {string} selector
  * @returns {HTMLElement}
@@ -318,7 +318,7 @@ class Leaderboard {
 		}
 		// Go through all the possible scores
 		var possibleScores = Object.keys(scores).map((v) => Number(v))
-		possibleScores.sort();
+		possibleScores.sort((a, b) => b - a);
 		var cumRank = 1 // (Keep track of the rank)
 		for (var score of possibleScores) {
 			var entriesWithThisScore = scores[score]
@@ -331,14 +331,15 @@ class Leaderboard {
 		// Collect all the entries now that we've set their `rank` and `tied` parameters
 		var collected = Object.values(scores).reduce((a, b) => [...a, ...b], [])
 		// Order the entries appropriately
+		var reverse = this.reverseOrder
 		collected.sort((a, b) => {
-			return b.entry.date.getTime() - a.entry.date.getTime()
+			return a.entry.date.getTime() - b.entry.date.getTime()
 		}).sort((a, b) => {
 			/**
 			 * @param {{ entry: Entry }} x
 			 * @return {number}
 			 */
-			function g(x) { return x.entry.score }
+			function g(x) { return x.entry.score * (reverse ? -1 : 1) }
 			if (g(a) < g(b)) {
 				return -1;
 			}

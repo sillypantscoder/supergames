@@ -12,16 +12,22 @@ import json
 # 	print(patterns)
 # getColors()
 
+colors = [
+	# F00
+	"F00", "0F0", "00F",
+	"0FF", "F0F", "FF0",
+	# 800
+	"800", "080", "008",
+	# 880
+	"088", "808", "880",
+	# 8F0
+	"8F0", "F80", "F08"
+	"80F", "08F", "0F8",
+	# F88
+	"F88", "8F8", "88F"
+]
+
 def generateBarChart(data: dict[str, int]):
-	colors = [
-		"F00", "0F0", "00F",
-		"0FF", "F0F", "FF0",
-		"000", "888",
-		"800", "080", "008",
-		"088", "808", "880",
-		"8F0", "F80", "F08"
-		"80F", "08F", "0F8"
-	]
 	usernames = [*data.keys()]
 	usernames.sort(key=lambda x: -data[x])
 	colwidth = (len(usernames) + 1) * 10
@@ -38,15 +44,6 @@ def generateBarChart(data: dict[str, int]):
 	return r
 
 def generateBar2Chart(data: dict[str, int]):
-	colors = [
-		"F00", "0F0", "00F",
-		"0FF", "F0F", "FF0",
-	#	"000", "888", "FFF",
-		"800", "080", "008",
-		"088", "808", "880",
-		"8F0", "F80", "F08"
-		"80F", "08F", "0F8"
-	]
 	usernames = [*data.keys()]
 	usernames.sort(key=lambda x: -data[x])
 	img_size = len(usernames) * 20
@@ -75,15 +72,6 @@ def movePoint(X: float, Y: float, angle: float, distance: float) -> tuple[float,
 	return Xfinal, Yfinal
 
 def generatePieChart(data: dict[str, int]):
-	colors = [
-		"F00", "0F0", "00F",
-		"0FF", "F0F", "FF0",
-	#	"000", "888", "FFF",
-		"800", "080", "008",
-		"088", "808", "880",
-		"8F0", "F80", "F08"
-		"80F", "08F", "0F8"
-	]
 	usernames = [*data.keys()]
 	usernames.sort(key=lambda x: -data[x])
 	img_size = 100
@@ -111,15 +99,6 @@ def generatePieChart(data: dict[str, int]):
 	return r
 
 def generateStackedColumnChart(data: dict[str, int]):
-	colors = [
-		"F00", "0F0", "00F",
-		"0FF", "F0F", "FF0",
-	#	"000", "888", "FFF",
-		"800", "080", "008",
-		"088", "808", "880",
-		"8F0", "F80", "F08"
-		"80F", "08F", "0F8"
-	]
 	usernames = [*data.keys()]
 	usernames.sort(key=lambda x: -data[x])
 	img_size = 100
