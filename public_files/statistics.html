@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
+		<link rel="stylesheet" type="text/css" href="/assets/table.css" />
+		<style>
+body {
+	min-height: 50vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+img {
+	max-width: 15vw;
+	margin: 2em;
+	margin-top: 4em;
+}
+.buttons {
+	display: flex;
+	width: 100%;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+.buttons a {
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 1em;
+	color: black;
+	text-decoration: none;
+	background: #03fccf;
+}
+
+h4 {
+	margin-top: 0;
+}
+.card {
+	background: #03fccf;
+	width: 75vw;
+	border-radius: 1em;
+	margin: 1em;
+	padding: 1em;
+	border: 1px solid black;
+	/* text-align: center; */
+	font-family: sans-serif;
+}
+		</style>
+	</head>
+	<body>
+		<img src="/assets/logo.png">
+		<div class="buttons">
+			<a href="/home.html">Back Home</a>
+		</div>
+		<h1>Statistics</h1>
+		<div class="card">
+			<h2>Number of Leaderboards for Each Game</h2>
+			<table>
+				<tbody id="games">
+					<tr>
+						<th rowspan="2">Game</th>
+						<th rowspan="2">Total<br>Leaderboards</th>
+						<th colspan="2">Has Badges</th>
+						<th colspan="2">Mode</th>
+						<th colspan="2">With<br>Entries</th>
+					</tr>
+					<tr>
+						<th>Yes</th>
+						<th>No</th>
+						<th>Score</th>
+						<th>Time</th>
+						<th>1+</th>
+						<th>3+</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="card">
+			<h2>Number of Entries for Each Leaderboard</h2>
+			<table>
+				<tbody id="leaderboards">
+					<tr>
+						<th rowspan="2">Leaderboard</th>
+						<th colspan="9">Number of Entries</th>
+					</tr>
+					<tr>
+						<th>All</th>
+						<th>At least<br>Novice</th>
+						<th>At least<br>Vassal</th>
+						<th>At least<br>Apprentice</th>
+						<th>At least<br>Prospect</th>
+						<th>At least<br>Artisan</th>
+						<th>At least<br>Expert</th>
+						<th>At least<br>Master</th>
+						<th>At least<br>Ultimate Master</th>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<script src="/data.js"></script>
+		<script src="/assets/background.js"></script>
+		<script>
+(() => {
+	var elms = document.querySelectorAll(".buttons > a")
+	for (var i = 0; i < elms.length; i++) {
+		elms[i].href += location.search
+	}
+})();
+		</script>
+		<script src="statistics.js"></script>
+	</body>
+</html>
