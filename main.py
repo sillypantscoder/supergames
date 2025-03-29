@@ -5,7 +5,6 @@ import datetime
 import traceback
 import subprocess
 from urllib.parse import unquote
-import random
 import typing
 import sys
 
@@ -197,11 +196,11 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 		}
 	elif path == "/":
 		return {
-			"status": 200,
+			"status": 301,
 			"headers": {
-				"Content-Type": "text/html"
+				"Location": "/home.html?" + query.orig
 			},
-			"content": f"<!DOCTYPE html><html><head><script>//{random.random()}</script></head><body><script>location.replace('/home.html'+location.search);</script></body></html>".encode("UTF-8")
+			"content": b""
 		}
 	elif path == "/data.csv":
 		csv = ["Leaderboard Name,Is Reversed,Username@Score..."]
@@ -495,6 +494,15 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 			}
 		# get data
 		bodydata = body.decode("UTF-8").split("\n")
+		# find if there is a duplicate user name
+		users = [u["name"] for u in json.loads(read_file("users.json").decode("UTF-8"))]
+		if bodydata[0] in users:
+			log("APPLC", "cannot accept application for " + bodydata[0] + " because the user already exists")
+			return {
+				"status": 404,
+				"headers": {},
+				"content": b"Cannot create a user with a duplicate name"
+			}
 		# Update user list
 		c = read_file("users.json").decode("UTF-8")
 		now = datetime.datetime.now()
@@ -523,9 +531,10 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 		}
 	elif path.startswith("/rejectprofile/"):
 		# Authenticate
-		auth = path.split("/")[2]
+		auth = query.get("user")
 		user = getUserFromID(auth)
 		if user == None or user["admin"] == False:
+			log("APPLC", f"can't reject a user {repr(body.decode('UTF-8'))} because admin permissions are required (login data: {auth})")
 			return {
 				"status": 404,
 				"headers": {},
