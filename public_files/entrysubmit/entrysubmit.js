@@ -19,6 +19,7 @@ getData().then((info) => {
 	x.send()
 	// Leaderboard List
 	var sorted = [...info.leaderboards]
+	sorted.sort((a, b) => a.name.localeCompare(b.name))
 	sorted.sort((a, b) => a.game.localeCompare(b.game))
 	/** @type {Object<string, HTMLOptGroupElement>} */
 	var game_groups = {}
