@@ -319,6 +319,7 @@ class Leaderboard {
 		// Go through all the possible scores
 		var possibleScores = Object.keys(scores).map((v) => Number(v))
 		possibleScores.sort((a, b) => b - a);
+		if (this.reverseOrder) possibleScores.reverse()
 		var cumRank = 1 // (Keep track of the rank)
 		for (var score of possibleScores) {
 			var entriesWithThisScore = scores[score]
@@ -349,7 +350,7 @@ class Leaderboard {
 			// a must be equal to b
 			return 0;
 		})
-		if (!this.reverseOrder) collected.reverse()
+		collected.reverse()
 		// Finish
 		return collected
 	}

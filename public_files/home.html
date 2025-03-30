@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="/assets/theme.css" />
+		<script src="/data.js"></script>
+		<script src="/cookies.js"></script>
 		<style>
 body {
 	min-height: 50vh;
@@ -100,7 +102,7 @@ h2 {
 	var elms = document.querySelectorAll(".buttons > a")
 	for (var i = 0; i < elms.length; i++) {
 		if (i == 0) {
-			if (location.search != "") {
+			if (cookies.user) {
 				elms[i].innerText = "My Profile";
 				((i) => {
 					var x = new XMLHttpRequest()

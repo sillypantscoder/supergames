@@ -142,6 +142,15 @@ class SafeDict:
 		for i in fields:
 			f[i[0]] = i[1]
 		return SafeDict(f)
+	@staticmethod
+	def from_cookies(cookies: str):
+		f: dict[str, str] = {}
+		if len(cookies.strip()) != 0:
+			for cookie in cookies.split(";"):
+				key, value = cookie.split("=", 1)
+				key, value = key.strip(), value.strip()
+				f[key] = value
+		return SafeDict(f)
 
 class URLQuery(SafeDict):
 	def __init__(self, q: str):
@@ -158,9 +167,9 @@ class HTTPResponse(typing.TypedDict):
 	headers: dict[str, str]
 	content: bytes
 
-def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
+def get(path: str, query: URLQuery, headers: SafeDict, cookies: SafeDict) -> HTTPResponse:
 	log_existence_check()
-	user = getUserFromID(query.get("user"))
+	user = getUserFromID(cookies.get("user"))
 	if path == "/users.json":
 		ou = json.loads(read_file("users.json"))
 		for n in ou:
@@ -198,7 +207,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 		return {
 			"status": 301,
 			"headers": {
-				"Location": "/home.html?" + query.orig
+				"Location": "/home.html"
 			},
 			"content": b""
 		}
@@ -318,7 +327,7 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"headers": {
 				"Content-Type": "text/html"
 			},
-			"content": f"<script>location.replace('/?user={userid}')</script>".encode("UTF-8")
+			"content": f"<script src='/cookies.js'></script><script>cookiesAllowed = true; cookies.user = '{userid}'; location.replace('/home.html')</script>".encode("UTF-8")
 		}
 	elif path == "/user_id_create/sudo":
 		newname = unquote(query.get("newUser"))
@@ -341,8 +350,6 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 			"content": f"[Invalid admin credentials.]".encode("UTF-8")
 		}
 	elif path == "/applications.txt":
-		u = query.get("user")
-		user = getUserFromID(u)
 		if user and user["admin"]:
 			ou = read_file("applications.txt")
 			return {
@@ -359,8 +366,6 @@ def get(path: str, query: URLQuery, headers: SafeDict) -> HTTPResponse:
 				"content": b"You must be an admin to access the applications list"
 			}
 	elif path == "/forms.json":
-		u = query.get("user")
-		user = getUserFromID(u)
 		ou = json.loads(read_file("forms.json"))
 		if not (user and user["admin"]):
 			for form in ou:
@@ -636,7 +641,15 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 	elif path == "/submit_form":
 		bodydata = json.loads(body.decode("UTF-8"))
 		forms = json.loads(read_file("forms.json"))
-		name = getUserFromID(bodydata["user"])["name"] # type: ignore
+		userData = getUserFromID(bodydata["user"])
+		if userData == None:
+			log("FORMS", f"can't submit a form because the user is not logged in (login data: {repr(bodydata)})")
+			return {
+				"status": 404,
+				"headers": {},
+				"content": b"The user is not correct (need to have admin permissions)"
+			}
+		name = userData["name"]
 		forms[bodydata["id"]]["responses"].append({
 			"user": name,
 			"results": bodydata["results"]
@@ -771,7 +784,7 @@ class MyServer(BaseHTTPRequestHandler):
 	def do_GET(self):
 		try:
 			splitpath = self.path.split("?")
-			res = get(splitpath[0], URLQuery(''.join(splitpath[1:])), SafeDict.from_list(self.headers.items()))
+			res = get(splitpath[0], URLQuery(''.join(splitpath[1:])), SafeDict.from_list(self.headers.items()), SafeDict.from_cookies(self.headers["Cookie"] if self.headers["Cookie"] != None else ''))
 		except Exception as e:
 			tb = sys.exc_info()[2]
 			if tb != None: tb = tb.tb_next
