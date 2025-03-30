@@ -680,7 +680,7 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 		bodydata = body.decode("UTF-8").split("\n")
 		user = getUserFromID(bodydata[0])
 		if user == None or user["admin"] == False:
-			log(repr(user), bodydata[0])
+			log("EnErr", repr(user) + bodydata[0])
 			log("EnErr", "User tried to handle entry without sufficient permissions")
 			return {
 				"status": 404,

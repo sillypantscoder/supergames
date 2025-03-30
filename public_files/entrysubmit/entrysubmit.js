@@ -122,7 +122,7 @@ function fillResponse(response, responseIndex) {
 		x.addEventListener("loadend", (e) => {
 			location.reload()
 		})
-		x.send(query.get("user", "") + "\n0\n" + responseIndex)
+		x.send(cookies.user + "\n0\n" + responseIndex)
 	})
 	// Add Accept Button
 	var e = document.createElement("button")
@@ -134,7 +134,7 @@ function fillResponse(response, responseIndex) {
 		x.addEventListener("loadend", (e) => {
 			location.reload()
 		})
-		x.send(query.get("user", "") + "\n1\n" + responseIndex)
+		x.send(cookies.user + "\n1\n" + responseIndex)
 	});
 	// Add Cancel Button
 	[...document.querySelectorAll("#responses button")].forEach((e) => e.remove())
