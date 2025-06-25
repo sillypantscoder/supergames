@@ -25,7 +25,7 @@ getData().then((info) => {
  */
 function createprofile(username, email) {
 	var x = new XMLHttpRequest()
-	x.open("POST", "/createuser/?user=" + query.get("user", "error"))
+	x.open("POST", "/createuser/?user=" + cookies.user)
 	x.addEventListener("loadend", () => location.reload())
 	x.send(`${username}\n${email}`)
 }
@@ -35,7 +35,7 @@ function createprofile(username, email) {
  */
 function rejectprofile(username, email) {
 	var x = new XMLHttpRequest()
-	x.open("POST", "/rejectprofile/?user=" + query.get("user", "error"))
+	x.open("POST", "/rejectprofile/?user=" + cookies.user)
 	x.addEventListener("loadend", () => location.reload())
 	x.send(`${username}\n${email}`)
 }

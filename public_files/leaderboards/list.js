@@ -3,10 +3,13 @@ sgtabs();
 getData().then((info) => {
 	sgtabs.userfix(info);
 	// Display buttons
+	var leaderboards = info.leaderboards.sort((a, b) => {
+		return a.game.localeCompare(b.game)
+	})
 	/** @type {string[]} */
 	var games = []
-	for (var i = 0; i < info.leaderboards.length; i++) {
-		var game = info.leaderboards[i].game
+	for (var i = 0; i < leaderboards.length; i++) {
+		var game = leaderboards[i].game
 		if (! games.includes(game)) {
 			games.push(game)
 		}

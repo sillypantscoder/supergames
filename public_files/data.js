@@ -148,6 +148,11 @@ function describe(key, obj) {
 	return e
 }
 /**
+ * @param {number} n
+ * @param {number} precision Number representing the maximum precision to keep (e.g. 1000)
+ */
+function round(n, precision) { return Math.round(n * precision) / precision }
+/**
  * @param {number} i
  */
 function scrollToEntry(i) {
@@ -275,16 +280,18 @@ class Leaderboard {
 	 * @param {string} name
 	 * @param {string} game
 	 * @param {string} description
-	 * @param {{ values: number[], description: string } | null} badges
+	 * @param {number[]} badgeValues
+	 * @param {string} badgeDescription
 	 * @param {Entry[]} entries
 	 * @param {boolean} reverseOrder
 	 * @param {boolean} isTime
 	 */
-	constructor(name, game, description, badges, entries, reverseOrder, isTime) {
+	constructor(name, game, description, badgeValues, badgeDescription, entries, reverseOrder, isTime) {
 		this.name = name
 		this.game = game ?? "undefined"
 		this.description = description
-		this.badges = badges
+		this.badgeValues = badgeValues
+		this.badgeDescription = badgeDescription
 		this.entries = entries
 		this.reverseOrder = reverseOrder
 		this.isTime = isTime
@@ -358,21 +365,20 @@ class Leaderboard {
 	 * @param {number} score
 	 */
 	getNumberOfBadges(score) {
-		if (this.badges == null) throw new Error("There are no badges on a specialty leaderboard")
 		if (!this.reverseOrder) {
 			// Highest score is best. Return 0 if the score is less than the lowest badge.
-			if (score < this.badges.values[0]) return 0
+			if (score < this.badgeValues[0]) return 0
 			// For each badge from left to right (lowest to highest), stop once we find a higher badge.
-			for (var i = 0; i < this.badges.values.length; i++) {
-				if (this.badges.values[i] > score) return i
+			for (var i = 0; i < this.badgeValues.length; i++) {
+				if (this.badgeValues[i] > score) return i
 			}
-			return this.badges.values.length
+			return this.badgeValues.length
 		} else {
 			// Lowest score is best. Return 0 if the score is higher than the highest badge.
-			if (score > this.badges.values[0]) return 0
+			if (score > this.badgeValues[0]) return 0
 			// For each badge from right to left (lowest to highest), stop once we find a lower badge.
-			for (var i = this.badges.values.length - 1; i >= 0; i--) {
-				if (this.badges.values[i] >= score) return i + 1
+			for (var i = this.badgeValues.length - 1; i >= 0; i--) {
+				if (this.badgeValues[i] >= score) return i + 1
 			}
 			return 0
 		}
@@ -464,7 +470,6 @@ class SGData {
 		var total = []
 		for (var i = 0; i < this.leaderboards.length; i++) {
 			var leaderboard = this.leaderboards[i]
-			if (leaderboard.badges == null) continue
 			var entry = leaderboard.getEntryForUser(user)
 			if (entry == undefined) continue
 			var badges = leaderboard.getNumberOfBadgesInEachCategory(entry.score)
@@ -488,6 +493,26 @@ async function getData() {
 		profile: results["/usercheck" + location.search]
 	}
 	return parseData(info)
+}
+/**
+ * @param {Entry[]} entries
+ * @param {boolean} reverseOrder
+ * @returns {number[]}
+ */
+function inferBadgeValuesFromEntries(entries, reverseOrder) {
+	var highest = Math.max(...entries.map((v) => v.score));
+	var lowest = Math.min(...entries.map((v) => v.score));
+	var diff = highest - lowest;
+	return [
+		lowest,
+		round(highest - (diff * 0.86), 1000),
+		round(highest - (diff * 0.7), 1000),
+		round(highest - (diff * 0.56), 1000),
+		round(highest - (diff * 0.42), 1000),
+		round(highest - (diff * 0.28), 1000),
+		round(highest - (diff * 0.14), 1000),
+		round(highest - (diff * 0.02), 1000)
+	]
 }
 /**
  * @param {{ data: string; users: string; profile: string; }} info
@@ -515,10 +540,12 @@ function parseData(info) {
 		}).sort((a, b) => {
 			return a.date.getTime() - b.date.getTime()
 		})
-		var leaderboard = new Leaderboard(eventname, eventData.game, eventData.leaderboard_desc, eventData.badges.length == 0 ? null : {
-			description: eventData.badge_desc,
-			values: eventData.badges
-		}, entries, eventData.reverseOrder, eventData.isTime)
+		/** @type {number[]} */
+		var badge_values = eventData.badges
+		if (badge_values.length == 0) {
+			badge_values = inferBadgeValuesFromEntries(entries, eventData.reverseOrder)
+		}
+		var leaderboard = new Leaderboard(eventname, eventData.game, eventData.leaderboard_desc, badge_values, eventData.badge_desc, entries, eventData.reverseOrder, eventData.isTime)
 		leaderboards.push(leaderboard)
 	}
 	// Parse profile

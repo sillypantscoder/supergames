@@ -200,7 +200,7 @@ class ActivityLeaderboard extends SpecialLeaderboard {
 			var score = leaderboard.getEntryForUser(user)?.score
 			if (score == undefined) continue;
 			// find vassal amount
-			var vassal = leaderboard.badges?.values[1]
+			var vassal = leaderboard.badgeValues[1]
 			if (vassal == undefined) continue;
 			// add to total score
 			totalScore += Math.round(score / (vassal / 25))

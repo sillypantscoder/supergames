@@ -16,11 +16,11 @@ for line in d:
 	newData[line[0]] = {
 		"game": line[-1],
 		"badges": [float(x) for x in line[1:-5]] if line[1] != '' else [],
-		"badge_desc": line[-6],
-		"leaderboard_desc": line[-5],
+		"badge_desc": line[-5],
+		"leaderboard_desc": line[-4],
 		"entries": [],
-		"isTime": line[-3] == "Time",
-		"reverseOrder": line[-4] == "Lowest"
+		"isTime": line[-2] == "Time",
+		"reverseOrder": line[-3] == "Lowest"
 	}
 
 not_tsv_deleted: list[str] = []
@@ -39,7 +39,7 @@ for name in data:
 			not_tsv_notdeleted.append(name)
 		else:
 			print("Leaderboard was deleted")
-			not_tsv_deleted.append(name)
+			not_tsv_deleted.append(name + " --- " + json.dumps(data[name]))
 	else:
 		newData[name]["entries"] = data[name]["entries"]
 		newentries.remove(name)

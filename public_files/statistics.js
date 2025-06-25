@@ -57,8 +57,6 @@ function addGamesRows(info) {
 	/** @type {((category: string, v: Leaderboard) => boolean)[]} */
 	var filters = [
 		(c, v) => true,
-		(c, v) => v.badges != null,
-		(c, v) => v.badges == null,
 		(c, v) => v.isTime,
 		(c, v) => !v.isTime,
 		(c, v) => v.entries.length >= 1,
@@ -82,14 +80,14 @@ function addLeaderboardsRows(info) {
 	/** @type {((category: string, v: Entry) => boolean | null)[]} */
 	var filters = [
 		(c, v) => true,
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[0])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[1])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[2])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[3])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[4])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[5])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[6])(info.getLeaderboard(c).badges),
-		(c, v) => c == "All Leaderboards" ? null : ((badges) => badges == null ? null : v.score > badges.values[7])(info.getLeaderboard(c).badges)
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[0])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[1])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[2])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[3])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[4])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[5])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[6])(info.getLeaderboard(c).badgeValues),
+		(c, v) => c == "All Leaderboards" ? null : ((badges) => v.score > badges[7])(info.getLeaderboard(c).badgeValues)
 	]
 	// - Add Rows
 	addRows(body, collected, filters, "All Leaderboards", info.leaderboards)

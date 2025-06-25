@@ -488,17 +488,18 @@ def post(path: str, query: URLQuery, body: bytes) -> HTTPResponse:
 			"content": b"Application was created"
 		}
 	elif path.startswith("/createuser/"):
+		# get data
+		bodydata = body.decode("UTF-8").split("\n")
 		# Authenticate
 		auth = query.get("user")
 		user = getUserFromID(auth)
 		if user == None or user["admin"] == False:
+			log("APPLC", "cannot accept application for " + bodydata[0] + " because the user does not have admin permissions. Auth data: " + auth + " User data: " + str(user))
 			return {
 				"status": 404,
 				"headers": {},
 				"content": b"The user is not correct (need to have admin permissions)"
 			}
-		# get data
-		bodydata = body.decode("UTF-8").split("\n")
 		# find if there is a duplicate user name
 		users = [u["name"] for u in json.loads(read_file("users.json").decode("UTF-8"))]
 		if bodydata[0] in users:

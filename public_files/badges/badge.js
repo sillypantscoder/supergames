@@ -11,9 +11,8 @@ getData().then((info) => {
 	sgtabs.userfix(info);
 	// get badge info
 	var leaderboard = info.getLeaderboard(leaderboardName)
-	if (leaderboard.badges == null) throw new Error("This is a specialty leaderboard, it does not have badges")
-	var badge_value = leaderboard.badges.values[rank]
-	var badge_desc = leaderboard.badges.description
+	var badge_value = leaderboard.badgeValues[rank]
+	var badge_desc = leaderboard.badgeDescription
 	expect("#badge_desc").innerText = `${badge_desc.replaceAll("%s", leaderboard.isTime ? formatTime(badge_value) : addCommas(badge_value.toString()))}`
 	// owners
 	var owners = leaderboard.getUsersWithBadge(info.users, rank)

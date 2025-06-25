@@ -42,24 +42,20 @@ getData().then((info) => {
 			}
 		// 3rd column: Badges
 		e.appendChild(document.createElement("td"))
-			if (event.badges == null) {
-				e.children[2].innerHTML = "<i style='font-family: sans-serif; font-size: 0.7em;'>Specialty leaderboard</i>"
-			} else {
-				var badgeno = event.getNumberOfBadges(entry.score)
-				for (var i = 0; i < badgeno; i++) {
-					e.children[2].innerHTML += `<a href="/badges/${event.name}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
-				}
-				// Progress bar: Distance to next badge
-				if (badgeno < 8) {
-					var bar = document.createElement("a")
-					bar.setAttribute("href", `/badges/${event.name}/${badgeno}${location.search}`)
-					bar.classList.add("bar")
-					bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
-					var nextBadgeValue = event.badges.values[badgeno]
-					var prevBadgeValue = [0, ...event.badges.values][badgeno]
-					bar.setAttribute("style", `--amount: ${(entry.score - prevBadgeValue) / (nextBadgeValue - prevBadgeValue)};`);
-					e.children[2].appendChild(bar)
-				}
+			var badgeno = event.getNumberOfBadges(entry.score)
+			for (var i = 0; i < badgeno; i++) {
+				e.children[2].innerHTML += `<a href="/badges/${event.name}/${i}${location.search}"><div class="badge badge-${['bronze', 'bronze', 'bronze', 'silver', 'silver', 'gold', 'gold', 'platinum'][i]}">${'NVAPREMU'[i]}</div></a>`
+			}
+			// Progress bar: Distance to next badge
+			if (badgeno < 8) {
+				var bar = document.createElement("a")
+				bar.setAttribute("href", `/badges/${event.name}/${badgeno}${location.search}`)
+				bar.classList.add("bar")
+				bar.innerText = ["Novice", "Vassal", "Apprentice", "Prospect", "Artisan", "Expert", "Master", "Ultimate Master"][badgeno]
+				var nextBadgeValue = event.badgeValues[badgeno]
+				var prevBadgeValue = [0, ...event.badgeValues][badgeno]
+				bar.setAttribute("style", `--amount: ${(entry.score - prevBadgeValue) / (nextBadgeValue - prevBadgeValue)};`);
+				e.children[2].appendChild(bar)
 			}
 		// 4th column: Rank
 		e.appendChild(document.createElement("td"))
